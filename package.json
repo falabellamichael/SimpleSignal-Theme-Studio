@@ -1,0 +1,171 @@
+{
+  "name": "simplesignal-theme-studio",
+  "displayName": "SimpleSignal Theme Studio",
+  "description": "Visual Theme Designer & Customizer for VS Code. Live color pickers, syntax highlights, curated presets, mock preview & instant live apply.",
+  "version": "1.0.0",
+  "publisher": "falabella",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/falabellamichael/SimpleSignal-Theme-Studio.git"
+  },
+  "icon": "media/logo.png",
+  "categories": [
+    "Themes",
+    "Other"
+  ],
+  "keywords": [
+    "theme",
+    "theme customizer",
+    "color theme",
+    "syntax highlighter",
+    "tokyo night",
+    "cyberpunk",
+    "catppuccin",
+    "dracula",
+    "oled",
+    "live preview"
+  ],
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "simplesignal-theme-studio-sidebar",
+          "title": "Theme Studio",
+          "icon": "media/logo.svg"
+        }
+      ]
+    },
+    "views": {
+      "simplesignal-theme-studio-sidebar": [
+        {
+          "id": "simplesignalThemeStudioView",
+          "name": "Theme Studio",
+          "type": "tree"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "simpletheme.openStudio",
+        "title": "Open Visual Theme Studio",
+        "category": "Theme Studio",
+        "icon": "$(paintcan)"
+      },
+      {
+        "command": "simpletheme.applyPreset",
+        "title": "Load Theme Preset...",
+        "category": "Theme Studio",
+        "icon": "$(color-mode)"
+      },
+      {
+        "command": "simpletheme.saveCurrentProfile",
+        "title": "Save Current Theme as Profile...",
+        "category": "Theme Studio",
+        "icon": "$(save)"
+      },
+      {
+        "command": "simpletheme.quickTweakAccent",
+        "title": "Quick Tweak: Accent Color",
+        "category": "Theme Studio",
+        "icon": "$(symbol-color)"
+      },
+      {
+        "command": "simpletheme.quickTweakEditorBg",
+        "title": "Quick Tweak: Editor Background",
+        "category": "Theme Studio",
+        "icon": "$(window)"
+      },
+      {
+        "command": "simpletheme.quickTweakSidebarBg",
+        "title": "Quick Tweak: Sidebar Background",
+        "category": "Theme Studio",
+        "icon": "$(layout-sidebar-left)"
+      },
+      {
+        "command": "simpletheme.exportJson",
+        "title": "Export Customizations to Clipboard",
+        "category": "Theme Studio",
+        "icon": "$(copy)"
+      },
+      {
+        "command": "simpletheme.importJson",
+        "title": "Import Theme JSON...",
+        "category": "Theme Studio",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "simpletheme.exportVsix",
+        "title": "Package as Standalone Theme Extension (.vsix)...",
+        "category": "Theme Studio",
+        "icon": "$(package)"
+      },
+      {
+        "command": "simpletheme.resetTheme",
+        "title": "Reset Custom Theme to Default",
+        "category": "Theme Studio",
+        "icon": "$(clear-all)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "simpletheme.openStudio",
+          "when": "view == simplesignalThemeStudioView",
+          "group": "navigation@1"
+        },
+        {
+          "command": "simpletheme.applyPreset",
+          "when": "view == simplesignalThemeStudioView",
+          "group": "navigation@2"
+        },
+        {
+          "command": "simpletheme.resetTheme",
+          "when": "view == simplesignalThemeStudioView",
+          "group": "navigation@3"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "SimpleSignal Theme Studio",
+      "properties": {
+        "simpletheme.liveApply": {
+          "type": "boolean",
+          "default": true,
+          "description": "Apply color changes immediately in real-time as you drag color sliders or pick colors in Theme Studio."
+        },
+        "simpletheme.targetScope": {
+          "type": "string",
+          "enum": [
+            "global",
+            "workspace"
+          ],
+          "default": "global",
+          "description": "Whether theme customizations are applied globally across all VS Code windows or restricted to the active workspace."
+        },
+        "simpletheme.activeProfile": {
+          "type": "string",
+          "default": "Cyberpunk Neon",
+          "description": "Name of the currently active Theme Studio preset or custom profile."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.5.2"
+  }
+}

@@ -15,6 +15,8 @@ export class ThemeStudioWebview {
   private readonly _panel: vscode.WebviewPanel;
   private readonly _extensionUri: vscode.Uri;
   private _disposables: vscode.Disposable[] = [];
+  private _isApplyingInternalChange: boolean = false;
+  private _internalChangeTimer: NodeJS.Timeout | undefined;
 
   public static createOrShow(extensionUri: vscode.Uri) {
     const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
@@ -38,6 +40,16 @@ export class ThemeStudioWebview {
     ThemeStudioWebview.currentPanel = new ThemeStudioWebview(panel, extensionUri);
   }
 
+  private _markInternalChange() {
+    this._isApplyingInternalChange = true;
+    if (this._internalChangeTimer) {
+      clearTimeout(this._internalChangeTimer);
+    }
+    this._internalChangeTimer = setTimeout(() => {
+      this._isApplyingInternalChange = false;
+    }, 600);
+  }
+
   private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
     this._panel = panel;
     this._extensionUri = extensionUri;
@@ -55,9 +67,13 @@ export class ThemeStudioWebview {
       this._disposables
     );
 
-    // Live Setting Listener: When workbench.colorTheme, workbench.colorCustomizations, or tokenColorCustomizations change
+    // Live Setting Listener: Only sync when change was made externally (not by the Studio's active sliders)
     vscode.workspace.onDidChangeConfiguration(
       (e) => {
+        if (this._isApplyingInternalChange) {
+          return; // Skip echo feedback loop while user is picking colors in the studio
+        }
+
         if (
           e.affectsConfiguration('workbench.colorTheme') ||
           e.affectsConfiguration('workbench.colorCustomizations') ||
@@ -76,20 +92,24 @@ export class ThemeStudioWebview {
       async (message) => {
         switch (message.command) {
           case 'applyAll':
+            this._markInternalChange();
             await ThemeEngine.applyTheme(message.colors, message.tokenColors, message.profileName);
             vscode.window.showInformationMessage(`✨ Applied "${message.profileName || 'Custom'}" theme to VS Code!`);
             this._update();
             break;
 
           case 'applyLiveColor':
+            this._markInternalChange();
             await ThemeEngine.applySingleColor(message.key, message.value);
             break;
 
           case 'applyLiveTokenColor':
+            this._markInternalChange();
             await ThemeEngine.applySingleTokenColor(message.syntaxId, message.color);
             break;
 
           case 'applyPreset':
+            this._markInternalChange();
             const preset = THEME_PRESETS.find((p) => p.id === message.presetId);
             if (preset) {
               await ThemeEngine.applyPreset(preset);
@@ -2221,13 +2241,15 @@ export class ThemeStudioWebview {
             if (pDisplay) pDisplay.innerText = msg.themeName;
           }
 
+          const activeEl = document.activeElement;
+
           // Update Simple UI color pickers and hex inputs
           SIMPLE_UI_MAP.forEach(sDef => {
             const val = activeState.colors[sDef.targets[0]] || sDef.defaultColor;
             const pkr = document.querySelector('.simple-ui-picker[data-simple-id="' + sDef.id + '"]');
-            if (pkr && val && val.length === 7) pkr.value = val;
+            if (pkr && pkr !== activeEl && val && val.length === 7) pkr.value = val;
             const hex = document.querySelector('.simple-ui-hex[data-simple-id="' + sDef.id + '"]');
-            if (hex && val) hex.value = val;
+            if (hex && hex !== activeEl && val) hex.value = val;
           });
 
           // Update Simple Syntax color pickers and hex inputs
@@ -2240,9 +2262,9 @@ export class ThemeStudioWebview {
             });
             const val = rule?.settings?.foreground || sDef.defaultColor;
             const pkr = document.querySelector('.simple-syntax-picker[data-simple-syntax-id="' + sDef.id + '"]');
-            if (pkr && val && val.length === 7) pkr.value = val;
+            if (pkr && pkr !== activeEl && val && val.length === 7) pkr.value = val;
             const hex = document.querySelector('.simple-syntax-hex[data-simple-syntax-id="' + sDef.id + '"]');
-            if (hex && val) hex.value = val;
+            if (hex && hex !== activeEl && val) hex.value = val;
           });
 
           // Update Advanced UI pickers and hex inputs
@@ -2250,9 +2272,9 @@ export class ThemeStudioWebview {
           UI_DEFS.forEach(uDef => {
             const val = activeState.colors[uDef.id] || uDef.defaultValue;
             const pkr = document.querySelector('.adv-color-picker[data-target="' + uDef.id + '"]');
-            if (pkr && val && val.length === 7) pkr.value = val;
+            if (pkr && pkr !== activeEl && val && val.length === 7) pkr.value = val;
             const hex = document.querySelector('.adv-hex-input[data-target="' + uDef.id + '"]');
-            if (hex && val) hex.value = val;
+            if (hex && hex !== activeEl && val) hex.value = val;
           });
 
           // Update Advanced Syntax pickers and hex inputs
@@ -2263,9 +2285,9 @@ export class ThemeStudioWebview {
             });
             const val = rule?.settings?.foreground || sDef.defaultColor;
             const pkr = document.querySelector('.adv-syntax-picker[data-syntax-id="' + sDef.id + '"]');
-            if (pkr && val && val.length === 7) pkr.value = val;
+            if (pkr && pkr !== activeEl && val && val.length === 7) pkr.value = val;
             const hex = document.querySelector('.adv-syntax-hex[data-syntax-id="' + sDef.id + '"]');
-            if (hex && val) hex.value = val;
+            if (hex && hex !== activeEl && val) hex.value = val;
           });
         }
       });

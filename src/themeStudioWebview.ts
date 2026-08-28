@@ -161,6 +161,9 @@ export class ThemeStudioWebview {
       --text: #f0f0f8;
       --text-muted: #858599;
       --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --preview-width: 440px;
+      --preview-height: 480px;
+      --preview-scale: 1;
     }
 
     * {
@@ -228,6 +231,7 @@ export class ThemeStudioWebview {
     .toolbar {
       display: flex;
       gap: 10px;
+      align-items: center;
       flex-wrap: wrap;
     }
 
@@ -267,6 +271,20 @@ export class ThemeStudioWebview {
       box-shadow: 0 0 16px rgba(255, 255, 255, 0.6);
     }
 
+    .btn-dock {
+      background: rgba(0, 240, 255, 0.1);
+      border-color: rgba(0, 240, 255, 0.3);
+      color: #00f0ff;
+      font-weight: 700;
+    }
+
+    .btn-dock:hover {
+      background: rgba(0, 240, 255, 0.2);
+      border-color: #00f0ff;
+      color: #fff;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+    }
+
     .btn-danger {
       background: rgba(255, 0, 85, 0.12);
       border-color: rgba(255, 0, 85, 0.3);
@@ -279,17 +297,44 @@ export class ThemeStudioWebview {
       color: #fff;
     }
 
-    /* Layout Grid */
+    /* Layout Grid - Right Dock Mode (Default) */
     .studio-layout {
       display: grid;
-      grid-template-columns: 1fr 440px;
+      grid-template-columns: 1fr var(--preview-width);
       gap: 20px;
       align-items: start;
+      transition: all 0.2s ease;
+    }
+
+    /* Layout Grid - Bottom Dock Mode */
+    .studio-layout.dock-bottom {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .studio-layout.dock-bottom .main-column {
+      width: 100%;
+    }
+
+    .studio-layout.dock-bottom .preview-column {
+      width: 100%;
+      position: sticky;
+      bottom: 12px;
+      z-index: 100;
+    }
+
+    .studio-layout.dock-bottom .preview-sticky {
+      box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 230, 0, 0.2);
     }
 
     @media (max-width: 1080px) {
       .studio-layout {
-        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
+      }
+      .preview-column {
+        width: 100% !important;
       }
     }
 
@@ -599,6 +644,26 @@ export class ThemeStudioWebview {
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+      transition: box-shadow 0.2s ease;
+    }
+
+    /* Resizer Drag Handle */
+    .preview-resizer-handle {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      cursor: row-resize;
+      transition: background 0.15s ease;
+      display: none;
+    }
+
+    .studio-layout.dock-bottom .preview-resizer-handle {
+      display: block;
+    }
+
+    .preview-resizer-handle:hover,
+    .preview-resizer-handle.dragging {
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
     }
 
     .preview-header-bar {
@@ -611,15 +676,56 @@ export class ThemeStudioWebview {
       justify-content: space-between;
       align-items: center;
       color: var(--text-muted);
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .preview-controls-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .size-control {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .size-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 80px;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.2);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .size-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 6px var(--accent-glow);
     }
 
     .mock-window {
       font-family: 'Consolas', 'Courier New', monospace;
-      font-size: 11px;
+      font-size: calc(11px * var(--preview-scale));
       display: flex;
       flex-direction: column;
-      min-height: 480px;
+      height: var(--preview-height);
+      min-height: 220px;
+      max-height: 800px;
       background: #1e1e1e;
+      overflow: hidden;
     }
 
     .mock-titlebar {
@@ -629,14 +735,15 @@ export class ThemeStudioWebview {
       display: flex;
       align-items: center;
       padding: 0 10px;
-      font-size: 11px;
+      font-size: calc(11px * var(--preview-scale));
       border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+      flex-shrink: 0;
     }
 
     .mock-body {
       display: flex;
       flex: 1;
-      min-height: 380px;
+      overflow: hidden;
     }
 
     .mock-activitybar {
@@ -649,6 +756,7 @@ export class ThemeStudioWebview {
       gap: 12px;
       color: #ffffff;
       border-right: 1px solid rgba(0, 0, 0, 0.1);
+      flex-shrink: 0;
     }
 
     .mock-sidebar {
@@ -656,17 +764,20 @@ export class ThemeStudioWebview {
       background: #252526;
       color: #cccccc;
       padding: 10px;
-      font-size: 10px;
+      font-size: calc(10px * var(--preview-scale));
       display: flex;
       flex-direction: column;
       gap: 6px;
       border-right: 1px solid rgba(0, 0, 0, 0.1);
+      flex-shrink: 0;
+      overflow: hidden;
     }
 
     .mock-editor-area {
       flex: 1;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
     .mock-tabs-bar {
@@ -676,11 +787,12 @@ export class ThemeStudioWebview {
       align-items: flex-end;
       padding-left: 6px;
       gap: 2px;
+      flex-shrink: 0;
     }
 
     .mock-tab {
       padding: 5px 12px;
-      font-size: 10px;
+      font-size: calc(10px * var(--preview-scale));
       background: #2d2d2d;
       color: #858585;
       border-radius: 4px 4px 0 0;
@@ -701,7 +813,8 @@ export class ThemeStudioWebview {
       color: #d4d4d4;
       padding: 12px;
       line-height: 1.5;
-      font-size: 11px;
+      font-size: calc(11px * var(--preview-scale));
+      overflow: auto;
     }
 
     .mock-statusbar {
@@ -712,7 +825,8 @@ export class ThemeStudioWebview {
       align-items: center;
       justify-content: space-between;
       padding: 0 10px;
-      font-size: 10px;
+      font-size: calc(10px * var(--preview-scale));
+      flex-shrink: 0;
     }
   </style>
 </head>
@@ -734,6 +848,12 @@ export class ThemeStudioWebview {
     </div>
 
     <div class="toolbar">
+      <!-- Lock / Dock Preview Toggle Button -->
+      <button class="btn btn-dock" id="btnToggleDock" onclick="toggleDockPosition()">
+        <span id="dockBtnIcon">⬇️</span>
+        <span id="dockBtnLabel">Lock to Bottom</span>
+      </button>
+
       <button class="btn btn-primary" id="btnApplyAll">✨ Apply to VS Code</button>
       <button class="btn" id="btnSaveProfile">💾 Save Profile</button>
       <button class="btn" id="btnExportJson">📋 Export JSON</button>
@@ -741,8 +861,8 @@ export class ThemeStudioWebview {
     </div>
   </div>
 
-  <!-- Studio 2-Column Layout -->
-  <div class="studio-layout">
+  <!-- Studio Layout Container (Right or Bottom Docked) -->
+  <div class="studio-layout" id="studioLayout">
     
     <!-- Left Column: Tabs & Control Center -->
     <div class="main-column">
@@ -973,12 +1093,43 @@ export class ThemeStudioWebview {
 
     </div>
 
-    <!-- Right Column: Live Sticky Mock VS Code Workbench Preview -->
-    <div class="preview-column">
+    <!-- Right / Bottom Preview Column -->
+    <div class="preview-column" id="previewColumn">
       <div class="preview-sticky">
+        
+        <!-- Drag Handle for Resizing in Bottom Dock Mode -->
+        <div class="preview-resizer-handle" id="previewDragHandle" title="Drag to resize preview height"></div>
+
+        <!-- Preview Top Controls Bar -->
         <div class="preview-header-bar">
-          <span>LIVE VS CODE PREVIEW</span>
-          <span id="previewStatus">● Active Preview</span>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span>LIVE PREVIEW</span>
+            <span id="previewStatus" style="color: var(--accent); font-size: 10px;">● Live Sync</span>
+          </div>
+
+          <!-- Adjustable Size Controls -->
+          <div class="preview-controls-row">
+            
+            <!-- Height Slider -->
+            <div class="size-control">
+              <span>📏 Height:</span>
+              <input type="range" class="size-slider" id="heightSlider" min="220" max="750" value="480" oninput="onHeightSliderChange(this.value)" title="Adjust Preview Height" />
+              <span id="heightLabel">480px</span>
+            </div>
+
+            <!-- Zoom / Scale Slider -->
+            <div class="size-control">
+              <span>🔍 Zoom:</span>
+              <input type="range" class="size-slider" id="zoomSlider" min="0.75" max="1.3" step="0.05" value="1" oninput="onZoomSliderChange(this.value)" title="Adjust Text & Window Zoom" />
+              <span id="zoomLabel">100%</span>
+            </div>
+
+            <!-- Inline Dock Toggle -->
+            <button class="btn" style="padding: 3px 8px; font-size: 10px;" onclick="toggleDockPosition()" id="btnInlineDock" title="Toggle Dock to Bottom / Right">
+              <span id="inlineDockIcon">⬇️ Bottom</span>
+            </button>
+
+          </div>
         </div>
 
         <div class="mock-window" id="mockWindow">
@@ -1065,6 +1216,9 @@ export class ThemeStudioWebview {
         profileName: '${activeProfileName}',
         colors: ${JSON.stringify(currentColors)},
         tokenColors: ${JSON.stringify(currentTokens)},
+        dockPosition: 'right', // 'right' | 'bottom'
+        previewHeight: 480,
+        previewScale: 1.0,
       };
 
       const PRESETS = ${JSON.stringify(THEME_PRESETS)};
@@ -1085,7 +1239,94 @@ export class ThemeStudioWebview {
         });
       });
 
-      // 2. Mode Switches (Simple vs Advanced)
+      // 2. Dock Position Toggle (Right vs Bottom)
+      window.toggleDockPosition = function() {
+        const layout = document.getElementById('studioLayout');
+        const btnIcon = document.getElementById('dockBtnIcon');
+        const btnLabel = document.getElementById('dockBtnLabel');
+        const inlineIcon = document.getElementById('inlineDockIcon');
+        const heightSlider = document.getElementById('heightSlider');
+
+        if (activeState.dockPosition === 'right') {
+          activeState.dockPosition = 'bottom';
+          layout.classList.add('dock-bottom');
+          btnIcon.innerText = '📌';
+          btnLabel.innerText = 'Dock to Right';
+          inlineIcon.innerText = '📌 Right';
+          
+          // In bottom mode, set default comfortable height
+          if (activeState.previewHeight > 360) {
+            updateHeight(340);
+            if (heightSlider) heightSlider.value = 340;
+          }
+        } else {
+          activeState.dockPosition = 'right';
+          layout.classList.remove('dock-bottom');
+          btnIcon.innerText = '⬇️';
+          btnLabel.innerText = 'Lock to Bottom';
+          inlineIcon.innerText = '⬇️ Bottom';
+          
+          updateHeight(480);
+          if (heightSlider) heightSlider.value = 480;
+        }
+      };
+
+      // 3. Adjustable Height & Zoom Handlers
+      window.onHeightSliderChange = function(val) {
+        updateHeight(parseInt(val, 10));
+      };
+
+      function updateHeight(h) {
+        activeState.previewHeight = h;
+        document.documentElement.style.setProperty('--preview-height', h + 'px');
+        const label = document.getElementById('heightLabel');
+        if (label) label.innerText = h + 'px';
+      }
+
+      window.onZoomSliderChange = function(val) {
+        const scale = parseFloat(val);
+        activeState.previewScale = scale;
+        document.documentElement.style.setProperty('--preview-scale', scale);
+        const label = document.getElementById('zoomLabel');
+        if (label) label.innerText = Math.round(scale * 100) + '%';
+      };
+
+      // 4. Interactive Drag Resizer Handle in Bottom Mode
+      const dragHandle = document.getElementById('previewDragHandle');
+      if (dragHandle) {
+        let isDragging = false;
+        let startY = 0;
+        let startHeight = 0;
+
+        dragHandle.addEventListener('mousedown', function(e) {
+          isDragging = true;
+          startY = e.clientY;
+          startHeight = activeState.previewHeight;
+          dragHandle.classList.add('dragging');
+          document.body.style.userSelect = 'none';
+          document.body.style.cursor = 'row-resize';
+        });
+
+        document.addEventListener('mousemove', function(e) {
+          if (!isDragging) return;
+          const deltaY = startY - e.clientY;
+          const newHeight = Math.max(200, Math.min(800, startHeight + deltaY));
+          updateHeight(newHeight);
+          const heightSlider = document.getElementById('heightSlider');
+          if (heightSlider) heightSlider.value = newHeight;
+        });
+
+        document.addEventListener('mouseup', function() {
+          if (isDragging) {
+            isDragging = false;
+            dragHandle.classList.remove('dragging');
+            document.body.style.userSelect = '';
+            document.body.style.cursor = '';
+          }
+        });
+      }
+
+      // 5. Mode Switches (Simple vs Advanced)
       window.setUiMode = function(mode) {
         const btnSimple = document.getElementById('btnUiModeSimple');
         const btnAdv = document.getElementById('btnUiModeAdvanced');
@@ -1124,7 +1365,7 @@ export class ThemeStudioWebview {
         }
       };
 
-      // 3. Category Filter Pills (Advanced Mode)
+      // 6. Category Filter Pills (Advanced Mode)
       document.querySelectorAll('.pill:not(.preset-pill)').forEach(pill => {
         pill.addEventListener('click', function() {
           document.querySelectorAll('.pill:not(.preset-pill)').forEach(p => p.classList.remove('active'));
@@ -1157,7 +1398,7 @@ export class ThemeStudioWebview {
         });
       }
 
-      // 4. Preset Search & Type Filter
+      // 7. Preset Search & Type Filter
       document.querySelectorAll('.preset-pill').forEach(pill => {
         pill.addEventListener('click', function() {
           document.querySelectorAll('.preset-pill').forEach(p => p.classList.remove('active'));
@@ -1190,7 +1431,7 @@ export class ThemeStudioWebview {
         });
       }
 
-      // 5. Update Live Mock Workbench & Post Live Changes
+      // 8. Update Live Mock Workbench & Post Live Changes
       function updateLivePreview(key, val) {
         activeState.colors[key] = val;
 
@@ -1276,7 +1517,7 @@ export class ThemeStudioWebview {
         vscode.postMessage({ command: 'applyLiveTokenColor', syntaxId, color });
       }
 
-      // 6. Simple Mode UI Handlers (6 Master Colors)
+      // 9. Simple Mode UI Handlers (6 Master Colors)
       document.querySelectorAll('.simple-ui-picker').forEach(picker => {
         picker.addEventListener('input', function() {
           const simpleId = this.getAttribute('data-simple-id');
@@ -1306,7 +1547,6 @@ export class ThemeStudioWebview {
         def.targets.forEach(target => {
           updateLivePreview(target, val);
 
-          // Update corresponding advanced input if visible
           const advPicker = document.querySelector('.adv-color-picker[data-target="' + target + '"]');
           if (advPicker && val.length === 7) advPicker.value = val;
           const advHex = document.querySelector('.adv-hex-input[data-target="' + target + '"]');
@@ -1314,7 +1554,7 @@ export class ThemeStudioWebview {
         });
       }
 
-      // 7. Advanced UI Handlers
+      // 10. Advanced UI Handlers
       document.querySelectorAll('.adv-color-picker').forEach(picker => {
         picker.addEventListener('input', function() {
           const target = this.getAttribute('data-target');
@@ -1337,7 +1577,7 @@ export class ThemeStudioWebview {
         });
       });
 
-      // 8. Simple Mode Syntax Handlers (6 Master Tokens)
+      // 11. Simple Mode Syntax Handlers (6 Master Tokens)
       document.querySelectorAll('.simple-syntax-picker').forEach(picker => {
         picker.addEventListener('input', function() {
           const simpleId = this.getAttribute('data-simple-syntax-id');
@@ -1372,7 +1612,7 @@ export class ThemeStudioWebview {
         });
       });
 
-      // 9. Advanced Syntax Handlers
+      // 12. Advanced Syntax Handlers
       document.querySelectorAll('.adv-syntax-picker').forEach(picker => {
         picker.addEventListener('input', function() {
           const syntaxId = this.getAttribute('data-syntax-id');
@@ -1395,12 +1635,12 @@ export class ThemeStudioWebview {
         });
       });
 
-      // 10. Preset Loader
+      // 13. Preset Loader
       window.loadPreset = function(presetId) {
         vscode.postMessage({ command: 'applyPreset', presetId });
       };
 
-      // 11. Profile Actions
+      // 14. Profile Actions
       window.loadSavedProfile = function(profileId) {
         vscode.postMessage({ command: 'loadProfile', profileId });
       };
@@ -1409,7 +1649,7 @@ export class ThemeStudioWebview {
         vscode.postMessage({ command: 'deleteProfile', profileId, profileName });
       };
 
-      // 12. Top Toolbar Handlers
+      // 15. Top Toolbar Handlers
       document.getElementById('btnApplyAll').addEventListener('click', () => {
         vscode.postMessage({
           command: 'applyAll',

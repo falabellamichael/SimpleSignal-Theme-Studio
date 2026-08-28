@@ -2,7 +2,7 @@
   "name": "simpletheme",
   "displayName": "SimpleTheme",
   "description": "Visual Theme Designer & Customizer for VS Code. Live color pickers, syntax highlights, curated presets, mock preview & instant live apply.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "publisher": "falabella",
   "license": "MIT",
   "repository": {

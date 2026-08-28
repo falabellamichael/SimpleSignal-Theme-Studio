@@ -53,6 +53,46 @@ export class ThemeEngine {
     await workbench.update('colorCustomizations', updated, target);
   }
 
+  public static async applySingleTokenColor(syntaxId: string, color: string): Promise<void> {
+    const target = this.getTargetScope();
+    const editor = vscode.workspace.getConfiguration('editor');
+    const currentTokens = this.getCurrentTokenColors();
+    
+    // Map syntaxId to scopes
+    const scopeMap: Record<string, string[]> = {
+      keywords: ['keyword', 'keyword.control', 'storage.type', 'storage.modifier'],
+      functions: ['entity.name.function', 'support.function', 'meta.function-call'],
+      strings: ['string', 'string.quoted', 'string.template'],
+      variables: ['variable', 'variable.other', 'variable.parameter'],
+      types: ['entity.name.type', 'support.type', 'entity.name.class'],
+      comments: ['comment', 'comment.line', 'comment.block'],
+      numbers: ['constant.numeric', 'constant.language.boolean', 'constant.language'],
+      operators: ['keyword.operator', 'punctuation.separator'],
+      tags: ['entity.name.tag', 'entity.other.attribute-name'],
+    };
+
+    const targetScopes = scopeMap[syntaxId] || [syntaxId];
+    const updated = [...currentTokens];
+    const idx = updated.findIndex((r) => {
+      const scopes = Array.isArray(r.scope) ? r.scope : [r.scope];
+      return scopes.some((s) => targetScopes.includes(s));
+    });
+
+    if (idx >= 0) {
+      updated[idx] = {
+        ...updated[idx],
+        settings: { ...updated[idx].settings, foreground: color },
+      };
+    } else {
+      updated.push({
+        scope: targetScopes,
+        settings: { foreground: color },
+      });
+    }
+
+    await editor.update('tokenColorCustomizations', { textMateRules: updated }, target);
+  }
+
   public static async applyPreset(preset: ThemePreset): Promise<void> {
     await this.applyTheme(preset.colors, preset.tokenColors, preset.name);
   }

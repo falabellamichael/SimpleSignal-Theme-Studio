@@ -42,6 +42,9 @@ class ProfileManager {
         }
         return false;
     }
+    static getProfile(idOrName) {
+        return this.getProfileById(idOrName);
+    }
     static getProfileById(idOrName) {
         const profiles = this.getProfiles();
         return profiles.find((p) => p.id === idOrName || p.name.toLowerCase() === idOrName.toLowerCase());

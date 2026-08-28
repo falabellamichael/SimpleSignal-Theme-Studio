@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.THEME_PRESETS = exports.SYNTAX_SCOPE_DEFINITIONS = exports.UI_COLOR_DEFINITIONS = void 0;
+exports.THEME_PRESETS = exports.SIMPLE_SYNTAX_DEFINITIONS = exports.SIMPLE_UI_DEFINITIONS = exports.SYNTAX_SCOPE_DEFINITIONS = exports.UI_COLOR_DEFINITIONS = void 0;
 exports.UI_COLOR_DEFINITIONS = [
     // 1. Core Window & Editor
     { id: 'editor.background', name: 'Editor Background', description: 'Main coding canvas background color', category: 'core', defaultValue: '#1e1e1e' },
@@ -59,6 +59,106 @@ exports.SYNTAX_SCOPE_DEFINITIONS = [
     { id: 'numbers', name: 'Numbers & Booleans', description: 'integers, floats, true, false, null, undefined', scopes: ['constant.numeric', 'constant.language.boolean', 'constant.language'], defaultColor: '#b5cea8' },
     { id: 'operators', name: 'Operators & Punctuation', description: '+, -, *, =, =>, ==, &&, ||, ;, :, ,', scopes: ['keyword.operator', 'punctuation.separator', 'punctuation.terminator'], defaultColor: '#d4d4d4' },
     { id: 'tags', name: 'HTML / JSX Tags & Attributes', description: 'div, span, Button, onClick, className', scopes: ['entity.name.tag', 'entity.other.attribute-name'], defaultColor: '#4fc1ff' },
+];
+exports.SIMPLE_UI_DEFINITIONS = [
+    {
+        id: 'simple.accent',
+        name: 'Primary Accent',
+        description: 'Borders, cursor, badges, buttons, links & active line highlights',
+        icon: '✨',
+        targets: ['focusBorder', 'activityBarBadge.background', 'tab.activeBorderTop', 'editorCursor.foreground', 'textLink.foreground', 'badge.background', 'editorLineNumber.activeForeground', 'terminalCursor.foreground'],
+        defaultColor: '#ffe600',
+    },
+    {
+        id: 'simple.editorBg',
+        name: 'Editor Canvas Background',
+        description: 'Main coding canvas, active open tab & terminal background',
+        icon: '🖥️',
+        targets: ['editor.background', 'tab.activeBackground', 'terminal.background'],
+        defaultColor: '#07070a',
+    },
+    {
+        id: 'simple.text',
+        name: 'Main Code & Text',
+        description: 'Default code text, sidebar text & terminal output',
+        icon: '📝',
+        targets: ['editor.foreground', 'sideBar.foreground', 'titleBar.activeForeground', 'terminal.foreground'],
+        defaultColor: '#f0f0f8',
+    },
+    {
+        id: 'simple.sidebarBg',
+        name: 'Sidebar & Activity Bars',
+        description: 'Explorer file tree, Activity bar, Title bar & header sections',
+        icon: '📂',
+        targets: ['sideBar.background', 'activityBar.background', 'titleBar.activeBackground', 'sideBarSectionHeader.background'],
+        defaultColor: '#09090e',
+    },
+    {
+        id: 'simple.tabsBg',
+        name: 'Tabs & Sub-Panels',
+        description: 'Tab bar background, inactive tabs, chat prompt & code blocks',
+        icon: '📑',
+        targets: ['editorGroupHeader.tabsBackground', 'tab.inactiveBackground', 'tab.hoverBackground', 'interactive.requestBackground', 'textCodeBlock.background'],
+        defaultColor: '#0d0d14',
+    },
+    {
+        id: 'simple.statusBarBg',
+        name: 'Status Bar Background',
+        description: 'Bottom status bar color and debug indicators',
+        icon: '📊',
+        targets: ['statusBar.background', 'statusBar.foreground'],
+        defaultColor: '#050508',
+    },
+];
+exports.SIMPLE_SYNTAX_DEFINITIONS = [
+    {
+        id: 'simple.keywords',
+        name: 'Keywords & Control Flow',
+        description: 'if, else, return, const, let, function, class, import, export',
+        icon: '⚡',
+        targets: ['keywords'],
+        defaultColor: '#ff0055',
+    },
+    {
+        id: 'simple.functions',
+        name: 'Functions & Methods',
+        description: 'Function declarations, method calls, constructors',
+        icon: '🎯',
+        targets: ['functions'],
+        defaultColor: '#00f0ff',
+    },
+    {
+        id: 'simple.strings',
+        name: 'Strings & Templates',
+        description: 'Quoted text, template strings, character literals',
+        icon: '💬',
+        targets: ['strings'],
+        defaultColor: '#ffe600',
+    },
+    {
+        id: 'simple.variables',
+        name: 'Variables & Identifiers',
+        description: 'Variable names, parameters, object properties',
+        icon: '📦',
+        targets: ['variables'],
+        defaultColor: '#f0f0f8',
+    },
+    {
+        id: 'simple.types',
+        name: 'Types & Interfaces',
+        description: 'Classes, types, interfaces, structs, enums',
+        icon: '🏷️',
+        targets: ['types'],
+        defaultColor: '#b829ff',
+    },
+    {
+        id: 'simple.comments',
+        name: 'Comments',
+        description: 'Single-line // and multi-line /* */ code comments',
+        icon: '💭',
+        targets: ['comments'],
+        defaultColor: '#555566',
+    },
 ];
 exports.THEME_PRESETS = [
     // 1. 🍋 Lemonade Dark (Signature Local AI Theme)

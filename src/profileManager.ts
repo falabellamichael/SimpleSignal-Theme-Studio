@@ -54,6 +54,10 @@ export class ProfileManager {
     return false;
   }
 
+  public static getProfile(idOrName: string): ThemeProfile | undefined {
+    return this.getProfileById(idOrName);
+  }
+
   public static getProfileById(idOrName: string): ThemeProfile | undefined {
     const profiles = this.getProfiles();
     return profiles.find((p) => p.id === idOrName || p.name.toLowerCase() === idOrName.toLowerCase());

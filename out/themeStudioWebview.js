@@ -929,15 +929,15 @@ class ThemeStudioWebview {
             Editing Mode:
           </div>
           <div class="mode-toggle-group">
-            <button class="mode-btn active" id="btnUiModeSimple" onclick="setUiMode('simple')">⚡ Simple Mode (6 Colors)</button>
+            <button class="mode-btn active" id="btnUiModeSimple" onclick="setUiMode('simple')">⚡ Simple Mode (${presets_1.SIMPLE_UI_DEFINITIONS.length} Colors)</button>
             <button class="mode-btn" id="btnUiModeAdvanced" onclick="setUiMode('advanced')">⚙️ Advanced Mode (Granular)</button>
           </div>
         </div>
 
-        <!-- Tab 1A: Simple Mode UI (6 Master Colors) -->
+        <!-- Tab 1A: Simple Mode UI (${presets_1.SIMPLE_UI_DEFINITIONS.length} Master Colors) -->
         <div id="uiSimpleContainer">
           <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
-            Set these 6 master colors to style the entire VS Code workbench. *(Tip: Click any element in the Live Preview to jump right to its tile!)*
+            Set these ${presets_1.SIMPLE_UI_DEFINITIONS.length} master colors to style the entire VS Code workbench. *(Tip: Click any element in the Live Preview to jump right to its tile!)*
           </div>
           <div class="color-grid">
             ${presets_1.SIMPLE_UI_DEFINITIONS.map((def) => {
@@ -1219,13 +1219,29 @@ class ThemeStudioWebview {
                 <div>4  <span class="syn-keyword mock-clickable" id="synKw3" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">export</span> <span class="syn-keyword mock-clickable" id="synKw4" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">interface</span> <span class="syn-type mock-clickable" id="synType1" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types & Classes">ThemeProfile</span> {</div>
                 <div>5    <span class="syn-var mock-clickable" id="synVar2" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">id</span>: <span class="syn-type mock-clickable" id="synType2" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">string</span>;</div>
                 <div>6    <span class="syn-var mock-clickable" id="synVar3" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">name</span>: <span class="syn-type mock-clickable" id="synType3" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">string</span>;</div>
-                <div>7    <span class="syn-var mock-clickable" id="synVar4" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">active</span>: <span class="syn-type mock-clickable" id="synType4" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">boolean</span>;</div>
-                <div>8  }</div>
-                <div>9  </div>
-                <div>10 <span class="syn-keyword mock-clickable" id="synKw5" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">export</span> <span class="syn-keyword mock-clickable" id="synKw6" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">function</span> <span class="syn-func mock-clickable" id="synFunc1" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">activateTheme</span>(<span class="syn-var mock-clickable" id="synVar5" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">palette</span>: <span class="syn-type mock-clickable" id="synType5" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">ThemeProfile</span>) {</div>
-                <div>11   <span class="syn-func mock-clickable" id="synFunc2" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">console</span>.<span class="syn-func mock-clickable" id="synFunc3" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">log</span>(<span class="syn-string mock-clickable" id="synStr2" data-inspect-syntax="strings" data-inspect-simple-syntax="simple.strings" title="Click to highlight Strings">\`✨ Applied \${palette.name}!\`</span>);</div>
-                <div>12   <span class="syn-keyword mock-clickable" id="synKw7" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">return</span> <span class="syn-var mock-clickable" id="synVar6" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">palette</span>.<span class="syn-var mock-clickable" id="synVar7" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">active</span>;</div>
-                <div>13 }</div>
+                <div>7  }</div>
+                <div>8  </div>
+                <div>9  <span class="syn-keyword mock-clickable" id="synKw5" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">export</span> <span class="syn-keyword mock-clickable" id="synKw6" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">function</span> <span class="syn-func mock-clickable" id="synFunc1" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">activateTheme</span>(<span class="syn-var mock-clickable" id="synVar5" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">palette</span>: <span class="syn-type mock-clickable" id="synType5" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">ThemeProfile</span>) {</div>
+                <div>10   <span class="syn-func mock-clickable" id="synFunc2" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">console</span>.<span class="syn-func mock-clickable" id="synFunc3" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">log</span>(<span class="syn-string mock-clickable" id="synStr2" data-inspect-syntax="strings" data-inspect-simple-syntax="simple.strings" title="Click to highlight Strings">\`✨ Applied \${palette.name}!\`</span>);</div>
+                <div>11 }</div>
+              </div>
+
+              <!-- Mock Chat / Prompt Box Panel -->
+              <div class="mock-chat-panel mock-clickable" id="mockChatPanel" data-inspect-ui="panel.background" data-inspect-simple-ui="simple.sidebarBg" style="border-top: 1px solid var(--card-border); background: var(--card-bg); padding: 5px 8px; display: flex; flex-direction: column; gap: 4px; font-size: calc(9.5px * var(--preview-scale)); flex-shrink: 0;" title="Click to highlight Panel Container Background">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <span class="mock-clickable" id="mockPanelTitleActive" data-inspect-ui="panelTitle.activeForeground" data-inspect-simple-ui="simple.chatText" style="font-weight: 700; color: var(--accent); cursor: pointer;" title="Click to highlight Active Panel Tab (Chat)">Chat</span>
+                    <span class="mock-clickable" id="mockPanelTitleInactive" data-inspect-ui="panelTitle.inactiveForeground" data-inspect-simple-ui="simple.chatText" style="color: var(--text-muted); cursor: pointer;" title="Click to highlight Inactive Panel Tabs (Codex, CodeGPT)">Codex</span>
+                  </div>
+                  <span class="mock-clickable" id="mockIcon" data-inspect-ui="icon.foreground" data-inspect-simple-ui="simple.chatText" style="color: var(--text-muted); cursor: pointer; font-size: 10px;" title="Click to highlight UI Icons (+, ⚙️, X)">+ ⚙️ ⛶ ✕</span>
+                </div>
+                <div class="mock-chat-bubble mock-clickable" id="mockChatBubble" data-inspect-ui="chat.requestBackground" data-inspect-simple-ui="simple.chatText" style="background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); border-radius: 4px; padding: 2px 6px; font-weight: 600;" title="Click to highlight Chat User Request Bubble">
+                  <span>← heyy</span>
+                </div>
+                <div class="mock-input-box mock-clickable" id="mockInputBox" data-inspect-ui="input.background" data-inspect-simple-ui="simple.chatText" style="background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 4px; padding: 3px 6px; display: flex; justify-content: space-between; align-items: center;" title="Click to highlight Input / Chat Box">
+                  <span id="mockInputPlaceholder" class="mock-clickable" data-inspect-ui="input.placeholderForeground" data-inspect-simple-ui="simple.chatText" style="color: var(--text-muted);" title="Click to highlight Input Placeholder Text">just checking in, what you're capable of</span>
+                  <span id="mockCounter" class="mock-clickable" data-inspect-ui="descriptionForeground" data-inspect-simple-ui="simple.chatText" style="color: var(--text-muted); font-size: 8px; margin-left: 4px;" title="Click to highlight Muted / Counter Text (3/3)">3/3</span>
+                </div>
               </div>
 
             </div>
@@ -1562,6 +1578,33 @@ class ThemeStudioWebview {
         } else if (key === 'editorGroupHeader.tabsBackground') {
           const tb = document.getElementById('mockTabsBar');
           if (tb) tb.style.background = val;
+        } else if (key === 'input.background') {
+          const ib = document.getElementById('mockInputBox');
+          if (ib) ib.style.background = val;
+        } else if (key === 'input.foreground') {
+          const ib = document.getElementById('mockInputBox');
+          if (ib) ib.style.color = val;
+        } else if (key === 'input.placeholderForeground') {
+          const ip = document.getElementById('mockInputPlaceholder');
+          if (ip) ip.style.color = val;
+        } else if (key === 'descriptionForeground') {
+          const cnt = document.getElementById('mockCounter');
+          if (cnt) cnt.style.color = val;
+        } else if (key === 'panelTitle.activeForeground') {
+          const pta = document.getElementById('mockPanelTitleActive');
+          if (pta) pta.style.color = val;
+        } else if (key === 'panelTitle.inactiveForeground') {
+          const pti = document.getElementById('mockPanelTitleInactive');
+          if (pti) pti.style.color = val;
+        } else if (key === 'icon.foreground') {
+          const ico = document.getElementById('mockIcon');
+          if (ico) ico.style.color = val;
+        } else if (key === 'chat.requestBackground') {
+          const cb = document.getElementById('mockChatBubble');
+          if (cb) cb.style.background = val;
+        } else if (key === 'panel.background') {
+          const cp = document.getElementById('mockChatPanel');
+          if (cp) cp.style.background = val;
         }
 
         vscode.postMessage({ command: 'applyLiveColor', key, value: val });
@@ -1794,6 +1837,33 @@ class ThemeStudioWebview {
           } else if (k === 'editorGroupHeader.tabsBackground') {
             const tb = document.getElementById('mockTabsBar');
             if (tb) tb.style.background = val;
+          } else if (k === 'input.background') {
+            const ib = document.getElementById('mockInputBox');
+            if (ib) ib.style.background = val;
+          } else if (k === 'input.foreground') {
+            const ib = document.getElementById('mockInputBox');
+            if (ib) ib.style.color = val;
+          } else if (k === 'input.placeholderForeground') {
+            const ip = document.getElementById('mockInputPlaceholder');
+            if (ip) ip.style.color = val;
+          } else if (k === 'descriptionForeground') {
+            const cnt = document.getElementById('mockCounter');
+            if (cnt) cnt.style.color = val;
+          } else if (k === 'panelTitle.activeForeground') {
+            const pta = document.getElementById('mockPanelTitleActive');
+            if (pta) pta.style.color = val;
+          } else if (k === 'panelTitle.inactiveForeground') {
+            const pti = document.getElementById('mockPanelTitleInactive');
+            if (pti) pti.style.color = val;
+          } else if (k === 'icon.foreground') {
+            const ico = document.getElementById('mockIcon');
+            if (ico) ico.style.color = val;
+          } else if (k === 'chat.requestBackground') {
+            const cb = document.getElementById('mockChatBubble');
+            if (cb) cb.style.background = val;
+          } else if (k === 'panel.background') {
+            const cp = document.getElementById('mockChatPanel');
+            if (cp) cp.style.background = val;
           }
         }
       });

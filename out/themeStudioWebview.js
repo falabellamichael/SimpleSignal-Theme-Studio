@@ -141,14 +141,14 @@ class ThemeStudioWebview {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SimpleSignal Theme Studio</title>
+  <title>SimpleTheme</title>
   <style>
     :root {
       --bg: #07070a;
       --card-bg: #0e0e14;
       --card-border: rgba(255, 255, 255, 0.08);
       --accent: #ffe600;
-      --accent-glow: rgba(255, 230, 0, 0.35);
+      --accent-glow: rgba(255, 230, 0, 0.4);
       --accent-blue: #00f0ff;
       --text: #f0f0f8;
       --text-muted: #858599;
@@ -481,7 +481,7 @@ class ThemeStudioWebview {
       flex-direction: column;
       gap: 6px;
       min-width: 0;
-      transition: all 0.15s ease;
+      transition: all 0.2s ease;
     }
 
     .color-card:hover {
@@ -498,13 +498,39 @@ class ThemeStudioWebview {
       flex-direction: column;
       gap: 8px;
       min-width: 0;
-      transition: all 0.15s ease;
+      transition: all 0.2s ease;
     }
 
     .simple-card:hover {
       border-color: var(--accent);
       transform: translateY(-1px);
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Highlight Animation When Element in Preview is Clicked */
+    @keyframes tileGlowPulse {
+      0% {
+        box-shadow: 0 0 0 2px var(--accent), 0 0 20px var(--accent-glow);
+        border-color: var(--accent);
+        transform: scale(1.02);
+      }
+      50% {
+        box-shadow: 0 0 0 4px #00f0ff, 0 0 32px rgba(0, 240, 255, 0.6);
+        border-color: #00f0ff;
+        transform: scale(1.04);
+      }
+      100% {
+        box-shadow: 0 0 0 2px var(--accent), 0 0 20px var(--accent-glow);
+        border-color: var(--accent);
+        transform: scale(1.02);
+      }
+    }
+
+    .tile-highlighted {
+      animation: tileGlowPulse 1.6s ease-in-out 3;
+      border-color: var(--accent) !important;
+      z-index: 10;
+      position: relative;
     }
 
     .color-card-header {
@@ -715,6 +741,19 @@ class ThemeStudioWebview {
       color: #000;
     }
 
+    /* Interactive Clickable Preview Cues */
+    .mock-clickable {
+      cursor: pointer !important;
+      position: relative;
+      transition: outline 0.12s ease, filter 0.12s ease;
+    }
+
+    .mock-clickable:hover {
+      outline: 1.5px dashed var(--accent) !important;
+      outline-offset: -1px;
+      filter: brightness(1.2);
+    }
+
     .mock-window {
       font-family: 'Consolas', 'Courier New', monospace;
       font-size: calc(10.5px * var(--preview-scale));
@@ -898,7 +937,7 @@ class ThemeStudioWebview {
         <!-- Tab 1A: Simple Mode UI (6 Master Colors) -->
         <div id="uiSimpleContainer">
           <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
-            Set these 6 master colors to style the entire VS Code workbench.
+            Set these 6 master colors to style the entire VS Code workbench. *(Tip: Click any element in the Live Preview to jump right to its tile!)*
           </div>
           <div class="color-grid">
             ${presets_1.SIMPLE_UI_DEFINITIONS.map((def) => {
@@ -972,7 +1011,7 @@ class ThemeStudioWebview {
         <!-- Tab 2A: Simple Mode Syntax (6 Master Tokens) -->
         <div id="syntaxSimpleContainer">
           <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
-            Set 6 core syntax colors to instantly colorize code across all programming languages.
+            Set 6 core syntax colors to instantly colorize code across all programming languages. *(Tip: Click any code word in the Live Preview to highlight its tile!)*
           </div>
           <div class="color-grid">
             ${presets_1.SIMPLE_SYNTAX_DEFINITIONS.map((def) => {
@@ -1107,7 +1146,7 @@ class ThemeStudioWebview {
         <div class="preview-header-bar">
           <div style="display: flex; align-items: center; gap: 6px;">
             <span>👁️ LIVE PREVIEW</span>
-            <span style="color: var(--accent); font-size: 9px;">● Active</span>
+            <span style="color: var(--accent); font-size: 9px;">● Click element to edit tile</span>
           </div>
 
           <!-- Compact Size & Scale Controls -->
@@ -1133,7 +1172,7 @@ class ThemeStudioWebview {
         <div class="mock-window" id="mockWindow">
           
           <!-- Mock Top Title Bar -->
-          <div class="mock-titlebar" id="mockTitlebar">
+          <div class="mock-titlebar mock-clickable" id="mockTitlebar" data-inspect-ui="titleBar.activeBackground" data-inspect-simple-ui="simple.sidebarBg" title="Click to highlight Title Bar color">
             <span>SimpleTheme — VS Code</span>
           </div>
 
@@ -1141,7 +1180,7 @@ class ThemeStudioWebview {
           <div class="mock-body">
             
             <!-- Activity Bar -->
-            <div class="mock-activitybar" id="mockActivityBar">
+            <div class="mock-activitybar mock-clickable" id="mockActivityBar" data-inspect-ui="activityBar.background" data-inspect-simple-ui="simple.sidebarBg" title="Click to highlight Activity Bar color">
               <span>📄</span>
               <span>🔍</span>
               <span>⚡</span>
@@ -1149,7 +1188,7 @@ class ThemeStudioWebview {
             </div>
 
             <!-- Sidebar -->
-            <div class="mock-sidebar" id="mockSidebar">
+            <div class="mock-sidebar mock-clickable" id="mockSidebar" data-inspect-ui="sideBar.background" data-inspect-simple-ui="simple.sidebarBg" title="Click to highlight Sidebar color">
               <div style="font-weight: 700; margin-bottom: 2px;" id="mockSidebarTitle">EXPLORER</div>
               <div>📁 src</div>
               <div style="padding-left: 6px;">📄 themeEngine.ts</div>
@@ -1163,29 +1202,29 @@ class ThemeStudioWebview {
             <div class="mock-editor-area">
               
               <!-- Tabs Bar -->
-              <div class="mock-tabs-bar" id="mockTabsBar">
-                <div class="mock-tab active" id="mockActiveTab">
+              <div class="mock-tabs-bar mock-clickable" id="mockTabsBar" data-inspect-ui="editorGroupHeader.tabsBackground" data-inspect-simple-ui="simple.tabsBg" title="Click to highlight Tabs Bar color">
+                <div class="mock-tab active mock-clickable" id="mockActiveTab" data-inspect-ui="tab.activeBackground" data-inspect-simple-ui="simple.editorBg" title="Click to highlight Active Tab color">
                   <span>📄 studio.tsx</span>
                 </div>
-                <div class="mock-tab" id="mockInactiveTab">
+                <div class="mock-tab mock-clickable" id="mockInactiveTab" data-inspect-ui="tab.inactiveBackground" data-inspect-simple-ui="simple.tabsBg" title="Click to highlight Inactive Tab color">
                   <span>📄 themeEngine.ts</span>
                 </div>
               </div>
 
               <!-- Editor Code Canvas -->
-              <div class="mock-editor-canvas" id="mockCanvas">
-                <div style="color: #666; margin-bottom: 3px;">1  <span class="syn-comment" id="synComment">// SimpleTheme Live Preview</span></div>
-                <div>2  <span class="syn-keyword" id="synKw1">import</span> { <span class="syn-var" id="synVar1">SimpleTheme</span> } <span class="syn-keyword" id="synKw2">from</span> <span class="syn-string" id="synStr1">'simpletheme'</span>;</div>
+              <div class="mock-editor-canvas mock-clickable" id="mockCanvas" data-inspect-ui="editor.background" data-inspect-simple-ui="simple.editorBg" title="Click to highlight Editor Canvas Background">
+                <div style="color: #666; margin-bottom: 3px;">1  <span class="syn-comment mock-clickable" id="synComment" data-inspect-syntax="comments" data-inspect-simple-syntax="simple.comments" title="Click to highlight Comments">// SimpleTheme Live Preview</span></div>
+                <div>2  <span class="syn-keyword mock-clickable" id="synKw1" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">import</span> { <span class="syn-var mock-clickable" id="synVar1" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">SimpleTheme</span> } <span class="syn-keyword mock-clickable" id="synKw2" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">from</span> <span class="syn-string mock-clickable" id="synStr1" data-inspect-syntax="strings" data-inspect-simple-syntax="simple.strings" title="Click to highlight Strings">'simpletheme'</span>;</div>
                 <div>3  </div>
-                <div>4  <span class="syn-keyword" id="synKw3">export</span> <span class="syn-keyword" id="synKw4">interface</span> <span class="syn-type" id="synType1">ThemeProfile</span> {</div>
-                <div>5    <span class="syn-var" id="synVar2">id</span>: <span class="syn-type" id="synType2">string</span>;</div>
-                <div>6    <span class="syn-var" id="synVar3">name</span>: <span class="syn-type" id="synType3">string</span>;</div>
-                <div>7    <span class="syn-var" id="synVar4">active</span>: <span class="syn-type" id="synType4">boolean</span>;</div>
+                <div>4  <span class="syn-keyword mock-clickable" id="synKw3" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">export</span> <span class="syn-keyword mock-clickable" id="synKw4" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">interface</span> <span class="syn-type mock-clickable" id="synType1" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types & Classes">ThemeProfile</span> {</div>
+                <div>5    <span class="syn-var mock-clickable" id="synVar2" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">id</span>: <span class="syn-type mock-clickable" id="synType2" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">string</span>;</div>
+                <div>6    <span class="syn-var mock-clickable" id="synVar3" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">name</span>: <span class="syn-type mock-clickable" id="synType3" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">string</span>;</div>
+                <div>7    <span class="syn-var mock-clickable" id="synVar4" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">active</span>: <span class="syn-type mock-clickable" id="synType4" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">boolean</span>;</div>
                 <div>8  }</div>
                 <div>9  </div>
-                <div>10 <span class="syn-keyword" id="synKw5">export</span> <span class="syn-keyword" id="synKw6">function</span> <span class="syn-func" id="synFunc1">activateTheme</span>(<span class="syn-var" id="synVar5">palette</span>: <span class="syn-type" id="synType5">ThemeProfile</span>) {</div>
-                <div>11   <span class="syn-func" id="synFunc2">console</span>.<span class="syn-func" id="synFunc3">log</span>(<span class="syn-string" id="synStr2">\`✨ Applied \${palette.name}!\`</span>);</div>
-                <div>12   <span class="syn-keyword" id="synKw7">return</span> <span class="syn-var" id="synVar6">palette</span>.<span class="syn-var" id="synVar7">active</span>;</div>
+                <div>10 <span class="syn-keyword mock-clickable" id="synKw5" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">export</span> <span class="syn-keyword mock-clickable" id="synKw6" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">function</span> <span class="syn-func mock-clickable" id="synFunc1" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">activateTheme</span>(<span class="syn-var mock-clickable" id="synVar5" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">palette</span>: <span class="syn-type mock-clickable" id="synType5" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">ThemeProfile</span>) {</div>
+                <div>11   <span class="syn-func mock-clickable" id="synFunc2" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">console</span>.<span class="syn-func mock-clickable" id="synFunc3" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">log</span>(<span class="syn-string mock-clickable" id="synStr2" data-inspect-syntax="strings" data-inspect-simple-syntax="simple.strings" title="Click to highlight Strings">\`✨ Applied \${palette.name}!\`</span>);</div>
+                <div>12   <span class="syn-keyword mock-clickable" id="synKw7" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">return</span> <span class="syn-var mock-clickable" id="synVar6" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">palette</span>.<span class="syn-var mock-clickable" id="synVar7" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">active</span>;</div>
                 <div>13 }</div>
               </div>
 
@@ -1194,7 +1233,7 @@ class ThemeStudioWebview {
           </div>
 
           <!-- Mock Bottom Status Bar -->
-          <div class="mock-statusbar" id="mockStatusBar">
+          <div class="mock-statusbar mock-clickable" id="mockStatusBar" data-inspect-ui="statusBar.background" data-inspect-simple-ui="simple.statusBarBg" title="Click to highlight Status Bar color">
             <span>⚡ SimpleTheme: Active</span>
             <span>TypeScript • UTF-8</span>
           </div>
@@ -1226,18 +1265,98 @@ class ThemeStudioWebview {
       const SYNTAX_DEFS = ${JSON.stringify(presets_1.SYNTAX_SCOPE_DEFINITIONS)};
 
       // 1. Tab Switching
+      function switchTab(tabId) {
+        document.querySelectorAll('.nav-tab').forEach(b => {
+          if (b.getAttribute('data-tab') === tabId) b.classList.add('active');
+          else b.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+        const targetPane = document.getElementById(tabId);
+        if (targetPane) targetPane.style.display = 'block';
+      }
+
       document.querySelectorAll('.nav-tab').forEach(btn => {
         btn.addEventListener('click', function() {
-          document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-          document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
-          this.classList.add('active');
           const tabId = this.getAttribute('data-tab');
-          const pane = document.getElementById(tabId);
-          if (pane) pane.style.display = 'block';
+          switchTab(tabId);
         });
       });
 
-      // 2. Dock Position Toggle (Right vs Bottom)
+      // 2. Click on Preview Element -> Highlight Corresponding Tile!
+      function highlightTile(tileElement) {
+        if (!tileElement) return;
+
+        // Remove existing highlights
+        document.querySelectorAll('.tile-highlighted').forEach(el => el.classList.remove('tile-highlighted'));
+
+        // Apply pulse glow class
+        tileElement.classList.add('tile-highlighted');
+
+        // Smoothly scroll tile into center of view
+        tileElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Auto-focus the hex input
+        const hexInput = tileElement.querySelector('.hex-input');
+        if (hexInput) {
+          setTimeout(() => {
+            hexInput.focus();
+            hexInput.select();
+          }, 300);
+        }
+
+        // Clean up animation class after 4.5 seconds
+        setTimeout(() => {
+          tileElement.classList.remove('tile-highlighted');
+        }, 4500);
+      }
+
+      document.querySelectorAll('.mock-clickable').forEach(el => {
+        el.addEventListener('click', function(e) {
+          e.stopPropagation(); // Avoid triggering parent canvas
+
+          const inspectUi = this.getAttribute('data-inspect-ui');
+          const inspectSimpleUi = this.getAttribute('data-inspect-simple-ui');
+          const inspectSyntax = this.getAttribute('data-inspect-syntax');
+          const inspectSimpleSyntax = this.getAttribute('data-inspect-simple-syntax');
+
+          if (inspectSyntax || inspectSimpleSyntax) {
+            // Switch to Syntax tab
+            switchTab('tab-syntax');
+
+            const isSimple = document.getElementById('syntaxSimpleContainer').style.display !== 'none';
+            let targetCard = null;
+
+            if (isSimple && inspectSimpleSyntax) {
+              targetCard = document.querySelector('[data-simple-syntax-id="' + inspectSimpleSyntax + '"]');
+            } else if (!isSimple && inspectSyntax) {
+              targetCard = document.querySelector('[data-syntax-id="' + inspectSyntax + '"]');
+            } else if (inspectSimpleSyntax) {
+              targetCard = document.querySelector('[data-simple-syntax-id="' + inspectSimpleSyntax + '"]') || document.querySelector('[data-syntax-id="' + inspectSyntax + '"]');
+            }
+
+            if (targetCard) highlightTile(targetCard);
+
+          } else if (inspectUi || inspectSimpleUi) {
+            // Switch to UI tab
+            switchTab('tab-ui');
+
+            const isSimple = document.getElementById('uiSimpleContainer').style.display !== 'none';
+            let targetCard = null;
+
+            if (isSimple && inspectSimpleUi) {
+              targetCard = document.querySelector('[data-simple-ui-id="' + inspectSimpleUi + '"]');
+            } else if (!isSimple && inspectUi) {
+              targetCard = document.querySelector('[data-id="' + inspectUi + '"]');
+            } else if (inspectSimpleUi) {
+              targetCard = document.querySelector('[data-simple-ui-id="' + inspectSimpleUi + '"]') || document.querySelector('[data-id="' + inspectUi + '"]');
+            }
+
+            if (targetCard) highlightTile(targetCard);
+          }
+        });
+      });
+
+      // 3. Dock Position Toggle (Right vs Bottom)
       window.toggleDockPosition = function() {
         const layout = document.getElementById('studioLayout');
         const btnIcon = document.getElementById('dockBtnIcon');
@@ -1256,7 +1375,7 @@ class ThemeStudioWebview {
         }
       };
 
-      // 3. Height Presets
+      // 4. Height Presets
       window.setHeightPreset = function(h) {
         activeState.previewHeight = h;
         document.documentElement.style.setProperty('--preview-height', h + 'px');
@@ -1268,7 +1387,7 @@ class ThemeStudioWebview {
         });
       };
 
-      // 4. Zoom Controls
+      // 5. Zoom Controls
       window.setZoomDelta = function(delta) {
         let nextScale = Math.round((activeState.previewScale + delta) * 10) / 10;
         nextScale = Math.max(0.7, Math.min(1.4, nextScale));
@@ -1285,7 +1404,7 @@ class ThemeStudioWebview {
         if (disp) disp.innerText = '100%';
       };
 
-      // 5. Mode Switches (Simple vs Advanced)
+      // 6. Mode Switches (Simple vs Advanced)
       window.setUiMode = function(mode) {
         const btnSimple = document.getElementById('btnUiModeSimple');
         const btnAdv = document.getElementById('btnUiModeAdvanced');
@@ -1324,7 +1443,7 @@ class ThemeStudioWebview {
         }
       };
 
-      // 6. Category Filter Pills (Advanced Mode)
+      // 7. Category Filter Pills (Advanced Mode)
       document.querySelectorAll('.pill:not(.preset-pill)').forEach(pill => {
         pill.addEventListener('click', function() {
           document.querySelectorAll('.pill:not(.preset-pill)').forEach(p => p.classList.remove('active'));
@@ -1357,7 +1476,7 @@ class ThemeStudioWebview {
         });
       }
 
-      // 7. Preset Search & Type Filter
+      // 8. Preset Search & Type Filter
       document.querySelectorAll('.preset-pill').forEach(pill => {
         pill.addEventListener('click', function() {
           document.querySelectorAll('.preset-pill').forEach(p => p.classList.remove('active'));
@@ -1390,7 +1509,7 @@ class ThemeStudioWebview {
         });
       }
 
-      // 8. Update Live Mock Workbench & Post Live Changes
+      // 9. Update Live Mock Workbench & Post Live Changes
       function updateLivePreview(key, val) {
         activeState.colors[key] = val;
 
@@ -1473,7 +1592,7 @@ class ThemeStudioWebview {
         vscode.postMessage({ command: 'applyLiveTokenColor', syntaxId, color });
       }
 
-      // 9. Simple Mode UI Handlers
+      // 10. Simple Mode UI Handlers
       document.querySelectorAll('.simple-ui-picker').forEach(picker => {
         picker.addEventListener('input', function() {
           const simpleId = this.getAttribute('data-simple-id');
@@ -1510,7 +1629,7 @@ class ThemeStudioWebview {
         });
       }
 
-      // 10. Advanced UI Handlers
+      // 11. Advanced UI Handlers
       document.querySelectorAll('.adv-color-picker').forEach(picker => {
         picker.addEventListener('input', function() {
           const target = this.getAttribute('data-target');
@@ -1533,7 +1652,7 @@ class ThemeStudioWebview {
         });
       });
 
-      // 11. Simple Mode Syntax Handlers
+      // 12. Simple Mode Syntax Handlers
       document.querySelectorAll('.simple-syntax-picker').forEach(picker => {
         picker.addEventListener('input', function() {
           const simpleId = this.getAttribute('data-simple-syntax-id');
@@ -1568,7 +1687,7 @@ class ThemeStudioWebview {
         });
       });
 
-      // 12. Advanced Syntax Handlers
+      // 13. Advanced Syntax Handlers
       document.querySelectorAll('.adv-syntax-picker').forEach(picker => {
         picker.addEventListener('input', function() {
           const syntaxId = this.getAttribute('data-syntax-id');
@@ -1591,12 +1710,12 @@ class ThemeStudioWebview {
         });
       });
 
-      // 13. Preset Loader
+      // 14. Preset Loader
       window.loadPreset = function(presetId) {
         vscode.postMessage({ command: 'applyPreset', presetId });
       };
 
-      // 14. Profile Actions
+      // 15. Profile Actions
       window.loadSavedProfile = function(profileId) {
         vscode.postMessage({ command: 'loadProfile', profileId });
       };
@@ -1605,7 +1724,7 @@ class ThemeStudioWebview {
         vscode.postMessage({ command: 'deleteProfile', profileId, profileName });
       };
 
-      // 15. Top Toolbar Handlers
+      // 16. Top Toolbar Handlers
       document.getElementById('btnApplyAll').addEventListener('click', () => {
         vscode.postMessage({
           command: 'applyAll',

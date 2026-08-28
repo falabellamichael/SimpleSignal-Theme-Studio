@@ -1196,14 +1196,14 @@ export class ThemeStudioWebview {
             </div>
 
             <!-- Sidebar -->
-            <div class="mock-sidebar mock-clickable" id="mockSidebar" data-inspect-ui="sideBar.background" data-inspect-simple-ui="simple.sidebarBg" title="Click to highlight Sidebar color">
-              <div style="font-weight: 700; margin-bottom: 2px;" id="mockSidebarTitle">EXPLORER</div>
-              <div>📁 src</div>
-              <div style="padding-left: 6px;">📄 themeEngine.ts</div>
-              <div style="padding-left: 6px; color: var(--accent);">📄 presets.ts</div>
-              <div style="padding-left: 6px;">📄 studio.tsx</div>
-              <div>📁 media</div>
-              <div style="padding-left: 6px;">🖼️ logo.svg</div>
+            <div class="mock-sidebar mock-clickable" id="mockSidebar" data-inspect-ui="sideBar.background" data-inspect-simple-ui="simple.sidebarBg" title="Click to highlight Sidebar Background">
+              <div class="mock-sidebar-title mock-clickable" id="mockSidebarTitle" data-inspect-ui="sideBarTitle.foreground" data-inspect-simple-ui="simple.sidebarText" title="Click to highlight Sidebar Title (EXPLORER)" style="font-weight: 700; margin-bottom: 2px;">EXPLORER</div>
+              <div class="mock-tree-item mock-clickable" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.sidebarText" title="Click to highlight Explorer Text">📁 src</div>
+              <div class="mock-tree-item mock-clickable" style="padding-left: 6px;" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.sidebarText" title="Click to highlight Explorer Text">📄 themeEngine.ts</div>
+              <div class="mock-tree-item mock-clickable" style="padding-left: 6px; color: var(--accent);" data-inspect-ui="focusBorder" data-inspect-simple-ui="simple.accent" title="Click to highlight Selected File Accent">📄 presets.ts</div>
+              <div class="mock-tree-item mock-clickable" style="padding-left: 6px;" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.sidebarText" title="Click to highlight Explorer Text">📄 studio.tsx</div>
+              <div class="mock-tree-item mock-clickable" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.sidebarText" title="Click to highlight Explorer Text">📁 media</div>
+              <div class="mock-tree-item mock-clickable" style="padding-left: 6px;" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.sidebarText" title="Click to highlight Explorer Text">🖼️ logo.svg</div>
             </div>
 
             <!-- Editor Area -->
@@ -1533,6 +1533,10 @@ export class ThemeStudioWebview {
         } else if (key === 'sideBar.foreground') {
           const sb = document.getElementById('mockSidebar');
           if (sb) sb.style.color = val;
+          document.querySelectorAll('.mock-tree-item:not([style*="var(--accent)"])').forEach(el => el.style.color = val);
+        } else if (key === 'sideBarTitle.foreground') {
+          const sbt = document.getElementById('mockSidebarTitle');
+          if (sbt) sbt.style.color = val;
         } else if (key === 'activityBar.background') {
           const ab = document.getElementById('mockActivityBar');
           if (ab) ab.style.background = val;
@@ -1776,6 +1780,13 @@ export class ThemeStudioWebview {
           } else if (k === 'sideBar.background') {
             const sb = document.getElementById('mockSidebar');
             if (sb) sb.style.background = val;
+          } else if (k === 'sideBar.foreground') {
+            const sb = document.getElementById('mockSidebar');
+            if (sb) sb.style.color = val;
+            document.querySelectorAll('.mock-tree-item:not([style*="var(--accent)"])').forEach(el => el.style.color = val);
+          } else if (k === 'sideBarTitle.foreground') {
+            const sbt = document.getElementById('mockSidebarTitle');
+            if (sbt) sbt.style.color = val;
           } else if (k === 'activityBar.background') {
             const ab = document.getElementById('mockActivityBar');
             if (ab) ab.style.background = val;

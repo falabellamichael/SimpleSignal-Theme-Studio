@@ -1227,21 +1227,23 @@ export class ThemeStudioWebview {
 
               <!-- Editor Code Canvas -->
               <div class="mock-editor-canvas mock-clickable" id="mockCanvas" data-inspect-ui="editor.background" data-inspect-simple-ui="simple.editorBg" title="Click to highlight Editor Canvas Background">
-                <div style="color: #666; margin-bottom: 3px;">1  <span class="syn-comment mock-clickable" id="synComment" data-inspect-syntax="comments" data-inspect-simple-syntax="simple.comments" title="Click to highlight Comments">// SimpleTheme Live Preview</span></div>
+                <div style="color: #666; margin-bottom: 3px;">1  <span class="syn-comment mock-clickable" id="synComment" data-inspect-syntax="comments" data-inspect-simple-syntax="simple.comments" title="Click to highlight Comments">// SimpleTheme Realtime Studio</span></div>
                 <div>2  <span class="syn-keyword mock-clickable" id="synKw1" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">import</span> { <span class="syn-var mock-clickable" id="synVar1" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">SimpleTheme</span> } <span class="syn-keyword mock-clickable" id="synKw2" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">from</span> <span class="syn-string mock-clickable" id="synStr1" data-inspect-syntax="strings" data-inspect-simple-syntax="simple.strings" title="Click to highlight Strings">'simpletheme'</span>;</div>
                 <div>3  </div>
                 <div>4  <span class="syn-keyword mock-clickable" id="synKw3" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">export</span> <span class="syn-keyword mock-clickable" id="synKw4" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">interface</span> <span class="syn-type mock-clickable" id="synType1" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types & Classes">ThemeProfile</span> {</div>
-                <div>5    <span class="syn-var mock-clickable" id="synVar2" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">id</span>: <span class="syn-type mock-clickable" id="synType2" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">string</span>;</div>
-                <div>6    <span class="syn-var mock-clickable" id="synVar3" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">name</span>: <span class="syn-type mock-clickable" id="synType3" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">string</span>;</div>
+                <div>5    <span class="syn-prop mock-clickable" id="synProp1" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.properties" title="Click to highlight Object & JSON Keys">id</span>: <span class="syn-type mock-clickable" id="synType2" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">string</span>;</div>
+                <div>6    <span class="syn-prop mock-clickable" id="synProp2" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.properties" title="Click to highlight Object & JSON Keys">name</span>: <span class="syn-type mock-clickable" id="synType3" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">string</span>;</div>
                 <div>7  }</div>
                 <div>8  </div>
-                <div>9  <span class="syn-keyword mock-clickable" id="synKw5" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">export</span> <span class="syn-keyword mock-clickable" id="synKw6" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">function</span> <span class="syn-func mock-clickable" id="synFunc1" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">activateTheme</span>(<span class="syn-var mock-clickable" id="synVar5" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">palette</span>: <span class="syn-type mock-clickable" id="synType5" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">ThemeProfile</span>) {</div>
+                <div>9  <span class="syn-keyword mock-clickable" id="synKw5" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">export</span> <span class="syn-keyword mock-clickable" id="synKw6" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">function</span> <span class="syn-func mock-clickable" id="synFunc1" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">activateTheme</span>(<span class="syn-var mock-clickable" id="synVar2" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">palette</span>: <span class="syn-type mock-clickable" id="synType4" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">ThemeProfile</span>) {</div>
                 <div>10   <span class="syn-func mock-clickable" id="synFunc2" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">console</span>.<span class="syn-func mock-clickable" id="synFunc3" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">log</span>(<span class="syn-string mock-clickable" id="synStr2" data-inspect-syntax="strings" data-inspect-simple-syntax="simple.strings" title="Click to highlight Strings">\`✨ Applied \${palette.name}!\`</span>);</div>
                 <div>11 }</div>
-                <div style="position: relative; margin-top: 2px;">
-                  <div>12  <span class="syn-prop mock-clickable" id="synProp1" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.properties" title="Click to highlight Object & JSON Keys">"model"</span>: <span class="syn-string mock-clickable" id="synStr3" data-inspect-syntax="strings" data-inspect-simple-syntax="simple.strings" title="Click to highlight Strings & Text Literals">"qwen3.8-27b"</span>,</div>
+                <div style="position: relative; margin-top: 3px;">
+                  <div>12  <span class="syn-prop mock-clickable" id="synProp3" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.properties" title="Click to highlight Object & JSON Keys">"model"</span>: <span class="syn-string mock-clickable" id="synStr3" data-inspect-syntax="strings" data-inspect-simple-syntax="simple.strings" title="Click to highlight Strings & Text Literals">"qwen3.8-27b"</span>,</div>
+                  <div>13  <span class="syn-prop mock-clickable" id="synProp4" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.properties" title="Click to highlight Object & JSON Keys">"maxTokens"</span>: <span class="syn-num mock-clickable" id="synNum1" data-inspect-syntax="numbers" data-inspect-simple-syntax="simple.numbers" title="Click to highlight Numbers & Booleans">1000000</span>,</div>
+                  <div>14  <span class="syn-prop mock-clickable" id="synProp5" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.properties" title="Click to highlight Object & JSON Keys">"agentMode"</span>: <span class="syn-num mock-clickable" id="synNum2" data-inspect-syntax="numbers" data-inspect-simple-syntax="simple.numbers" title="Click to highlight Numbers & Booleans">true</span></div>
                   <!-- Floating Mock Hover Tooltip -->
-                  <div class="mock-hover-widget mock-clickable" id="mockHoverWidget" data-inspect-ui="editorHoverWidget.background" data-inspect-simple-ui="simple.popups" style="position: absolute; left: 16px; top: -18px; background: rgba(0,0,0,0.8); border: 1px solid var(--card-border); border-radius: 4px; padding: 2px 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.4); font-size: calc(8.5px * var(--preview-scale)); z-index: 10; display: flex; align-items: center; gap: 4px;" title="Click to highlight Hover Popup & Tooltips">
+                  <div class="mock-hover-widget mock-clickable" id="mockHoverWidget" data-inspect-ui="editorHoverWidget.background" data-inspect-simple-ui="simple.popups" style="position: absolute; right: 12px; top: -14px; background: rgba(0,0,0,0.85); border: 1px solid var(--card-border); border-radius: 4px; padding: 2px 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); font-size: calc(8.5px * var(--preview-scale)); z-index: 10; display: flex; align-items: center; gap: 4px;" title="Click to highlight Hover Popup & Tooltips">
                     <span id="mockHoverText" data-inspect-ui="editorHoverWidget.foreground" data-inspect-simple-ui="simple.popups" style="font-weight: 600;">⚠️ Unknown Configuration Setting</span>
                   </div>
                 </div>
@@ -1565,23 +1567,66 @@ export class ThemeStudioWebview {
         });
       }
 
-      // 9. Update Live Mock Workbench & Post Live Changes
+      // Debounced IPC messaging so dragging color picker never drops frames or causes lag
+      let liveColorDebounceTimer = null;
+      let pendingLiveColors = {};
+
+      function queueLiveColor(key, value) {
+        pendingLiveColors[key] = value;
+        if (liveColorDebounceTimer) clearTimeout(liveColorDebounceTimer);
+        liveColorDebounceTimer = setTimeout(() => {
+          Object.keys(pendingLiveColors).forEach(k => {
+            vscode.postMessage({ command: 'applyLiveColor', key: k, value: pendingLiveColors[k] });
+          });
+          pendingLiveColors = {};
+        }, 100);
+      }
+
+      let liveTokenDebounceTimer = null;
+      let pendingLiveTokens = {};
+
+      function queueLiveToken(syntaxId, color) {
+        pendingLiveTokens[syntaxId] = color;
+        if (liveTokenDebounceTimer) clearTimeout(liveTokenDebounceTimer);
+        liveTokenDebounceTimer = setTimeout(() => {
+          Object.keys(pendingLiveTokens).forEach(s => {
+            vscode.postMessage({ command: 'applyLiveTokenColor', syntaxId: s, color: pendingLiveTokens[s] });
+          });
+          pendingLiveTokens = {};
+        }, 100);
+      }
+
+      // 9. Update Live Mock Workbench & Post Live Changes (0ms Synchronous DOM update)
       function updateLivePreview(key, val) {
         activeState.colors[key] = val;
 
         if (key === 'editor.background') {
           const canvas = document.getElementById('mockCanvas');
           if (canvas) canvas.style.background = val;
+          const actTab = document.getElementById('mockActiveTab');
+          if (actTab) actTab.style.background = val;
         } else if (key === 'editor.foreground') {
           const canvas = document.getElementById('mockCanvas');
           if (canvas) canvas.style.color = val;
         } else if (key === 'sideBar.background') {
           const sb = document.getElementById('mockSidebar');
           if (sb) sb.style.background = val;
+          const ab = document.getElementById('mockActivityBar');
+          if (ab) ab.style.background = val;
+          const tb = document.getElementById('mockTitlebar');
+          if (tb) tb.style.background = val;
+          const cp = document.getElementById('mockChatPanel');
+          if (cp) cp.style.background = val;
         } else if (key === 'sideBar.foreground') {
           const sb = document.getElementById('mockSidebar');
           if (sb) sb.style.color = val;
-          document.querySelectorAll('.mock-tree-item:not([style*="var(--accent)"])').forEach(el => el.style.color = val);
+          const sbt = document.getElementById('mockSidebarTitle');
+          if (sbt) sbt.style.color = val;
+          const ab = document.getElementById('mockActivityBar');
+          if (ab) ab.style.color = val;
+          const tb = document.getElementById('mockTitlebar');
+          if (tb) tb.style.color = val;
+          document.querySelectorAll('.mock-tree-item:not(#mockTreeSelected)').forEach(el => el.style.color = val);
         } else if (key === 'sideBarTitle.foreground') {
           const sbt = document.getElementById('mockSidebarTitle');
           if (sbt) sbt.style.color = val;
@@ -1609,12 +1654,22 @@ export class ThemeStudioWebview {
         } else if (key === 'tab.activeForeground') {
           const tab = document.getElementById('mockActiveTab');
           if (tab) tab.style.color = val;
-        } else if (key === 'tab.activeBorderTop') {
+        } else if (key === 'tab.activeBorderTop' || key === 'focusBorder' || key === 'activityBarBadge.background' || key === 'textLink.foreground') {
           const tab = document.getElementById('mockActiveTab');
           if (tab) tab.style.borderTopColor = val;
+          const sel = document.getElementById('mockTreeSelected');
+          if (sel) sel.style.color = val;
+          const pta = document.getElementById('mockPanelTitleActive');
+          if (pta) pta.style.color = val;
+          document.documentElement.style.setProperty('--accent', val);
+          const mw = document.getElementById('mockWindow');
+          if (mw) mw.style.setProperty('--accent', val);
         } else if (key === 'tab.inactiveBackground') {
           const tab = document.getElementById('mockInactiveTab');
           if (tab) tab.style.background = val;
+        } else if (key === 'tab.inactiveForeground') {
+          const tab = document.getElementById('mockInactiveTab');
+          if (tab) tab.style.color = val;
         } else if (key === 'editorGroupHeader.tabsBackground') {
           const tb = document.getElementById('mockTabsBar');
           if (tb) tb.style.background = val;
@@ -1656,7 +1711,7 @@ export class ThemeStudioWebview {
           if (hw) hw.style.borderColor = val;
         }
 
-        vscode.postMessage({ command: 'applyLiveColor', key, value: val });
+        queueLiveColor(key, val);
       }
 
       function updateLiveSyntax(syntaxId, color) {
@@ -1674,6 +1729,8 @@ export class ThemeStudioWebview {
           document.querySelectorAll('.syn-type').forEach(el => el.style.color = color);
         } else if (syntaxId === 'comments') {
           document.querySelectorAll('.syn-comment').forEach(el => el.style.color = color);
+        } else if (syntaxId === 'numbers') {
+          document.querySelectorAll('.syn-num').forEach(el => el.style.color = color);
         }
 
         const item = SYNTAX_DEFS.find(s => s.id === syntaxId);
@@ -1687,7 +1744,7 @@ export class ThemeStudioWebview {
           }
         }
 
-        vscode.postMessage({ command: 'applyLiveTokenColor', syntaxId, color });
+        queueLiveToken(syntaxId, color);
       }
 
       // 10. Simple Mode UI Handlers
@@ -1735,6 +1792,15 @@ export class ThemeStudioWebview {
           const hexInput = document.querySelector('.adv-hex-input[data-target="' + target + '"]');
           if (hexInput) hexInput.value = val;
           updateLivePreview(target, val);
+
+          // Also sync to matching Simple UI picker
+          const parentSimple = SIMPLE_UI_MAP.find(s => s.targets.includes(target));
+          if (parentSimple) {
+            const sPicker = document.querySelector('.simple-ui-picker[data-simple-id="' + parentSimple.id + '"]');
+            if (sPicker && val.length === 7) sPicker.value = val;
+            const sHex = document.querySelector('.simple-ui-hex[data-simple-id="' + parentSimple.id + '"]');
+            if (sHex) sHex.value = val;
+          }
         });
       });
 
@@ -1746,6 +1812,14 @@ export class ThemeStudioWebview {
             const picker = document.querySelector('.adv-color-picker[data-target="' + target + '"]');
             if (picker && val.length === 7) picker.value = val;
             updateLivePreview(target, val);
+
+            const parentSimple = SIMPLE_UI_MAP.find(s => s.targets.includes(target));
+            if (parentSimple) {
+              const sPicker = document.querySelector('.simple-ui-picker[data-simple-id="' + parentSimple.id + '"]');
+              if (sPicker && val.length === 7) sPicker.value = val;
+              const sHex = document.querySelector('.simple-ui-hex[data-simple-id="' + parentSimple.id + '"]');
+              if (sHex) sHex.value = val;
+            }
           }
         });
       });
@@ -1793,6 +1867,11 @@ export class ThemeStudioWebview {
           const hexInput = document.querySelector('.adv-syntax-hex[data-syntax-id="' + syntaxId + '"]');
           if (hexInput) hexInput.value = val;
           updateLiveSyntax(syntaxId, val);
+
+          const sPicker = document.querySelector('.simple-syntax-picker[data-target-syntax="' + syntaxId + '"]');
+          if (sPicker && val.length === 7) sPicker.value = val;
+          const sHex = document.querySelector('.simple-syntax-hex[data-target-syntax="' + syntaxId + '"]');
+          if (sHex) sHex.value = val;
         });
       });
 
@@ -1804,12 +1883,57 @@ export class ThemeStudioWebview {
             const picker = document.querySelector('.adv-syntax-picker[data-syntax-id="' + syntaxId + '"]');
             if (picker && val.length === 7) picker.value = val;
             updateLiveSyntax(syntaxId, val);
+
+            const sPicker = document.querySelector('.simple-syntax-picker[data-target-syntax="' + syntaxId + '"]');
+            if (sPicker && val.length === 7) sPicker.value = val;
+            const sHex = document.querySelector('.simple-syntax-hex[data-target-syntax="' + syntaxId + '"]');
+            if (sHex) sHex.value = val;
           }
         });
       });
 
-      // 14. Preset Loader
+      // 14. Instant Preset Loader
+      const ALL_PRESETS = ${JSON.stringify(THEME_PRESETS)};
       window.loadPreset = function(presetId) {
+        const p = ALL_PRESETS.find(x => x.id === presetId);
+        if (p) {
+          // Instant synchronous preview update
+          Object.keys(p.colors).forEach(k => {
+            updateLivePreview(k, p.colors[k]);
+          });
+          p.tokenColors.forEach(tc => {
+            const scopes = Array.isArray(tc.scope) ? tc.scope : [tc.scope];
+            const fg = tc.settings?.foreground;
+            if (fg) {
+              if (scopes.some(s => s.includes('keyword'))) updateLiveSyntax('keywords', fg);
+              else if (scopes.some(s => s.includes('function'))) updateLiveSyntax('functions', fg);
+              else if (scopes.some(s => s.includes('property') || s.includes('key'))) updateLiveSyntax('properties', fg);
+              else if (scopes.some(s => s.includes('string'))) updateLiveSyntax('strings', fg);
+              else if (scopes.some(s => s.includes('variable'))) updateLiveSyntax('variables', fg);
+              else if (scopes.some(s => s.includes('type') || s.includes('class'))) updateLiveSyntax('types', fg);
+              else if (scopes.some(s => s.includes('comment'))) updateLiveSyntax('comments', fg);
+              else if (scopes.some(s => s.includes('numeric') || s.includes('number'))) updateLiveSyntax('numbers', fg);
+            }
+          });
+
+          // Sync all pickers & inputs in UI
+          SIMPLE_UI_MAP.forEach(sDef => {
+            const val = p.colors[sDef.targets[0]] || sDef.defaultColor;
+            const pkr = document.querySelector('.simple-ui-picker[data-simple-id="' + sDef.id + '"]');
+            if (pkr && val.length === 7) pkr.value = val;
+            const hex = document.querySelector('.simple-ui-hex[data-simple-id="' + sDef.id + '"]');
+            if (hex) hex.value = val;
+          });
+
+          const UI_DEFS = ${JSON.stringify(UI_COLOR_DEFINITIONS)};
+          UI_DEFS.forEach(uDef => {
+            const val = p.colors[uDef.id] || uDef.defaultValue;
+            const pkr = document.querySelector('.adv-color-picker[data-target="' + uDef.id + '"]');
+            if (pkr && val.length === 7) pkr.value = val;
+            const hex = document.querySelector('.adv-hex-input[data-target="' + uDef.id + '"]');
+            if (hex) hex.value = val;
+          });
+        }
         vscode.postMessage({ command: 'applyPreset', presetId });
       };
 
@@ -1947,6 +2071,8 @@ export class ThemeStudioWebview {
           document.querySelectorAll('.syn-type').forEach(el => el.style.color = fg);
         } else if (scopes.some(s => s.includes('comment'))) {
           document.querySelectorAll('.syn-comment').forEach(el => el.style.color = fg);
+        } else if (scopes.some(s => s.includes('numeric') || s.includes('number'))) {
+          document.querySelectorAll('.syn-num').forEach(el => el.style.color = fg);
         }
       });
 

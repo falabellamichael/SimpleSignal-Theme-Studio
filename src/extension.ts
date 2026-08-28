@@ -11,7 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
   ProfileManager.initialize(context);
 
   const treeProvider = new SimpleSignalThemeTreeProvider();
-  vscode.window.registerTreeDataProvider('simplesignalThemeStudioView', treeProvider);
+  vscode.window.registerTreeDataProvider('simpleThemeView', treeProvider);
 
   // Status Bar Item
   const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99);

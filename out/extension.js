@@ -45,7 +45,7 @@ const presets_1 = require("./presets");
 function activate(context) {
     profileManager_1.ProfileManager.initialize(context);
     const treeProvider = new treeProvider_1.SimpleSignalThemeTreeProvider();
-    vscode.window.registerTreeDataProvider('simplesignalThemeStudioView', treeProvider);
+    vscode.window.registerTreeDataProvider('simpleThemeView', treeProvider);
     // Status Bar Item
     const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99);
     statusBarItem.command = 'simpletheme.openStudio';

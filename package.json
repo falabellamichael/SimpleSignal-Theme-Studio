@@ -1,6 +1,6 @@
 {
-  "name": "simplesignal-theme-studio",
-  "displayName": "SimpleSignal Theme Studio",
+  "name": "simpletheme",
+  "displayName": "SimpleTheme",
   "description": "Visual Theme Designer & Customizer for VS Code. Live color pickers, syntax highlights, curated presets, mock preview & instant live apply.",
   "version": "1.0.0",
   "publisher": "falabella",
@@ -16,6 +16,7 @@
   ],
   "keywords": [
     "theme",
+    "simpletheme",
     "theme customizer",
     "color theme",
     "syntax highlighter",
@@ -24,6 +25,8 @@
     "catppuccin",
     "dracula",
     "oled",
+    "lemonade",
+    "solarized",
     "live preview"
   ],
   "engines": {
@@ -37,17 +40,17 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "simplesignal-theme-studio-sidebar",
-          "title": "Theme Studio",
+          "id": "simpletheme-sidebar",
+          "title": "SimpleTheme",
           "icon": "media/logo.svg"
         }
       ]
     },
     "views": {
-      "simplesignal-theme-studio-sidebar": [
+      "simpletheme-sidebar": [
         {
-          "id": "simplesignalThemeStudioView",
-          "name": "Theme Studio",
+          "id": "simpleThemeView",
+          "name": "SimpleTheme",
           "type": "tree"
         }
       ]
@@ -56,61 +59,61 @@
       {
         "command": "simpletheme.openStudio",
         "title": "Open Visual Theme Studio",
-        "category": "Theme Studio",
+        "category": "SimpleTheme",
         "icon": "$(paintcan)"
       },
       {
         "command": "simpletheme.applyPreset",
         "title": "Load Theme Preset...",
-        "category": "Theme Studio",
+        "category": "SimpleTheme",
         "icon": "$(color-mode)"
       },
       {
         "command": "simpletheme.saveCurrentProfile",
         "title": "Save Current Theme as Profile...",
-        "category": "Theme Studio",
+        "category": "SimpleTheme",
         "icon": "$(save)"
       },
       {
         "command": "simpletheme.quickTweakAccent",
         "title": "Quick Tweak: Accent Color",
-        "category": "Theme Studio",
+        "category": "SimpleTheme",
         "icon": "$(symbol-color)"
       },
       {
         "command": "simpletheme.quickTweakEditorBg",
         "title": "Quick Tweak: Editor Background",
-        "category": "Theme Studio",
+        "category": "SimpleTheme",
         "icon": "$(window)"
       },
       {
         "command": "simpletheme.quickTweakSidebarBg",
         "title": "Quick Tweak: Sidebar Background",
-        "category": "Theme Studio",
+        "category": "SimpleTheme",
         "icon": "$(layout-sidebar-left)"
       },
       {
         "command": "simpletheme.exportJson",
         "title": "Export Customizations to Clipboard",
-        "category": "Theme Studio",
+        "category": "SimpleTheme",
         "icon": "$(copy)"
       },
       {
         "command": "simpletheme.importJson",
         "title": "Import Theme JSON...",
-        "category": "Theme Studio",
+        "category": "SimpleTheme",
         "icon": "$(file-code)"
       },
       {
         "command": "simpletheme.exportVsix",
         "title": "Package as Standalone Theme Extension (.vsix)...",
-        "category": "Theme Studio",
+        "category": "SimpleTheme",
         "icon": "$(package)"
       },
       {
         "command": "simpletheme.resetTheme",
         "title": "Reset Custom Theme to Default",
-        "category": "Theme Studio",
+        "category": "SimpleTheme",
         "icon": "$(clear-all)"
       }
     ],
@@ -118,23 +121,23 @@
       "view/title": [
         {
           "command": "simpletheme.openStudio",
-          "when": "view == simplesignalThemeStudioView",
+          "when": "view == simpleThemeView",
           "group": "navigation@1"
         },
         {
           "command": "simpletheme.applyPreset",
-          "when": "view == simplesignalThemeStudioView",
+          "when": "view == simpleThemeView",
           "group": "navigation@2"
         },
         {
           "command": "simpletheme.resetTheme",
-          "when": "view == simplesignalThemeStudioView",
+          "when": "view == simpleThemeView",
           "group": "navigation@3"
         }
       ]
     },
     "configuration": {
-      "title": "SimpleSignal Theme Studio",
+      "title": "SimpleTheme",
       "properties": {
         "simpletheme.liveApply": {
           "type": "boolean",

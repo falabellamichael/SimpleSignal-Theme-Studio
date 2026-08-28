@@ -25,8 +25,8 @@ export class ThemeStudioWebview {
     }
 
     const panel = vscode.window.createWebviewPanel(
-      'simplesignalThemeStudio',
-      '🎨 SimpleSignal Theme Studio',
+      'simpleThemeStudio',
+      '🎨 SimpleTheme',
       column || vscode.ViewColumn.One,
       {
         enableScripts: true,
@@ -855,7 +855,7 @@ export class ThemeStudioWebview {
       </svg>
       <div>
         <div class="header-title">
-          SimpleSignal Theme Studio
+          SimpleTheme
           <span class="profile-pill" id="activeProfileLabel">${activeProfileName}</span>
         </div>
         <div style="font-size: 11px; color: var(--text-muted);">Visual Live Theme Customizer & Syntax Designer</div>
@@ -1142,7 +1142,7 @@ export class ThemeStudioWebview {
           
           <!-- Mock Top Title Bar -->
           <div class="mock-titlebar" id="mockTitlebar">
-            <span>SimpleSignal Theme Studio — VS Code</span>
+            <span>SimpleTheme — VS Code</span>
           </div>
 
           <!-- Mock Middle (Activity Bar + Sidebar + Editor) -->
@@ -1182,8 +1182,8 @@ export class ThemeStudioWebview {
 
               <!-- Editor Code Canvas -->
               <div class="mock-editor-canvas" id="mockCanvas">
-                <div style="color: #666; margin-bottom: 3px;">1  <span class="syn-comment" id="synComment">// SimpleSignal Live Preview</span></div>
-                <div>2  <span class="syn-keyword" id="synKw1">import</span> { <span class="syn-var" id="synVar1">SimpleSignal</span> } <span class="syn-keyword" id="synKw2">from</span> <span class="syn-string" id="synStr1">'simplesignal'</span>;</div>
+                <div style="color: #666; margin-bottom: 3px;">1  <span class="syn-comment" id="synComment">// SimpleTheme Live Preview</span></div>
+                <div>2  <span class="syn-keyword" id="synKw1">import</span> { <span class="syn-var" id="synVar1">SimpleTheme</span> } <span class="syn-keyword" id="synKw2">from</span> <span class="syn-string" id="synStr1">'simpletheme'</span>;</div>
                 <div>3  </div>
                 <div>4  <span class="syn-keyword" id="synKw3">export</span> <span class="syn-keyword" id="synKw4">interface</span> <span class="syn-type" id="synType1">ThemeProfile</span> {</div>
                 <div>5    <span class="syn-var" id="synVar2">id</span>: <span class="syn-type" id="synType2">string</span>;</div>
@@ -1203,7 +1203,7 @@ export class ThemeStudioWebview {
 
           <!-- Mock Bottom Status Bar -->
           <div class="mock-statusbar" id="mockStatusBar">
-            <span>⚡ SimpleSignal: Active</span>
+            <span>⚡ SimpleTheme: Active</span>
             <span>TypeScript • UTF-8</span>
           </div>
 

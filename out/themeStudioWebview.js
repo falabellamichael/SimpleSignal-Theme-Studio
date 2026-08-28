@@ -1064,11 +1064,17 @@ class ThemeStudioWebview {
       <!-- Tab 3: Presets Library -->
       <div id="tab-presets" class="tab-pane" style="display: none;">
         <div class="filter-bar" style="margin-bottom: 12px;">
-          <input type="text" class="search-input" id="presetSearchInput" placeholder="🔍 Search presets (e.g. lemonade, solarized, warm, cyberpunk)..." />
-          <div class="pill-filters">
-            <span class="pill preset-pill active" data-preset-type="all">⚡ All (${presets_1.THEME_PRESETS.length})</span>
-            <span class="pill preset-pill" data-preset-type="dark">🌙 Dark (${presets_1.THEME_PRESETS.filter((p) => p.type === 'dark').length})</span>
-            <span class="pill preset-pill" data-preset-type="light">☀️ Light (${presets_1.THEME_PRESETS.filter((p) => p.type === 'light').length})</span>
+          <input type="text" class="search-input" id="presetSearchInput" placeholder="🔍 Search 50 presets (e.g. checkered, colorblind, lemonade, gameboy, lego, matrix, latte)..." />
+          <div class="pill-filters" style="flex-wrap: wrap; gap: 4px;">
+            <span class="pill preset-pill active" data-preset-filter="all">⚡ All (${presets_1.THEME_PRESETS.length})</span>
+            <span class="pill preset-pill" data-preset-filter="dark">🌙 Dark (${presets_1.THEME_PRESETS.filter((p) => p.type === 'dark').length})</span>
+            <span class="pill preset-pill" data-preset-filter="light">☀️ Light (${presets_1.THEME_PRESETS.filter((p) => p.type === 'light').length})</span>
+            <span class="pill preset-pill" data-preset-filter="colorblind">👁️ Accessible & Safe</span>
+            <span class="pill preset-pill" data-preset-filter="checkered">🏁 Checkered & B&W</span>
+            <span class="pill preset-pill" data-preset-filter="warm">☕ Coffee & Warm</span>
+            <span class="pill preset-pill" data-preset-filter="cyber">⚡ Cyber & Neon</span>
+            <span class="pill preset-pill" data-preset-filter="pastel">🌸 Pastel & Soft</span>
+            <span class="pill preset-pill" data-preset-filter="creative">🎨 Creative & Retro</span>
           </div>
         </div>
         <div class="preset-grid" id="presetGrid">
@@ -1509,15 +1515,34 @@ class ThemeStudioWebview {
       function filterPresets() {
         const query = (presetSearchInput ? presetSearchInput.value : '').toLowerCase().trim();
         const activePill = document.querySelector('.preset-pill.active');
-        const type = activePill ? activePill.getAttribute('data-preset-type') : 'all';
+        const filter = activePill ? (activePill.getAttribute('data-preset-filter') || 'all') : 'all';
 
         document.querySelectorAll('.preset-card[data-preset-type]').forEach(card => {
-          const pType = card.getAttribute('data-preset-type');
+          const pType = card.getAttribute('data-preset-type') || '';
           const pName = card.getAttribute('data-preset-name') || '';
-          const matchesType = type === 'all' || pType === type;
+
+          let matchesFilter = true;
+          if (filter === 'all') {
+            matchesFilter = true;
+          } else if (filter === 'dark' || filter === 'light') {
+            matchesFilter = pType === filter;
+          } else if (filter === 'colorblind') {
+            matchesFilter = pName.includes('colorblind') || pName.includes('accessible') || pName.includes('contrast');
+          } else if (filter === 'checkered') {
+            matchesFilter = pName.includes('checker') || pName.includes('b&w') || pName.includes('binary') || pName.includes('carbon');
+          } else if (filter === 'warm') {
+            matchesFilter = pName.includes('latte') || pName.includes('sepia') || pName.includes('amber') || pName.includes('pastry') || pName.includes('cabin') || pName.includes('sunflower') || pName.includes('sunset') || pName.includes('solarized') || pName.includes('matcha') || pName.includes('espresso') || pName.includes('walnut');
+          } else if (filter === 'cyber') {
+            matchesFilter = pName.includes('cyber') || pName.includes('matrix') || pName.includes('synthwave') || pName.includes('alien') || pName.includes('void') || pName.includes('hyperion') || pName.includes('abyssal') || pName.includes('neon') || pName.includes('tokyo') || pName.includes('dracula') || pName.includes('oled') || pName.includes('lemonade');
+          } else if (filter === 'pastel') {
+            matchesFilter = pName.includes('sakura') || pName.includes('cotton') || pName.includes('peach') || pName.includes('lavender') || pName.includes('mint') || pName.includes('vanilla') || pName.includes('catppuccin') || pName.includes('ghost') || pName.includes('clean');
+          } else if (filter === 'creative') {
+            matchesFilter = pName.includes('gameboy') || pName.includes('lego') || pName.includes('wave') || pName.includes('halloween') || pName.includes('bauhaus') || pName.includes('python') || pName.includes('rust') || pName.includes('arcade');
+          }
+
           const matchesQuery = !query || pName.includes(query);
 
-          if (matchesType && matchesQuery) {
+          if (matchesFilter && matchesQuery) {
             card.style.display = 'flex';
           } else {
             card.style.display = 'none';

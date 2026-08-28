@@ -46,6 +46,32 @@ export class ThemeStudioWebview {
 
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
+    // Live VS Code Active Theme Listener: When user changes theme in VS Code (File > Preferences > Theme > Color Theme)
+    vscode.window.onDidChangeActiveColorTheme(
+      () => {
+        this._syncActiveThemeToWebview();
+      },
+      null,
+      this._disposables
+    );
+
+    // Live Setting Listener: When workbench.colorTheme, workbench.colorCustomizations, or tokenColorCustomizations change
+    vscode.workspace.onDidChangeConfiguration(
+      (e) => {
+        if (
+          e.affectsConfiguration('workbench.colorTheme') ||
+          e.affectsConfiguration('workbench.colorCustomizations') ||
+          e.affectsConfiguration('editor.tokenColorCustomizations') ||
+          e.affectsConfiguration('editor.semanticTokenColorCustomizations') ||
+          e.affectsConfiguration('simpletheme')
+        ) {
+          this._syncActiveThemeToWebview();
+        }
+      },
+      null,
+      this._disposables
+    );
+
     this._panel.webview.onDidReceiveMessage(
       async (message) => {
         switch (message.command) {
@@ -133,16 +159,28 @@ export class ThemeStudioWebview {
     );
   }
 
+  private _syncActiveThemeToWebview() {
+    if (!this._panel || !this._panel.webview) return;
+    const effective = ThemeEngine.getEffectiveThemeState();
+    this._panel.webview.postMessage({
+      command: 'syncActiveTheme',
+      themeName: effective.themeName,
+      themeKind: effective.themeKind,
+      colors: effective.colors,
+      tokenColors: effective.tokenColors,
+    });
+  }
+
   private _update() {
     this._panel.webview.html = this._getHtmlForWebview();
   }
 
   private _getHtmlForWebview(): string {
-    const currentColors = ThemeEngine.getCurrentColors();
-    const currentTokens = ThemeEngine.getCurrentTokenColors();
+    const effectiveState = ThemeEngine.getEffectiveThemeState();
+    const currentColors = effectiveState.colors;
+    const currentTokens = effectiveState.tokenColors;
     const savedProfiles = ProfileManager.getProfiles();
-    const config = vscode.workspace.getConfiguration('simpletheme');
-    const activeProfileName = config.get<string>('activeProfile', 'Custom');
+    const activeProfileName = effectiveState.themeName;
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -2073,6 +2111,92 @@ export class ThemeStudioWebview {
           document.querySelectorAll('.syn-comment').forEach(el => el.style.color = fg);
         } else if (scopes.some(s => s.includes('numeric') || s.includes('number'))) {
           document.querySelectorAll('.syn-num').forEach(el => el.style.color = fg);
+        }
+      });
+
+      // 17. Live Theme Sync from VS Code (e.g. user changes theme in VS Code or extensions)
+      window.addEventListener('message', event => {
+        const msg = event.data;
+        if (!msg) return;
+
+        if (msg.command === 'syncActiveTheme') {
+          if (msg.colors) {
+            activeState.colors = { ...activeState.colors, ...msg.colors };
+            Object.keys(msg.colors).forEach(k => {
+              updateLivePreview(k, msg.colors[k]);
+            });
+          }
+
+          if (msg.tokenColors && Array.isArray(msg.tokenColors)) {
+            activeState.tokenColors = msg.tokenColors;
+            msg.tokenColors.forEach(tc => {
+              const scopes = Array.isArray(tc.scope) ? tc.scope : [tc.scope];
+              const fg = tc.settings?.foreground;
+              if (fg) {
+                if (scopes.some(s => s.includes('keyword'))) updateLiveSyntax('keywords', fg);
+                else if (scopes.some(s => s.includes('function'))) updateLiveSyntax('functions', fg);
+                else if (scopes.some(s => s.includes('property') || s.includes('key'))) updateLiveSyntax('properties', fg);
+                else if (scopes.some(s => s.includes('string'))) updateLiveSyntax('strings', fg);
+                else if (scopes.some(s => s.includes('variable'))) updateLiveSyntax('variables', fg);
+                else if (scopes.some(s => s.includes('type') || s.includes('class'))) updateLiveSyntax('types', fg);
+                else if (scopes.some(s => s.includes('comment'))) updateLiveSyntax('comments', fg);
+                else if (scopes.some(s => s.includes('numeric') || s.includes('number'))) updateLiveSyntax('numbers', fg);
+              }
+            });
+          }
+
+          if (msg.themeName) {
+            activeState.profileName = msg.themeName;
+            const pDisplay = document.getElementById('activeProfileDisplay');
+            if (pDisplay) pDisplay.innerText = msg.themeName;
+          }
+
+          // Update Simple UI color pickers and hex inputs
+          SIMPLE_UI_MAP.forEach(sDef => {
+            const val = activeState.colors[sDef.targets[0]] || sDef.defaultColor;
+            const pkr = document.querySelector('.simple-ui-picker[data-simple-id="' + sDef.id + '"]');
+            if (pkr && val && val.length === 7) pkr.value = val;
+            const hex = document.querySelector('.simple-ui-hex[data-simple-id="' + sDef.id + '"]');
+            if (hex && val) hex.value = val;
+          });
+
+          // Update Simple Syntax color pickers and hex inputs
+          SIMPLE_SYNTAX_MAP.forEach(sDef => {
+            const targetSyntax = sDef.targets[0];
+            const item = SYNTAX_DEFS.find(s => s.id === targetSyntax);
+            const rule = activeState.tokenColors.find(r => {
+              const sc = Array.isArray(r.scope) ? r.scope : [r.scope];
+              return sc.some(s => item?.scopes.includes(s));
+            });
+            const val = rule?.settings?.foreground || sDef.defaultColor;
+            const pkr = document.querySelector('.simple-syntax-picker[data-simple-syntax-id="' + sDef.id + '"]');
+            if (pkr && val && val.length === 7) pkr.value = val;
+            const hex = document.querySelector('.simple-syntax-hex[data-simple-syntax-id="' + sDef.id + '"]');
+            if (hex && val) hex.value = val;
+          });
+
+          // Update Advanced UI pickers and hex inputs
+          const UI_DEFS = ${JSON.stringify(UI_COLOR_DEFINITIONS)};
+          UI_DEFS.forEach(uDef => {
+            const val = activeState.colors[uDef.id] || uDef.defaultValue;
+            const pkr = document.querySelector('.adv-color-picker[data-target="' + uDef.id + '"]');
+            if (pkr && val && val.length === 7) pkr.value = val;
+            const hex = document.querySelector('.adv-hex-input[data-target="' + uDef.id + '"]');
+            if (hex && val) hex.value = val;
+          });
+
+          // Update Advanced Syntax pickers and hex inputs
+          SYNTAX_DEFS.forEach(sDef => {
+            const rule = activeState.tokenColors.find(r => {
+              const sc = Array.isArray(r.scope) ? r.scope : [r.scope];
+              return sc.some(s => sDef.scopes.includes(s));
+            });
+            const val = rule?.settings?.foreground || sDef.defaultColor;
+            const pkr = document.querySelector('.adv-syntax-picker[data-syntax-id="' + sDef.id + '"]');
+            if (pkr && val && val.length === 7) pkr.value = val;
+            const hex = document.querySelector('.adv-syntax-hex[data-syntax-id="' + sDef.id + '"]');
+            if (hex && val) hex.value = val;
+          });
         }
       });
 

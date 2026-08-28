@@ -35,11 +35,248 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ThemeEngine = void 0;
 const vscode = __importStar(require("vscode"));
+const presets_1 = require("./presets");
 class ThemeEngine {
     static getTargetScope() {
         const config = vscode.workspace.getConfiguration('simpletheme');
         const scope = config.get('targetScope', 'global');
         return scope === 'workspace' ? vscode.ConfigurationTarget.Workspace : vscode.ConfigurationTarget.Global;
+    }
+    static getEffectiveThemeState() {
+        const workbench = vscode.workspace.getConfiguration('workbench');
+        const editor = vscode.workspace.getConfiguration('editor');
+        const simpletheme = vscode.workspace.getConfiguration('simpletheme');
+        const themeName = workbench.get('colorTheme') || 'Default Dark+';
+        const activeColorTheme = vscode.window.activeColorTheme;
+        const kind = activeColorTheme ? activeColorTheme.kind : vscode.ColorThemeKind.Dark;
+        let themeKind = 'dark';
+        if (kind === vscode.ColorThemeKind.Light)
+            themeKind = 'light';
+        else if (kind === vscode.ColorThemeKind.HighContrast)
+            themeKind = 'high-contrast-dark';
+        else if (kind === vscode.ColorThemeKind.HighContrastLight)
+            themeKind = 'high-contrast-light';
+        // 1. Try matching against 50 built-in presets
+        const lower = themeName.toLowerCase();
+        const matched = presets_1.THEME_PRESETS.find((p) => p.name.toLowerCase() === lower ||
+            p.id.toLowerCase() === lower ||
+            lower.includes(p.id.toLowerCase()) ||
+            lower.includes(p.name.toLowerCase()));
+        let baseColors = {};
+        let baseTokenColors = [];
+        if (matched) {
+            baseColors = { ...matched.colors };
+            baseTokenColors = JSON.parse(JSON.stringify(matched.tokenColors));
+        }
+        else {
+            // Build default base palette based on theme name or kind
+            const isLight = themeKind === 'light' || lower.includes('light') || lower.includes('latte') || lower.includes('snow') || lower.includes('sun');
+            const isHighContrast = themeKind.includes('high-contrast') || lower.includes('contrast');
+            if (lower.includes('monokai')) {
+                baseColors = {
+                    'editor.background': '#272822',
+                    'editor.foreground': '#f8f8f2',
+                    'sideBar.background': '#1e1f1c',
+                    'sideBar.foreground': '#cccccc',
+                    'activityBar.background': '#272822',
+                    'activityBar.foreground': '#f8f8f2',
+                    'titleBar.activeBackground': '#1e1f1c',
+                    'statusBar.background': '#75715e',
+                    'statusBar.foreground': '#ffffff',
+                    'tab.activeBackground': '#272822',
+                    'tab.inactiveBackground': '#1e1f1c',
+                    'tab.activeBorderTop': '#a6e22e',
+                    'editorGroupHeader.tabsBackground': '#1e1f1c',
+                    'input.background': '#3e3d32',
+                    'panel.background': '#1e1f1c',
+                    'editorHoverWidget.background': '#272822',
+                    'editorHoverWidget.foreground': '#f8f8f2',
+                    'editorHoverWidget.border': '#75715e',
+                };
+                baseTokenColors = [
+                    { scope: ['keyword', 'keyword.control', 'storage.type'], settings: { foreground: '#f92672' } },
+                    { scope: ['entity.name.function', 'support.function'], settings: { foreground: '#a6e22e' } },
+                    { scope: ['support.type.property-name', 'meta.object-literal.key'], settings: { foreground: '#66d9ef' } },
+                    { scope: ['string', 'string.quoted'], settings: { foreground: '#e6db74' } },
+                    { scope: ['variable', 'variable.other'], settings: { foreground: '#f8f8f2' } },
+                    { scope: ['entity.name.type', 'support.type'], settings: { foreground: '#66d9ef' } },
+                    { scope: ['comment', 'comment.line'], settings: { foreground: '#75715e' } },
+                    { scope: ['constant.numeric', 'constant.language.boolean'], settings: { foreground: '#ae81ff' } },
+                ];
+            }
+            else if (lower.includes('solarized') && isLight) {
+                baseColors = {
+                    'editor.background': '#fdf6e3',
+                    'editor.foreground': '#181514',
+                    'sideBar.background': '#eee8d5',
+                    'sideBar.foreground': '#181514',
+                    'activityBar.background': '#eee8d5',
+                    'activityBar.foreground': '#181514',
+                    'titleBar.activeBackground': '#eee8d5',
+                    'statusBar.background': '#073642',
+                    'statusBar.foreground': '#ffffff',
+                    'tab.activeBackground': '#fdf6e3',
+                    'tab.inactiveBackground': '#eee8d5',
+                    'tab.activeBorderTop': '#268bd2',
+                    'editorGroupHeader.tabsBackground': '#eee8d5',
+                    'input.background': '#e4decb',
+                    'panel.background': '#eee8d5',
+                    'editorHoverWidget.background': '#fdf6e3',
+                    'editorHoverWidget.foreground': '#181514',
+                    'editorHoverWidget.border': '#93a1a1',
+                };
+                baseTokenColors = [
+                    { scope: ['keyword', 'keyword.control'], settings: { foreground: '#859900' } },
+                    { scope: ['entity.name.function'], settings: { foreground: '#1d4ed8' } },
+                    { scope: ['support.type.property-name'], settings: { foreground: '#b45309' } },
+                    { scope: ['string', 'string.quoted'], settings: { foreground: '#047857' } },
+                    { scope: ['variable'], settings: { foreground: '#181514' } },
+                    { scope: ['entity.name.type'], settings: { foreground: '#b58900' } },
+                    { scope: ['comment'], settings: { foreground: '#78716c' } },
+                    { scope: ['constant.numeric'], settings: { foreground: '#b91c1c' } },
+                ];
+            }
+            else if (isLight) {
+                baseColors = {
+                    'editor.background': '#ffffff',
+                    'editor.foreground': '#111827',
+                    'sideBar.background': '#f3f4f6',
+                    'sideBar.foreground': '#1f2937',
+                    'activityBar.background': '#e5e7eb',
+                    'activityBar.foreground': '#111827',
+                    'titleBar.activeBackground': '#f3f4f6',
+                    'statusBar.background': '#007acc',
+                    'statusBar.foreground': '#ffffff',
+                    'tab.activeBackground': '#ffffff',
+                    'tab.inactiveBackground': '#f3f4f6',
+                    'tab.activeBorderTop': '#007acc',
+                    'editorGroupHeader.tabsBackground': '#f3f4f6',
+                    'input.background': '#ffffff',
+                    'panel.background': '#f9fafb',
+                    'editorHoverWidget.background': '#ffffff',
+                    'editorHoverWidget.foreground': '#111827',
+                    'editorHoverWidget.border': '#d1d5db',
+                };
+                baseTokenColors = [
+                    { scope: ['keyword', 'keyword.control'], settings: { foreground: '#0000ff' } },
+                    { scope: ['entity.name.function'], settings: { foreground: '#795e26' } },
+                    { scope: ['support.type.property-name'], settings: { foreground: '#001080' } },
+                    { scope: ['string', 'string.quoted'], settings: { foreground: '#a31515' } },
+                    { scope: ['variable'], settings: { foreground: '#001080' } },
+                    { scope: ['entity.name.type'], settings: { foreground: '#267f99' } },
+                    { scope: ['comment'], settings: { foreground: '#008000' } },
+                    { scope: ['constant.numeric'], settings: { foreground: '#098658' } },
+                ];
+            }
+            else if (isHighContrast) {
+                baseColors = {
+                    'editor.background': '#000000',
+                    'editor.foreground': '#ffffff',
+                    'sideBar.background': '#0a0a0a',
+                    'sideBar.foreground': '#ffffff',
+                    'activityBar.background': '#000000',
+                    'activityBar.foreground': '#00f0ff',
+                    'titleBar.activeBackground': '#000000',
+                    'statusBar.background': '#000000',
+                    'statusBar.foreground': '#00f0ff',
+                    'tab.activeBackground': '#000000',
+                    'tab.inactiveBackground': '#0a0a0a',
+                    'tab.activeBorderTop': '#00f0ff',
+                    'editorGroupHeader.tabsBackground': '#0a0a0a',
+                    'input.background': '#000000',
+                    'panel.background': '#000000',
+                    'editorHoverWidget.background': '#000000',
+                    'editorHoverWidget.foreground': '#ffffff',
+                    'editorHoverWidget.border': '#00f0ff',
+                };
+                baseTokenColors = [
+                    { scope: ['keyword', 'keyword.control'], settings: { foreground: '#ffb000' } },
+                    { scope: ['entity.name.function'], settings: { foreground: '#00f0ff' } },
+                    { scope: ['support.type.property-name'], settings: { foreground: '#648fff' } },
+                    { scope: ['string', 'string.quoted'], settings: { foreground: '#fe6100' } },
+                    { scope: ['variable'], settings: { foreground: '#ffffff' } },
+                    { scope: ['entity.name.type'], settings: { foreground: '#785ef0' } },
+                    { scope: ['comment'], settings: { foreground: '#888888' } },
+                    { scope: ['constant.numeric'], settings: { foreground: '#dc267f' } },
+                ];
+            }
+            else {
+                // Default Dark+
+                baseColors = {
+                    'editor.background': '#1e1e1e',
+                    'editor.foreground': '#d4d4d4',
+                    'sideBar.background': '#252526',
+                    'sideBar.foreground': '#cccccc',
+                    'activityBar.background': '#333333',
+                    'activityBar.foreground': '#ffffff',
+                    'titleBar.activeBackground': '#3c3c3c',
+                    'statusBar.background': '#007acc',
+                    'statusBar.foreground': '#ffffff',
+                    'tab.activeBackground': '#1e1e1e',
+                    'tab.inactiveBackground': '#2d2d2d',
+                    'tab.activeBorderTop': '#007acc',
+                    'editorGroupHeader.tabsBackground': '#252526',
+                    'input.background': '#3c3c3c',
+                    'panel.background': '#1e1e1e',
+                    'editorHoverWidget.background': '#252526',
+                    'editorHoverWidget.foreground': '#cccccc',
+                    'editorHoverWidget.border': '#454545',
+                };
+                baseTokenColors = [
+                    { scope: ['keyword', 'keyword.control'], settings: { foreground: '#569cd6' } },
+                    { scope: ['entity.name.function'], settings: { foreground: '#dcdcaa' } },
+                    { scope: ['support.type.property-name'], settings: { foreground: '#9cdcfe' } },
+                    { scope: ['string', 'string.quoted'], settings: { foreground: '#ce9178' } },
+                    { scope: ['variable'], settings: { foreground: '#9cdcfe' } },
+                    { scope: ['entity.name.type'], settings: { foreground: '#4ec9b0' } },
+                    { scope: ['comment'], settings: { foreground: '#6a9955' } },
+                    { scope: ['constant.numeric'], settings: { foreground: '#b5cea8' } },
+                ];
+            }
+        }
+        // 2. Layer active customizations on top
+        const userColors = workbench.get('colorCustomizations') || {};
+        const finalColors = { ...baseColors, ...userColors };
+        const userTokenConfig = editor.get('tokenColorCustomizations') || {};
+        const userTextMateRules = userTokenConfig.textMateRules || [];
+        // Merge token rules
+        const finalTokenColors = [...baseTokenColors];
+        if (Array.isArray(userTextMateRules)) {
+            userTextMateRules.forEach((ur) => {
+                const uScopes = Array.isArray(ur.scope) ? ur.scope : [ur.scope];
+                const idx = finalTokenColors.findIndex((fr) => {
+                    const fScopes = Array.isArray(fr.scope) ? fr.scope : [fr.scope];
+                    return fScopes.some((s) => uScopes.includes(s));
+                });
+                if (idx >= 0) {
+                    finalTokenColors[idx] = { ...finalTokenColors[idx], ...ur };
+                }
+                else {
+                    finalTokenColors.push(ur);
+                }
+            });
+        }
+        // Top-level token customizations
+        const directKeys = ['strings', 'keywords', 'functions', 'variables', 'types', 'comments', 'numbers'];
+        directKeys.forEach((dk) => {
+            if (userTokenConfig[dk]) {
+                const color = userTokenConfig[dk];
+                const idx = finalTokenColors.findIndex((r) => {
+                    const sc = Array.isArray(r.scope) ? r.scope : [r.scope];
+                    return sc.some((s) => s.includes(dk.slice(0, -1)) || s.includes(dk));
+                });
+                if (idx >= 0) {
+                    finalTokenColors[idx].settings.foreground = color;
+                }
+            }
+        });
+        const activeProfileName = simpletheme.get('activeProfile', themeName);
+        return {
+            themeName: activeProfileName,
+            themeKind,
+            colors: finalColors,
+            tokenColors: finalTokenColors,
+        };
     }
     static getCurrentColors() {
         const workbench = vscode.workspace.getConfiguration('workbench');

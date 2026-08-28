@@ -130,6 +130,11 @@ class ThemeStudioWebview {
                     await vscode.env.clipboard.writeText(json);
                     vscode.window.showInformationMessage('📋 Copied theme settings JSON to clipboard!');
                     break;
+                case 'refreshThemeFromVsCode':
+                    this._syncActiveThemeToWebview();
+                    const activeStateObj = themeEngine_1.ThemeEngine.getEffectiveThemeState();
+                    vscode.window.showInformationMessage(`🔄 Synced live colors from "${activeStateObj.themeName}"!`);
+                    break;
                 case 'resetTheme':
                     const confirmReset = await vscode.window.showWarningMessage('Reset all theme customizations and restore default colors?', { modal: true }, 'Reset Theme');
                     if (confirmReset === 'Reset Theme') {
@@ -305,6 +310,65 @@ class ThemeStudioWebview {
       border-color: #00f0ff;
       color: #fff;
       box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+    }
+
+    .btn-sync {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.16), rgba(255, 230, 0, 0.16));
+      border: 1px solid rgba(0, 240, 255, 0.45);
+      color: #00f0ff;
+      font-weight: 700;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.15);
+    }
+
+    .btn-sync:hover {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.35), rgba(255, 230, 0, 0.3));
+      border-color: #00f0ff;
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+    }
+
+    .spin-anim {
+      animation: spin 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .preview-refreshed {
+      animation: pulseGlow 0.8s ease-out;
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 0px var(--accent); }
+      50% { box-shadow: 0 0 25px var(--accent-blue), 0 0 12px var(--accent); }
+      100% { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6); }
+    }
+
+    .toast-popup {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: rgba(14, 14, 20, 0.95);
+      border: 1px solid var(--accent);
+      color: var(--text);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      gap: 8px;
+      z-index: 9999;
+      animation: slideInToast 0.25s ease;
+    }
+
+    @keyframes slideInToast {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
     .btn-danger {
@@ -920,6 +984,11 @@ class ThemeStudioWebview {
     </div>
 
     <div class="toolbar">
+      <button class="btn btn-sync" id="btnUniversalRefresh" onclick="refreshFromVsCode()" title="Universal Live Sync: pull active theme & colors directly from VS Code to update Live Preview and all tiles">
+        <span id="syncIcon" style="display:inline-block; font-size: 13px;">🔄</span>
+        <span>Sync from VS Code</span>
+      </button>
+
       <button class="btn btn-dock" id="btnToggleDock" onclick="toggleDockPosition()">
         <span id="dockBtnIcon">⬇️</span>
         <span id="dockBtnLabel">Lock to Bottom</span>
@@ -2180,8 +2249,48 @@ class ThemeStudioWebview {
         }
       });
 
+      // 18. Toast Notification Helper
+      function showToast(msg, icon = '✨') {
+        const toast = document.getElementById('toastPopup');
+        const text = document.getElementById('toastMessage');
+        const iconEl = document.getElementById('toastIcon');
+        if (!toast || !text) return;
+        text.innerText = msg;
+        if (iconEl) iconEl.innerText = icon;
+        toast.style.display = 'flex';
+        setTimeout(() => {
+          toast.style.display = 'none';
+        }, 2400);
+      }
+
+      // 19. Universal Live Refresh Function (Syncs everything: preview, tiles, pickers)
+      window.refreshFromVsCode = function() {
+        const icon = document.getElementById('syncIcon');
+        if (icon) {
+          icon.classList.remove('spin-anim');
+          void icon.offsetWidth;
+          icon.classList.add('spin-anim');
+        }
+
+        const preview = document.querySelector('.preview-sticky');
+        if (preview) {
+          preview.classList.remove('preview-refreshed');
+          void preview.offsetWidth;
+          preview.classList.add('preview-refreshed');
+        }
+
+        vscode.postMessage({ command: 'refreshThemeFromVsCode' });
+        showToast('Live Preview & Tiles Synced from VS Code!', '🔄');
+      };
+
     })();
   </script>
+
+  <!-- Floating Toast Notification -->
+  <div id="toastPopup" class="toast-popup">
+    <span id="toastIcon">✨</span>
+    <span id="toastMessage">Live Preview & Tiles Synced!</span>
+  </div>
 </body>
 </html>`;
     }

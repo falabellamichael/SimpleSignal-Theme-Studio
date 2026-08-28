@@ -1,6 +1,116 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 import { ThemePreset, TokenRule } from './types';
 import { THEME_PRESETS } from './presets';
+
+function stripJsonComments(str: string): string {
+  let insideString = false;
+  let insideBlockComment = false;
+  let insideLineComment = false;
+  let result = '';
+
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+    const nextChar = str[i + 1];
+
+    if (!insideString && !insideBlockComment && !insideLineComment) {
+      if (char === '"' && (i === 0 || str[i - 1] !== '\\')) {
+        insideString = true;
+        result += char;
+      } else if (char === '/' && nextChar === '*') {
+        insideBlockComment = true;
+        i++;
+      } else if (char === '/' && nextChar === '/') {
+        insideLineComment = true;
+        i++;
+      } else {
+        result += char;
+      }
+    } else if (insideString) {
+      if (char === '"' && str[i - 1] !== '\\') {
+        insideString = false;
+      }
+      result += char;
+    } else if (insideBlockComment) {
+      if (char === '*' && nextChar === '/') {
+        insideBlockComment = false;
+        i++;
+      }
+    } else if (insideLineComment) {
+      if (char === '\n' || char === '\r') {
+        insideLineComment = false;
+        result += char;
+      }
+    }
+  }
+
+  return result.replace(/,\s*([}\]])/g, '$1');
+}
+
+function tryReadInstalledThemeFile(themeName: string): { colors: Record<string, string>; tokenColors: TokenRule[] } | null {
+  const lowerName = themeName.toLowerCase().trim();
+
+  for (const ext of vscode.extensions.all) {
+    const pkg = ext.packageJSON;
+    if (pkg && pkg.contributes && Array.isArray(pkg.contributes.themes)) {
+      for (const t of pkg.contributes.themes) {
+        const label = (t.label || t.id || '').toLowerCase().trim();
+        const id = (t.id || '').toLowerCase().trim();
+        if (label === lowerName || id === lowerName || lowerName.includes(label) || label.includes(lowerName)) {
+          const themePath = path.isAbsolute(t.path) ? t.path : path.join(ext.extensionPath, t.path);
+          try {
+            if (fs.existsSync(themePath)) {
+              const content = fs.readFileSync(themePath, 'utf8');
+              const parsed = JSON.parse(stripJsonComments(content));
+              const colors: Record<string, string> = parsed.colors || {};
+              let tokenColors: TokenRule[] = [];
+
+              if (Array.isArray(parsed.tokenColors)) {
+                tokenColors = parsed.tokenColors;
+              } else if (typeof parsed.tokenColors === 'string') {
+                const tokenPath = path.isAbsolute(parsed.tokenColors)
+                  ? parsed.tokenColors
+                  : path.join(path.dirname(themePath), parsed.tokenColors);
+                if (fs.existsSync(tokenPath)) {
+                  const tokenContent = fs.readFileSync(tokenPath, 'utf8');
+                  const parsedTokens = JSON.parse(stripJsonComments(tokenContent));
+                  if (Array.isArray(parsedTokens.tokenColors)) {
+                    tokenColors = parsedTokens.tokenColors;
+                  } else if (Array.isArray(parsedTokens)) {
+                    tokenColors = parsedTokens;
+                  }
+                }
+              }
+
+              if (parsed.include) {
+                const incPath = path.isAbsolute(parsed.include) ? parsed.include : path.join(path.dirname(themePath), parsed.include);
+                if (fs.existsSync(incPath)) {
+                  try {
+                    const incParsed = JSON.parse(stripJsonComments(fs.readFileSync(incPath, 'utf8')));
+                    if (incParsed.colors) {
+                      for (const k of Object.keys(incParsed.colors)) {
+                        if (!colors[k]) colors[k] = incParsed.colors[k];
+                      }
+                    }
+                    if (Array.isArray(incParsed.tokenColors) && tokenColors.length === 0) {
+                      tokenColors = incParsed.tokenColors;
+                    }
+                  } catch (e) {}
+                }
+              }
+
+              return { colors, tokenColors };
+            }
+          } catch (err) {
+            // Ignore parse errors on unsupported formats and continue
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
 
 export class ThemeEngine {
   public static getTargetScope(): vscode.ConfigurationTarget {
@@ -28,23 +138,29 @@ export class ThemeEngine {
     else if (kind === vscode.ColorThemeKind.HighContrast) themeKind = 'high-contrast-dark';
     else if (kind === vscode.ColorThemeKind.HighContrastLight) themeKind = 'high-contrast-light';
 
-    // 1. Try matching against 50 built-in presets
-    const lower = themeName.toLowerCase();
-    const matched = THEME_PRESETS.find(
-      (p) =>
-        p.name.toLowerCase() === lower ||
-        p.id.toLowerCase() === lower ||
-        lower.includes(p.id.toLowerCase()) ||
-        lower.includes(p.name.toLowerCase())
-    );
-
     let baseColors: Record<string, string> = {};
     let baseTokenColors: TokenRule[] = [];
 
-    if (matched) {
-      baseColors = { ...matched.colors };
-      baseTokenColors = JSON.parse(JSON.stringify(matched.tokenColors));
+    // 1. Try reading directly from installed/built-in theme extension JSON file!
+    const fromExtension = tryReadInstalledThemeFile(themeName);
+    if (fromExtension && (Object.keys(fromExtension.colors).length > 0 || fromExtension.tokenColors.length > 0)) {
+      baseColors = { ...fromExtension.colors };
+      baseTokenColors = JSON.parse(JSON.stringify(fromExtension.tokenColors));
     } else {
+      // 2. Try matching against 50 built-in presets
+      const lower = themeName.toLowerCase();
+      const matched = THEME_PRESETS.find(
+        (p) =>
+          p.name.toLowerCase() === lower ||
+          p.id.toLowerCase() === lower ||
+          lower.includes(p.id.toLowerCase()) ||
+          lower.includes(p.name.toLowerCase())
+      );
+
+      if (matched) {
+        baseColors = { ...matched.colors };
+        baseTokenColors = JSON.parse(JSON.stringify(matched.tokenColors));
+      } else {
       // Build default base palette based on theme name or kind
       const isLight = themeKind === 'light' || lower.includes('light') || lower.includes('latte') || lower.includes('snow') || lower.includes('sun');
       const isHighContrast = themeKind.includes('high-contrast') || lower.includes('contrast');
@@ -207,6 +323,7 @@ export class ThemeEngine {
         ];
       }
     }
+  }
 
     // 2. Layer active customizations on top
     const userColors = workbench.get<Record<string, string>>('colorCustomizations') || {};

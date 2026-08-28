@@ -34,9 +34,47 @@ export class ThemeEngine {
     // 1. Update workbench.colorCustomizations
     await workbench.update('colorCustomizations', colors, target);
 
-    // 2. Update editor.tokenColorCustomizations if provided
+    // 2. Update editor.tokenColorCustomizations & semanticTokenColorCustomizations if provided
     if (tokenColors && tokenColors.length > 0) {
-      await editor.update('tokenColorCustomizations', { textMateRules: tokenColors }, target);
+      const tokenConfig: Record<string, any> = {
+        textMateRules: tokenColors,
+      };
+
+      const semanticRules: Record<string, string> = {};
+
+      tokenColors.forEach((r) => {
+        const fg = r.settings?.foreground;
+        if (!fg) return;
+        const scopes = Array.isArray(r.scope) ? r.scope : [r.scope];
+
+        if (scopes.some((s) => s.includes('string'))) {
+          tokenConfig.strings = fg;
+          semanticRules['string'] = fg;
+        } else if (scopes.some((s) => s.includes('keyword'))) {
+          tokenConfig.keywords = fg;
+          semanticRules['keyword'] = fg;
+        } else if (scopes.some((s) => s.includes('function'))) {
+          tokenConfig.functions = fg;
+          semanticRules['function'] = fg;
+        } else if (scopes.some((s) => s.includes('property') || s.includes('key'))) {
+          semanticRules['property'] = fg;
+        } else if (scopes.some((s) => s.includes('variable'))) {
+          tokenConfig.variables = fg;
+          semanticRules['variable'] = fg;
+        } else if (scopes.some((s) => s.includes('type') || s.includes('class'))) {
+          tokenConfig.types = fg;
+          semanticRules['type'] = fg;
+        } else if (scopes.some((s) => s.includes('comment'))) {
+          tokenConfig.comments = fg;
+          semanticRules['comment'] = fg;
+        } else if (scopes.some((s) => s.includes('numeric') || s.includes('number'))) {
+          tokenConfig.numbers = fg;
+          semanticRules['number'] = fg;
+        }
+      });
+
+      await editor.update('tokenColorCustomizations', tokenConfig, target);
+      await editor.update('semanticTokenColorCustomizations', { rules: semanticRules, enabled: true }, target);
     }
 
     // 3. Save active profile name if provided
@@ -57,17 +95,21 @@ export class ThemeEngine {
     const target = this.getTargetScope();
     const editor = vscode.workspace.getConfiguration('editor');
     const currentTokens = this.getCurrentTokenColors();
+    const tokenConfig: Record<string, any> = { ...(editor.get<any>('tokenColorCustomizations') || {}) };
+    const semanticConfig: Record<string, any> = { ...(editor.get<any>('semanticTokenColorCustomizations') || {}) };
+    const semanticRules: Record<string, string> = { ...(semanticConfig.rules || {}) };
     
     // Map syntaxId to scopes
     const scopeMap: Record<string, string[]> = {
       keywords: ['keyword', 'keyword.control', 'storage.type', 'storage.modifier'],
       functions: ['entity.name.function', 'support.function', 'meta.function-call'],
-      strings: ['string', 'string.quoted', 'string.template'],
-      variables: ['variable', 'variable.other', 'variable.parameter'],
-      types: ['entity.name.type', 'support.type', 'entity.name.class'],
+      properties: ['support.type.property-name', 'meta.object-literal.key', 'support.type.property-name.json', 'meta.structure.dictionary.json string.quoted.double.json', 'entity.name.tag.json'],
+      strings: ['string', 'string.quoted', 'string.quoted.double', 'string.quoted.single', 'string.template', 'string.unquoted', 'string.json', 'source.json string', 'meta.structure.dictionary.value.json string.quoted.double.json'],
+      variables: ['variable', 'variable.other', 'variable.parameter', 'variable.language'],
+      types: ['entity.name.type', 'support.type', 'entity.name.class', 'entity.other.inherited-class'],
       comments: ['comment', 'comment.line', 'comment.block'],
-      numbers: ['constant.numeric', 'constant.language.boolean', 'constant.language'],
-      operators: ['keyword.operator', 'punctuation.separator'],
+      numbers: ['constant.numeric', 'constant.numeric.json', 'constant.language.boolean', 'constant.language.json', 'constant.language'],
+      operators: ['keyword.operator', 'punctuation.separator', 'punctuation.terminator'],
       tags: ['entity.name.tag', 'entity.other.attribute-name'],
     };
 
@@ -90,7 +132,27 @@ export class ThemeEngine {
       });
     }
 
-    await editor.update('tokenColorCustomizations', { textMateRules: updated }, target);
+    tokenConfig.textMateRules = updated;
+    if (['strings', 'keywords', 'functions', 'variables', 'types', 'comments', 'numbers'].includes(syntaxId)) {
+      tokenConfig[syntaxId] = color;
+    }
+
+    const semKeyMap: Record<string, string> = {
+      strings: 'string',
+      keywords: 'keyword',
+      properties: 'property',
+      functions: 'function',
+      variables: 'variable',
+      types: 'type',
+      comments: 'comment',
+      numbers: 'number',
+    };
+    if (semKeyMap[syntaxId]) {
+      semanticRules[semKeyMap[syntaxId]] = color;
+    }
+
+    await editor.update('tokenColorCustomizations', tokenConfig, target);
+    await editor.update('semanticTokenColorCustomizations', { rules: semanticRules, enabled: true }, target);
   }
 
   public static async applyPreset(preset: ThemePreset): Promise<void> {
@@ -105,6 +167,7 @@ export class ThemeEngine {
 
     await workbench.update('colorCustomizations', undefined, target);
     await editor.update('tokenColorCustomizations', undefined, target);
+    await editor.update('semanticTokenColorCustomizations', undefined, target);
     await simpletheme.update('activeProfile', 'Default', target);
   }
 

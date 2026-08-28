@@ -339,7 +339,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#facc15",
@@ -349,7 +350,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#a3e635"
@@ -361,7 +363,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#bef264"
@@ -372,7 +378,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#facc15"
@@ -381,7 +388,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#f7fbe8"
@@ -390,7 +399,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#67e8f9"
@@ -398,7 +409,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#4b553e",
@@ -408,7 +421,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#fb923c"
@@ -416,15 +432,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#facc15"
+                  "foreground": "#f7fbe8"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#a3e635"
@@ -441,29 +460,29 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#ca8a04",
     colors: {
-      "foreground": "#1c1917",
-      "descriptionForeground": "#854d0e",
+      "foreground": "#181514",
+      "descriptionForeground": "#713f12",
       "disabledForeground": "#78716c",
       "icon.foreground": "#ca8a04",
       "editor.background": "#fefce8",
-      "editor.foreground": "#1c1917",
+      "editor.foreground": "#181514",
       "editorLineNumber.foreground": "#78716c",
       "editorLineNumber.activeForeground": "#ca8a04",
       "editorCursor.foreground": "#ca8a04",
       "editor.selectionBackground": "#fef08a88",
       "editor.lineHighlightBackground": "#fef08a88",
       "editorHoverWidget.background": "#fffbeb",
-      "editorHoverWidget.foreground": "#292524",
+      "editorHoverWidget.foreground": "#181514",
       "editorHoverWidget.border": "#fef08a88",
       "editorHoverWidget.statusBarBackground": "#fef08a88",
       "editorSuggestWidget.background": "#fffbeb",
-      "editorSuggestWidget.foreground": "#292524",
+      "editorSuggestWidget.foreground": "#181514",
       "editorSuggestWidget.border": "#fef08a88",
       "editorSuggestWidget.selectedBackground": "#fef08a88",
       "editorSuggestWidget.selectedForeground": "#713f12",
       "editorSuggestWidget.highlightForeground": "#ca8a04",
       "editorWidget.background": "#fffbeb",
-      "editorWidget.foreground": "#292524",
+      "editorWidget.foreground": "#181514",
       "editorWidget.border": "#fef08a88",
       "focusBorder": "#ca8a04",
       "activityBar.background": "#fef08a",
@@ -472,12 +491,12 @@ export const THEME_PRESETS: ThemePreset[] = [
       "activityBarBadge.background": "#ca8a04",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#fffbeb",
-      "sideBar.foreground": "#292524",
+      "sideBar.foreground": "#181514",
       "sideBarTitle.foreground": "#713f12",
       "sideBarSectionHeader.background": "#fef08a88",
-      "sideBarSectionHeader.foreground": "#292524",
+      "sideBarSectionHeader.foreground": "#181514",
       "titleBar.activeBackground": "#fef08a",
-      "titleBar.activeForeground": "#1c1917",
+      "titleBar.activeForeground": "#181514",
       "statusBar.background": "#eab308",
       "statusBar.foreground": "#422006",
       "statusBar.debuggingBackground": "#e11d48",
@@ -486,22 +505,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#713f12",
       "tab.activeBorderTop": "#ca8a04",
       "tab.inactiveBackground": "#fef08a88",
-      "tab.inactiveForeground": "#854d0e",
+      "tab.inactiveForeground": "#713f12",
       "tab.hoverBackground": "#fef08a88",
-      "breadcrumb.foreground": "#854d0e",
+      "breadcrumb.foreground": "#713f12",
       "terminal.background": "#fefce8",
-      "terminal.foreground": "#1c1917",
+      "terminal.foreground": "#181514",
       "terminalCursor.foreground": "#ca8a04",
-      "terminal.ansiGreen": "#4d7c0f",
-      "terminal.ansiCyan": "#0369a1",
-      "terminal.ansiYellow": "#0d9488",
+      "terminal.ansiGreen": "#15803d",
+      "terminal.ansiCyan": "#1d4ed8",
+      "terminal.ansiYellow": "#047857",
       "input.background": "#fef9c3",
-      "input.foreground": "#1c1917",
-      "input.placeholderForeground": "#854d0e",
+      "input.foreground": "#181514",
+      "input.placeholderForeground": "#713f12",
       "panel.background": "#fefce8",
       "panel.border": "#fffbeb",
       "panelTitle.activeForeground": "#ca8a04",
-      "panelTitle.inactiveForeground": "#854d0e",
+      "panelTitle.inactiveForeground": "#713f12",
       "panelTitle.activeBorder": "#ca8a04",
       "chat.requestBackground": "#fef9c3",
       "chat.requestBorder": "#fef08a88",
@@ -516,7 +535,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#c2410c",
@@ -526,10 +546,11 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
-                  "foreground": "#4d7c0f"
+                  "foreground": "#15803d"
             }
       },
       {
@@ -538,10 +559,14 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
-                  "foreground": "#0d9488"
+                  "foreground": "#047857"
             }
       },
       {
@@ -549,7 +574,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#c2410c"
@@ -558,24 +584,30 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#1c1917"
+                  "foreground": "#181514"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
-                  "foreground": "#0369a1"
+                  "foreground": "#1d4ed8"
             }
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#78716c",
@@ -585,26 +617,32 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
-                  "foreground": "#d97706"
+                  "foreground": "#b45309"
             }
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#c2410c"
+                  "foreground": "#181514"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
-                  "foreground": "#4d7c0f"
+                  "foreground": "#15803d"
             }
       }
 ],
@@ -693,7 +731,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#ffb000",
@@ -703,7 +742,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#00f0ff"
@@ -715,7 +755,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#648fff"
@@ -726,7 +770,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#ffb000"
@@ -735,7 +780,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#ffffff"
@@ -744,7 +791,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#dc267f"
@@ -752,7 +801,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#888888",
@@ -762,7 +813,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#fe6100"
@@ -770,15 +824,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#ffb000"
+                  "foreground": "#ffffff"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#00f0ff"
@@ -796,40 +853,40 @@ export const THEME_PRESETS: ThemePreset[] = [
     accentColor: "#005ab5",
     colors: {
       "foreground": "#000000",
-      "descriptionForeground": "#555555",
-      "disabledForeground": "#666666",
+      "descriptionForeground": "#444444",
+      "disabledForeground": "#555555",
       "icon.foreground": "#005ab5",
       "editor.background": "#ffffff",
       "editor.foreground": "#000000",
-      "editorLineNumber.foreground": "#666666",
+      "editorLineNumber.foreground": "#555555",
       "editorLineNumber.activeForeground": "#005ab5",
       "editorCursor.foreground": "#005ab5",
       "editor.selectionBackground": "#ebebeb",
       "editor.lineHighlightBackground": "#ebebeb",
       "editorHoverWidget.background": "#f4f4f4",
-      "editorHoverWidget.foreground": "#111111",
+      "editorHoverWidget.foreground": "#000000",
       "editorHoverWidget.border": "#ebebeb",
       "editorHoverWidget.statusBarBackground": "#ebebeb",
       "editorSuggestWidget.background": "#f4f4f4",
-      "editorSuggestWidget.foreground": "#111111",
+      "editorSuggestWidget.foreground": "#000000",
       "editorSuggestWidget.border": "#ebebeb",
       "editorSuggestWidget.selectedBackground": "#ebebeb",
       "editorSuggestWidget.selectedForeground": "#005ab5",
       "editorSuggestWidget.highlightForeground": "#005ab5",
       "editorWidget.background": "#f4f4f4",
-      "editorWidget.foreground": "#111111",
+      "editorWidget.foreground": "#000000",
       "editorWidget.border": "#ebebeb",
       "focusBorder": "#005ab5",
       "activityBar.background": "#e0e0e0",
       "activityBar.foreground": "#005ab5",
-      "activityBar.inactiveForeground": "#666666",
+      "activityBar.inactiveForeground": "#555555",
       "activityBarBadge.background": "#005ab5",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#f4f4f4",
-      "sideBar.foreground": "#111111",
+      "sideBar.foreground": "#000000",
       "sideBarTitle.foreground": "#005ab5",
       "sideBarSectionHeader.background": "#ebebeb",
-      "sideBarSectionHeader.foreground": "#111111",
+      "sideBarSectionHeader.foreground": "#000000",
       "titleBar.activeBackground": "#e0e0e0",
       "titleBar.activeForeground": "#000000",
       "statusBar.background": "#005ab5",
@@ -840,22 +897,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#005ab5",
       "tab.activeBorderTop": "#005ab5",
       "tab.inactiveBackground": "#ebebeb",
-      "tab.inactiveForeground": "#555555",
+      "tab.inactiveForeground": "#444444",
       "tab.hoverBackground": "#ebebeb",
-      "breadcrumb.foreground": "#555555",
+      "breadcrumb.foreground": "#444444",
       "terminal.background": "#ffffff",
       "terminal.foreground": "#000000",
       "terminalCursor.foreground": "#005ab5",
       "terminal.ansiGreen": "#005ab5",
       "terminal.ansiCyan": "#785ef0",
-      "terminal.ansiYellow": "#2b8a3e",
+      "terminal.ansiYellow": "#15803d",
       "input.background": "#f0f0f0",
       "input.foreground": "#000000",
-      "input.placeholderForeground": "#555555",
+      "input.placeholderForeground": "#444444",
       "panel.background": "#ffffff",
       "panel.border": "#f4f4f4",
       "panelTitle.activeForeground": "#005ab5",
-      "panelTitle.inactiveForeground": "#555555",
+      "panelTitle.inactiveForeground": "#444444",
       "panelTitle.activeBorder": "#005ab5",
       "chat.requestBackground": "#f0f0f0",
       "chat.requestBorder": "#ebebeb",
@@ -870,7 +927,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#dc267f",
@@ -880,7 +938,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#005ab5"
@@ -892,10 +951,14 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
-                  "foreground": "#2b8a3e"
+                  "foreground": "#15803d"
             }
       },
       {
@@ -903,7 +966,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#dc267f"
@@ -912,7 +976,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#000000"
@@ -921,7 +987,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#785ef0"
@@ -929,17 +997,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#666666",
+                  "foreground": "#555555",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#d95f02"
@@ -947,15 +1020,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#dc267f"
+                  "foreground": "#000000"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#005ab5"
@@ -1047,7 +1123,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#ffffff",
@@ -1057,7 +1134,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#e5e5e5"
@@ -1069,7 +1147,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#cccccc"
@@ -1080,7 +1162,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#ffffff"
@@ -1089,7 +1172,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#f5f5f5"
@@ -1098,7 +1183,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#b3b3b3"
@@ -1106,7 +1193,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#666666",
@@ -1116,7 +1205,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#ffffff"
@@ -1124,15 +1216,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#ffffff"
+                  "foreground": "#f5f5f5"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#e5e5e5"
@@ -1147,76 +1242,76 @@ export const THEME_PRESETS: ThemePreset[] = [
     name: "\ud83c\udfc1 Checkered Alabaster Grid",
     description: "Modern gallery architecture checkerboard with alternating alabaster panels and stark jet black typography.",
     type: "light",
-    accentColor: "#111111",
+    accentColor: "#000000",
     colors: {
-      "foreground": "#111111",
-      "descriptionForeground": "#666666",
-      "disabledForeground": "#777777",
-      "icon.foreground": "#111111",
+      "foreground": "#000000",
+      "descriptionForeground": "#444444",
+      "disabledForeground": "#555555",
+      "icon.foreground": "#000000",
       "editor.background": "#f9f9f9",
-      "editor.foreground": "#111111",
-      "editorLineNumber.foreground": "#777777",
-      "editorLineNumber.activeForeground": "#111111",
-      "editorCursor.foreground": "#111111",
+      "editor.foreground": "#000000",
+      "editorLineNumber.foreground": "#555555",
+      "editorLineNumber.activeForeground": "#000000",
+      "editorCursor.foreground": "#000000",
       "editor.selectionBackground": "#e5e5e5",
       "editor.lineHighlightBackground": "#e5e5e5",
       "editorHoverWidget.background": "#efefef",
-      "editorHoverWidget.foreground": "#1a1a1a",
+      "editorHoverWidget.foreground": "#000000",
       "editorHoverWidget.border": "#e5e5e5",
       "editorHoverWidget.statusBarBackground": "#e5e5e5",
       "editorSuggestWidget.background": "#efefef",
-      "editorSuggestWidget.foreground": "#1a1a1a",
+      "editorSuggestWidget.foreground": "#000000",
       "editorSuggestWidget.border": "#e5e5e5",
       "editorSuggestWidget.selectedBackground": "#e5e5e5",
       "editorSuggestWidget.selectedForeground": "#000000",
-      "editorSuggestWidget.highlightForeground": "#111111",
+      "editorSuggestWidget.highlightForeground": "#000000",
       "editorWidget.background": "#efefef",
-      "editorWidget.foreground": "#1a1a1a",
+      "editorWidget.foreground": "#000000",
       "editorWidget.border": "#e5e5e5",
-      "focusBorder": "#111111",
+      "focusBorder": "#000000",
       "activityBar.background": "#dcdcdc",
-      "activityBar.foreground": "#111111",
-      "activityBar.inactiveForeground": "#777777",
-      "activityBarBadge.background": "#111111",
+      "activityBar.foreground": "#000000",
+      "activityBar.inactiveForeground": "#555555",
+      "activityBarBadge.background": "#000000",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#efefef",
-      "sideBar.foreground": "#1a1a1a",
+      "sideBar.foreground": "#000000",
       "sideBarTitle.foreground": "#000000",
       "sideBarSectionHeader.background": "#e5e5e5",
-      "sideBarSectionHeader.foreground": "#1a1a1a",
+      "sideBarSectionHeader.foreground": "#000000",
       "titleBar.activeBackground": "#dcdcdc",
-      "titleBar.activeForeground": "#111111",
-      "statusBar.background": "#111111",
+      "titleBar.activeForeground": "#000000",
+      "statusBar.background": "#000000",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
       "editorGroupHeader.tabsBackground": "#efefef",
       "tab.activeBackground": "#f9f9f9",
       "tab.activeForeground": "#000000",
-      "tab.activeBorderTop": "#111111",
+      "tab.activeBorderTop": "#000000",
       "tab.inactiveBackground": "#e5e5e5",
-      "tab.inactiveForeground": "#666666",
+      "tab.inactiveForeground": "#444444",
       "tab.hoverBackground": "#e5e5e5",
-      "breadcrumb.foreground": "#666666",
+      "breadcrumb.foreground": "#444444",
       "terminal.background": "#f9f9f9",
-      "terminal.foreground": "#111111",
-      "terminalCursor.foreground": "#111111",
-      "terminal.ansiGreen": "#222222",
-      "terminal.ansiCyan": "#333333",
-      "terminal.ansiYellow": "#444444",
+      "terminal.foreground": "#000000",
+      "terminalCursor.foreground": "#000000",
+      "terminal.ansiGreen": "#1a1a1a",
+      "terminal.ansiCyan": "#1a1a1a",
+      "terminal.ansiYellow": "#2d2d2d",
       "input.background": "#ebebeb",
       "input.foreground": "#000000",
-      "input.placeholderForeground": "#666666",
+      "input.placeholderForeground": "#444444",
       "panel.background": "#f9f9f9",
       "panel.border": "#efefef",
-      "panelTitle.activeForeground": "#111111",
-      "panelTitle.inactiveForeground": "#666666",
-      "panelTitle.activeBorder": "#111111",
+      "panelTitle.activeForeground": "#000000",
+      "panelTitle.inactiveForeground": "#444444",
+      "panelTitle.activeBorder": "#000000",
       "chat.requestBackground": "#ebebeb",
       "chat.requestBorder": "#e5e5e5",
       "interactive.requestBackground": "#ebebeb",
       "textCodeBlock.background": "#e5e5e5",
-      "textLink.foreground": "#111111",
-      "badge.background": "#111111",
+      "textLink.foreground": "#000000",
+      "badge.background": "#000000",
       "badge.foreground": "#ffffff"
 },
     tokenColors: [
@@ -1224,7 +1319,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#000000",
@@ -1234,10 +1330,11 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
-                  "foreground": "#222222"
+                  "foreground": "#1a1a1a"
             }
       },
       {
@@ -1246,10 +1343,14 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
-                  "foreground": "#444444"
+                  "foreground": "#2d2d2d"
             }
       },
       {
@@ -1257,7 +1358,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#000000"
@@ -1266,34 +1368,43 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#111111"
+                  "foreground": "#000000"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
-                  "foreground": "#333333"
+                  "foreground": "#1a1a1a"
             }
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#777777",
+                  "foreground": "#555555",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#000000"
@@ -1301,7 +1412,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
                   "foreground": "#000000"
@@ -1309,10 +1422,11 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
-                  "foreground": "#222222"
+                  "foreground": "#1a1a1a"
             }
       }
 ],
@@ -1401,7 +1515,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#ffffff",
@@ -1411,7 +1526,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#ffffff"
@@ -1423,7 +1539,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#dddddd"
@@ -1434,7 +1554,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#ffffff"
@@ -1443,7 +1564,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#ffffff"
@@ -1452,7 +1575,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#ffffff"
@@ -1460,7 +1585,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#666666",
@@ -1470,7 +1597,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#ffffff"
@@ -1478,7 +1608,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
                   "foreground": "#ffffff"
@@ -1486,7 +1618,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#ffffff"
@@ -1578,7 +1711,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#ef4444",
@@ -1588,7 +1722,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#eab308"
@@ -1600,7 +1735,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#ffffff"
@@ -1611,7 +1750,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#ef4444"
@@ -1620,7 +1760,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#f4f4f5"
@@ -1629,7 +1771,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#38bdf8"
@@ -1637,7 +1781,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#71717a",
@@ -1647,7 +1793,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#22c55e"
@@ -1655,15 +1804,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#ef4444"
+                  "foreground": "#f4f4f5"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#eab308"
@@ -1680,67 +1832,67 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#268bd2",
     colors: {
-      "foreground": "#475b62",
-      "descriptionForeground": "#657b83",
-      "disabledForeground": "#839496",
+      "foreground": "#384c54",
+      "descriptionForeground": "#586e75",
+      "disabledForeground": "#78716c",
       "icon.foreground": "#268bd2",
       "editor.background": "#fdf6e3",
-      "editor.foreground": "#475b62",
-      "editorLineNumber.foreground": "#839496",
+      "editor.foreground": "#384c54",
+      "editorLineNumber.foreground": "#78716c",
       "editorLineNumber.activeForeground": "#268bd2",
       "editorCursor.foreground": "#268bd2",
       "editor.selectionBackground": "#eee8d5",
       "editor.lineHighlightBackground": "#eee8d5",
       "editorHoverWidget.background": "#eee8d5",
-      "editorHoverWidget.foreground": "#475b62",
+      "editorHoverWidget.foreground": "#384c54",
       "editorHoverWidget.border": "#eee8d5",
       "editorHoverWidget.statusBarBackground": "#eee8d5",
       "editorSuggestWidget.background": "#eee8d5",
-      "editorSuggestWidget.foreground": "#475b62",
+      "editorSuggestWidget.foreground": "#384c54",
       "editorSuggestWidget.border": "#eee8d5",
       "editorSuggestWidget.selectedBackground": "#eee8d5",
       "editorSuggestWidget.selectedForeground": "#268bd2",
       "editorSuggestWidget.highlightForeground": "#268bd2",
       "editorWidget.background": "#eee8d5",
-      "editorWidget.foreground": "#475b62",
+      "editorWidget.foreground": "#384c54",
       "editorWidget.border": "#eee8d5",
       "focusBorder": "#268bd2",
       "activityBar.background": "#eee8d5",
       "activityBar.foreground": "#268bd2",
-      "activityBar.inactiveForeground": "#839496",
+      "activityBar.inactiveForeground": "#78716c",
       "activityBarBadge.background": "#268bd2",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#eee8d5",
-      "sideBar.foreground": "#475b62",
+      "sideBar.foreground": "#384c54",
       "sideBarTitle.foreground": "#268bd2",
       "sideBarSectionHeader.background": "#eee8d5",
-      "sideBarSectionHeader.foreground": "#475b62",
+      "sideBarSectionHeader.foreground": "#384c54",
       "titleBar.activeBackground": "#eee8d5",
-      "titleBar.activeForeground": "#475b62",
+      "titleBar.activeForeground": "#384c54",
       "statusBar.background": "#eee8d5",
-      "statusBar.foreground": "#475b62",
+      "statusBar.foreground": "#384c54",
       "statusBar.debuggingBackground": "#e11d48",
       "editorGroupHeader.tabsBackground": "#eee8d5",
       "tab.activeBackground": "#fdf6e3",
       "tab.activeForeground": "#268bd2",
       "tab.activeBorderTop": "#268bd2",
       "tab.inactiveBackground": "#eee8d5",
-      "tab.inactiveForeground": "#657b83",
+      "tab.inactiveForeground": "#586e75",
       "tab.hoverBackground": "#eee8d5",
-      "breadcrumb.foreground": "#657b83",
+      "breadcrumb.foreground": "#586e75",
       "terminal.background": "#fdf6e3",
-      "terminal.foreground": "#475b62",
+      "terminal.foreground": "#384c54",
       "terminalCursor.foreground": "#268bd2",
-      "terminal.ansiGreen": "#268bd2",
-      "terminal.ansiCyan": "#b58900",
-      "terminal.ansiYellow": "#1f8c83",
+      "terminal.ansiGreen": "#1d4ed8",
+      "terminal.ansiCyan": "#b45309",
+      "terminal.ansiYellow": "#047857",
       "input.background": "#eee8d5",
-      "input.foreground": "#475b62",
-      "input.placeholderForeground": "#657b83",
+      "input.foreground": "#384c54",
+      "input.placeholderForeground": "#586e75",
       "panel.background": "#fdf6e3",
       "panel.border": "#eee8d5",
       "panelTitle.activeForeground": "#268bd2",
-      "panelTitle.inactiveForeground": "#657b83",
+      "panelTitle.inactiveForeground": "#586e75",
       "panelTitle.activeBorder": "#268bd2",
       "chat.requestBackground": "#eee8d5",
       "chat.requestBorder": "#eee8d5",
@@ -1755,7 +1907,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#859900",
@@ -1765,10 +1918,11 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
-                  "foreground": "#268bd2"
+                  "foreground": "#1d4ed8"
             }
       },
       {
@@ -1777,10 +1931,14 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
-                  "foreground": "#1f8c83"
+                  "foreground": "#047857"
             }
       },
       {
@@ -1788,7 +1946,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#859900"
@@ -1797,53 +1956,65 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#475b62"
+                  "foreground": "#384c54"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
-                  "foreground": "#b58900"
+                  "foreground": "#b45309"
             }
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#839496",
+                  "foreground": "#78716c",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
-                  "foreground": "#d33682"
+                  "foreground": "#b91c1c"
             }
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#859900"
+                  "foreground": "#384c54"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
-                  "foreground": "#268bd2"
+                  "foreground": "#1d4ed8"
             }
       }
 ],
@@ -1857,43 +2028,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#b58900",
     colors: {
-      "foreground": "#3b2c1f",
+      "foreground": "#332314",
       "descriptionForeground": "#6e5a44",
-      "disabledForeground": "#85735f",
+      "disabledForeground": "#78716c",
       "icon.foreground": "#b58900",
       "editor.background": "#faf2da",
-      "editor.foreground": "#3b2c1f",
-      "editorLineNumber.foreground": "#85735f",
+      "editor.foreground": "#332314",
+      "editorLineNumber.foreground": "#78716c",
       "editorLineNumber.activeForeground": "#b58900",
       "editorCursor.foreground": "#b58900",
       "editor.selectionBackground": "#ecdab0",
       "editor.lineHighlightBackground": "#ecdab0",
       "editorHoverWidget.background": "#f3e4c0",
-      "editorHoverWidget.foreground": "#3b2c1f",
+      "editorHoverWidget.foreground": "#332314",
       "editorHoverWidget.border": "#ecdab0",
       "editorHoverWidget.statusBarBackground": "#ecdab0",
       "editorSuggestWidget.background": "#f3e4c0",
-      "editorSuggestWidget.foreground": "#3b2c1f",
+      "editorSuggestWidget.foreground": "#332314",
       "editorSuggestWidget.border": "#ecdab0",
       "editorSuggestWidget.selectedBackground": "#ecdab0",
       "editorSuggestWidget.selectedForeground": "#b58900",
       "editorSuggestWidget.highlightForeground": "#b58900",
       "editorWidget.background": "#f3e4c0",
-      "editorWidget.foreground": "#3b2c1f",
+      "editorWidget.foreground": "#332314",
       "editorWidget.border": "#ecdab0",
       "focusBorder": "#b58900",
       "activityBar.background": "#ecdab0",
       "activityBar.foreground": "#b58900",
-      "activityBar.inactiveForeground": "#85735f",
+      "activityBar.inactiveForeground": "#78716c",
       "activityBarBadge.background": "#b58900",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#f3e4c0",
-      "sideBar.foreground": "#3b2c1f",
+      "sideBar.foreground": "#332314",
       "sideBarTitle.foreground": "#b58900",
       "sideBarSectionHeader.background": "#ecdab0",
-      "sideBarSectionHeader.foreground": "#3b2c1f",
+      "sideBarSectionHeader.foreground": "#332314",
       "titleBar.activeBackground": "#ecdab0",
-      "titleBar.activeForeground": "#3b2c1f",
+      "titleBar.activeForeground": "#332314",
       "statusBar.background": "#b58900",
       "statusBar.foreground": "#faf2da",
       "statusBar.debuggingBackground": "#e11d48",
@@ -1906,13 +2077,13 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.hoverBackground": "#ecdab0",
       "breadcrumb.foreground": "#6e5a44",
       "terminal.background": "#faf2da",
-      "terminal.foreground": "#3b2c1f",
+      "terminal.foreground": "#332314",
       "terminalCursor.foreground": "#b58900",
       "terminal.ansiGreen": "#1d4ed8",
-      "terminal.ansiCyan": "#b58900",
-      "terminal.ansiYellow": "#0f766e",
+      "terminal.ansiCyan": "#b45309",
+      "terminal.ansiYellow": "#047857",
       "input.background": "#ecdab0",
-      "input.foreground": "#3b2c1f",
+      "input.foreground": "#332314",
       "input.placeholderForeground": "#6e5a44",
       "panel.background": "#faf2da",
       "panel.border": "#f3e4c0",
@@ -1932,17 +2103,19 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
-                  "foreground": "#cb4b16",
+                  "foreground": "#c2410c",
                   "fontStyle": "bold"
             }
       },
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#1d4ed8"
@@ -1954,10 +2127,14 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
-                  "foreground": "#0f766e"
+                  "foreground": "#047857"
             }
       },
       {
@@ -1965,43 +2142,53 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
-                  "foreground": "#cb4b16"
+                  "foreground": "#c2410c"
             }
       },
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#3b2c1f"
+                  "foreground": "#332314"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
-                  "foreground": "#b58900"
+                  "foreground": "#b45309"
             }
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#85735f",
+                  "foreground": "#78716c",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#b91c1c"
@@ -2009,15 +2196,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#cb4b16"
+                  "foreground": "#332314"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#1d4ed8"
@@ -2109,7 +2299,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#859900",
@@ -2119,7 +2310,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#268bd2"
@@ -2131,7 +2323,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#2aa198"
@@ -2142,7 +2338,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#859900"
@@ -2151,7 +2348,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#839496"
@@ -2160,7 +2359,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#b58900"
@@ -2168,7 +2369,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#586e75",
@@ -2178,7 +2381,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#d33682"
@@ -2186,15 +2392,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#859900"
+                  "foreground": "#839496"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#268bd2"
@@ -2211,67 +2420,67 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#d7827e",
     colors: {
-      "foreground": "#403a60",
-      "descriptionForeground": "#797593",
-      "disabledForeground": "#888299",
+      "foreground": "#3b3254",
+      "descriptionForeground": "#6e6884",
+      "disabledForeground": "#716a82",
       "icon.foreground": "#d7827e",
       "editor.background": "#faf4ed",
-      "editor.foreground": "#403a60",
-      "editorLineNumber.foreground": "#888299",
+      "editor.foreground": "#3b3254",
+      "editorLineNumber.foreground": "#716a82",
       "editorLineNumber.activeForeground": "#d7827e",
       "editorCursor.foreground": "#d7827e",
       "editor.selectionBackground": "#f2e9e1",
       "editor.lineHighlightBackground": "#f2e9e1",
       "editorHoverWidget.background": "#f4ebe2",
-      "editorHoverWidget.foreground": "#403a60",
+      "editorHoverWidget.foreground": "#3b3254",
       "editorHoverWidget.border": "#f2e9e1",
       "editorHoverWidget.statusBarBackground": "#f2e9e1",
       "editorSuggestWidget.background": "#f4ebe2",
-      "editorSuggestWidget.foreground": "#403a60",
+      "editorSuggestWidget.foreground": "#3b3254",
       "editorSuggestWidget.border": "#f2e9e1",
       "editorSuggestWidget.selectedBackground": "#f2e9e1",
       "editorSuggestWidget.selectedForeground": "#d7827e",
       "editorSuggestWidget.highlightForeground": "#d7827e",
       "editorWidget.background": "#f4ebe2",
-      "editorWidget.foreground": "#403a60",
+      "editorWidget.foreground": "#3b3254",
       "editorWidget.border": "#f2e9e1",
       "focusBorder": "#d7827e",
       "activityBar.background": "#f2e9e1",
       "activityBar.foreground": "#d7827e",
-      "activityBar.inactiveForeground": "#888299",
+      "activityBar.inactiveForeground": "#716a82",
       "activityBarBadge.background": "#d7827e",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#f4ebe2",
-      "sideBar.foreground": "#403a60",
+      "sideBar.foreground": "#3b3254",
       "sideBarTitle.foreground": "#d7827e",
       "sideBarSectionHeader.background": "#f2e9e1",
-      "sideBarSectionHeader.foreground": "#403a60",
+      "sideBarSectionHeader.foreground": "#3b3254",
       "titleBar.activeBackground": "#f2e9e1",
-      "titleBar.activeForeground": "#403a60",
+      "titleBar.activeForeground": "#3b3254",
       "statusBar.background": "#f2e9e1",
-      "statusBar.foreground": "#403a60",
+      "statusBar.foreground": "#3b3254",
       "statusBar.debuggingBackground": "#e11d48",
       "editorGroupHeader.tabsBackground": "#f4ebe2",
       "tab.activeBackground": "#faf4ed",
       "tab.activeForeground": "#d7827e",
       "tab.activeBorderTop": "#d7827e",
       "tab.inactiveBackground": "#f2e9e1",
-      "tab.inactiveForeground": "#797593",
+      "tab.inactiveForeground": "#6e6884",
       "tab.hoverBackground": "#f2e9e1",
-      "breadcrumb.foreground": "#797593",
+      "breadcrumb.foreground": "#6e6884",
       "terminal.background": "#faf4ed",
-      "terminal.foreground": "#403a60",
+      "terminal.foreground": "#3b3254",
       "terminalCursor.foreground": "#d7827e",
       "terminal.ansiGreen": "#1d4ed8",
-      "terminal.ansiCyan": "#0f766e",
+      "terminal.ansiCyan": "#047857",
       "terminal.ansiYellow": "#b45309",
       "input.background": "#f2e9e1",
-      "input.foreground": "#403a60",
-      "input.placeholderForeground": "#797593",
+      "input.foreground": "#3b3254",
+      "input.placeholderForeground": "#6e6884",
       "panel.background": "#faf4ed",
       "panel.border": "#f4ebe2",
       "panelTitle.activeForeground": "#d7827e",
-      "panelTitle.inactiveForeground": "#797593",
+      "panelTitle.inactiveForeground": "#6e6884",
       "panelTitle.activeBorder": "#d7827e",
       "chat.requestBackground": "#f2e9e1",
       "chat.requestBorder": "#f2e9e1",
@@ -2286,7 +2495,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#b91c1c",
@@ -2296,7 +2506,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#1d4ed8"
@@ -2308,7 +2519,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#b45309"
@@ -2319,7 +2534,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#b91c1c"
@@ -2328,50 +2544,62 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#403a60"
+                  "foreground": "#3b3254"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
-                  "foreground": "#0f766e"
+                  "foreground": "#047857"
             }
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#888299",
+                  "foreground": "#716a82",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
-                  "foreground": "#b4637a"
+                  "foreground": "#be123c"
             }
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#b91c1c"
+                  "foreground": "#3b3254"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#1d4ed8"
@@ -2388,43 +2616,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#b45309",
     colors: {
-      "foreground": "#2d1f14",
+      "foreground": "#2b1b10",
       "descriptionForeground": "#78350f",
-      "disabledForeground": "#8f7055",
+      "disabledForeground": "#785e49",
       "icon.foreground": "#b45309",
       "editor.background": "#fffaf0",
-      "editor.foreground": "#2d1f14",
-      "editorLineNumber.foreground": "#8f7055",
+      "editor.foreground": "#2b1b10",
+      "editorLineNumber.foreground": "#785e49",
       "editorLineNumber.activeForeground": "#b45309",
       "editorCursor.foreground": "#b45309",
       "editor.selectionBackground": "#ffedd5",
       "editor.lineHighlightBackground": "#ffedd5",
       "editorHoverWidget.background": "#fff7ed",
-      "editorHoverWidget.foreground": "#2d1f14",
+      "editorHoverWidget.foreground": "#2b1b10",
       "editorHoverWidget.border": "#ffedd5",
       "editorHoverWidget.statusBarBackground": "#ffedd5",
       "editorSuggestWidget.background": "#fff7ed",
-      "editorSuggestWidget.foreground": "#2d1f14",
+      "editorSuggestWidget.foreground": "#2b1b10",
       "editorSuggestWidget.border": "#ffedd5",
       "editorSuggestWidget.selectedBackground": "#ffedd5",
       "editorSuggestWidget.selectedForeground": "#7c2d12",
       "editorSuggestWidget.highlightForeground": "#b45309",
       "editorWidget.background": "#fff7ed",
-      "editorWidget.foreground": "#2d1f14",
+      "editorWidget.foreground": "#2b1b10",
       "editorWidget.border": "#ffedd5",
       "focusBorder": "#b45309",
       "activityBar.background": "#ffedd5",
       "activityBar.foreground": "#b45309",
-      "activityBar.inactiveForeground": "#8f7055",
+      "activityBar.inactiveForeground": "#785e49",
       "activityBarBadge.background": "#b45309",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#fff7ed",
-      "sideBar.foreground": "#2d1f14",
+      "sideBar.foreground": "#2b1b10",
       "sideBarTitle.foreground": "#7c2d12",
       "sideBarSectionHeader.background": "#ffedd5",
-      "sideBarSectionHeader.foreground": "#2d1f14",
+      "sideBarSectionHeader.foreground": "#2b1b10",
       "titleBar.activeBackground": "#ffedd5",
-      "titleBar.activeForeground": "#2d1f14",
+      "titleBar.activeForeground": "#2b1b10",
       "statusBar.background": "#c2410c",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -2437,13 +2665,13 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.hoverBackground": "#ffedd5",
       "breadcrumb.foreground": "#78350f",
       "terminal.background": "#fffaf0",
-      "terminal.foreground": "#2d1f14",
+      "terminal.foreground": "#2b1b10",
       "terminalCursor.foreground": "#b45309",
       "terminal.ansiGreen": "#b45309",
       "terminal.ansiCyan": "#0f766e",
       "terminal.ansiYellow": "#15803d",
       "input.background": "#ffedd5",
-      "input.foreground": "#2d1f14",
+      "input.foreground": "#2b1b10",
       "input.placeholderForeground": "#78350f",
       "panel.background": "#fffaf0",
       "panel.border": "#fff7ed",
@@ -2463,7 +2691,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#c2410c",
@@ -2473,7 +2702,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#b45309"
@@ -2485,7 +2715,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#15803d"
@@ -2496,7 +2730,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#c2410c"
@@ -2505,16 +2740,20 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#2d1f14"
+                  "foreground": "#2b1b10"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#0f766e"
@@ -2522,17 +2761,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#8f7055",
+                  "foreground": "#785e49",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#991b1b"
@@ -2540,15 +2784,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#c2410c"
+                  "foreground": "#2b1b10"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#b45309"
@@ -2565,43 +2812,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#8b4513",
     colors: {
-      "foreground": "#382312",
+      "foreground": "#2c1b0d",
       "descriptionForeground": "#6e553e",
-      "disabledForeground": "#856f5c",
+      "disabledForeground": "#6e5744",
       "icon.foreground": "#8b4513",
       "editor.background": "#f5eedb",
-      "editor.foreground": "#382312",
-      "editorLineNumber.foreground": "#856f5c",
+      "editor.foreground": "#2c1b0d",
+      "editorLineNumber.foreground": "#6e5744",
       "editorLineNumber.activeForeground": "#8b4513",
       "editorCursor.foreground": "#8b4513",
       "editor.selectionBackground": "#e8dcbe",
       "editor.lineHighlightBackground": "#e8dcbe",
       "editorHoverWidget.background": "#eee3c8",
-      "editorHoverWidget.foreground": "#382312",
+      "editorHoverWidget.foreground": "#2c1b0d",
       "editorHoverWidget.border": "#e8dcbe",
       "editorHoverWidget.statusBarBackground": "#e8dcbe",
       "editorSuggestWidget.background": "#eee3c8",
-      "editorSuggestWidget.foreground": "#382312",
+      "editorSuggestWidget.foreground": "#2c1b0d",
       "editorSuggestWidget.border": "#e8dcbe",
       "editorSuggestWidget.selectedBackground": "#e8dcbe",
       "editorSuggestWidget.selectedForeground": "#8b4513",
       "editorSuggestWidget.highlightForeground": "#8b4513",
       "editorWidget.background": "#eee3c8",
-      "editorWidget.foreground": "#382312",
+      "editorWidget.foreground": "#2c1b0d",
       "editorWidget.border": "#e8dcbe",
       "focusBorder": "#8b4513",
       "activityBar.background": "#e8dcbe",
       "activityBar.foreground": "#8b4513",
-      "activityBar.inactiveForeground": "#856f5c",
+      "activityBar.inactiveForeground": "#6e5744",
       "activityBarBadge.background": "#8b4513",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#eee3c8",
-      "sideBar.foreground": "#382312",
+      "sideBar.foreground": "#2c1b0d",
       "sideBarTitle.foreground": "#8b4513",
       "sideBarSectionHeader.background": "#e8dcbe",
-      "sideBarSectionHeader.foreground": "#382312",
+      "sideBarSectionHeader.foreground": "#2c1b0d",
       "titleBar.activeBackground": "#e8dcbe",
-      "titleBar.activeForeground": "#382312",
+      "titleBar.activeForeground": "#2c1b0d",
       "statusBar.background": "#8b4513",
       "statusBar.foreground": "#f5eedb",
       "statusBar.debuggingBackground": "#e11d48",
@@ -2614,13 +2861,13 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.hoverBackground": "#e8dcbe",
       "breadcrumb.foreground": "#6e553e",
       "terminal.background": "#f5eedb",
-      "terminal.foreground": "#382312",
+      "terminal.foreground": "#2c1b0d",
       "terminalCursor.foreground": "#8b4513",
-      "terminal.ansiGreen": "#2b593f",
-      "terminal.ansiCyan": "#1e5b4f",
+      "terminal.ansiGreen": "#1b4d3e",
+      "terminal.ansiCyan": "#1d4ed8",
       "terminal.ansiYellow": "#92400e",
       "input.background": "#e8dcbe",
-      "input.foreground": "#382312",
+      "input.foreground": "#2c1b0d",
       "input.placeholderForeground": "#6e553e",
       "panel.background": "#f5eedb",
       "panel.border": "#eee3c8",
@@ -2640,7 +2887,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#8b4513",
@@ -2650,10 +2898,11 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
-                  "foreground": "#2b593f"
+                  "foreground": "#1b4d3e"
             }
       },
       {
@@ -2662,7 +2911,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#92400e"
@@ -2673,7 +2926,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#8b4513"
@@ -2682,53 +2936,65 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#382312"
+                  "foreground": "#2c1b0d"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
-                  "foreground": "#1e5b4f"
+                  "foreground": "#1d4ed8"
             }
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#856f5c",
+                  "foreground": "#6e5744",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
-                  "foreground": "#a0351d"
+                  "foreground": "#991b1b"
             }
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#8b4513"
+                  "foreground": "#2c1b0d"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
-                  "foreground": "#2b593f"
+                  "foreground": "#1b4d3e"
             }
       }
 ],
@@ -2742,43 +3008,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#4d7c0f",
     colors: {
-      "foreground": "#1e2912",
-      "descriptionForeground": "#4d7c0f",
-      "disabledForeground": "#65a30d",
+      "foreground": "#1a260e",
+      "descriptionForeground": "#3f6212",
+      "disabledForeground": "#4d7c0f",
       "icon.foreground": "#4d7c0f",
       "editor.background": "#f7fee7",
-      "editor.foreground": "#1e2912",
-      "editorLineNumber.foreground": "#65a30d",
+      "editor.foreground": "#1a260e",
+      "editorLineNumber.foreground": "#4d7c0f",
       "editorLineNumber.activeForeground": "#4d7c0f",
       "editorCursor.foreground": "#4d7c0f",
       "editor.selectionBackground": "#d9f99d",
       "editor.lineHighlightBackground": "#d9f99d",
       "editorHoverWidget.background": "#ecfccb",
-      "editorHoverWidget.foreground": "#1e2912",
+      "editorHoverWidget.foreground": "#1a260e",
       "editorHoverWidget.border": "#d9f99d",
       "editorHoverWidget.statusBarBackground": "#d9f99d",
       "editorSuggestWidget.background": "#ecfccb",
-      "editorSuggestWidget.foreground": "#1e2912",
+      "editorSuggestWidget.foreground": "#1a260e",
       "editorSuggestWidget.border": "#d9f99d",
       "editorSuggestWidget.selectedBackground": "#d9f99d",
       "editorSuggestWidget.selectedForeground": "#3f6212",
       "editorSuggestWidget.highlightForeground": "#4d7c0f",
       "editorWidget.background": "#ecfccb",
-      "editorWidget.foreground": "#1e2912",
+      "editorWidget.foreground": "#1a260e",
       "editorWidget.border": "#d9f99d",
       "focusBorder": "#4d7c0f",
       "activityBar.background": "#d9f99d",
       "activityBar.foreground": "#4d7c0f",
-      "activityBar.inactiveForeground": "#65a30d",
+      "activityBar.inactiveForeground": "#4d7c0f",
       "activityBarBadge.background": "#4d7c0f",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#ecfccb",
-      "sideBar.foreground": "#1e2912",
+      "sideBar.foreground": "#1a260e",
       "sideBarTitle.foreground": "#3f6212",
       "sideBarSectionHeader.background": "#d9f99d",
-      "sideBarSectionHeader.foreground": "#1e2912",
+      "sideBarSectionHeader.foreground": "#1a260e",
       "titleBar.activeBackground": "#d9f99d",
-      "titleBar.activeForeground": "#1e2912",
+      "titleBar.activeForeground": "#1a260e",
       "statusBar.background": "#4d7c0f",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -2787,22 +3053,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#3f6212",
       "tab.activeBorderTop": "#4d7c0f",
       "tab.inactiveBackground": "#d9f99d",
-      "tab.inactiveForeground": "#4d7c0f",
+      "tab.inactiveForeground": "#3f6212",
       "tab.hoverBackground": "#d9f99d",
-      "breadcrumb.foreground": "#4d7c0f",
+      "breadcrumb.foreground": "#3f6212",
       "terminal.background": "#f7fee7",
-      "terminal.foreground": "#1e2912",
+      "terminal.foreground": "#1a260e",
       "terminalCursor.foreground": "#4d7c0f",
       "terminal.ansiGreen": "#15803d",
       "terminal.ansiCyan": "#047857",
       "terminal.ansiYellow": "#b45309",
       "input.background": "#ecfccb",
-      "input.foreground": "#1e2912",
-      "input.placeholderForeground": "#4d7c0f",
+      "input.foreground": "#1a260e",
+      "input.placeholderForeground": "#3f6212",
       "panel.background": "#f7fee7",
       "panel.border": "#ecfccb",
       "panelTitle.activeForeground": "#4d7c0f",
-      "panelTitle.inactiveForeground": "#4d7c0f",
+      "panelTitle.inactiveForeground": "#3f6212",
       "panelTitle.activeBorder": "#4d7c0f",
       "chat.requestBackground": "#ecfccb",
       "chat.requestBorder": "#d9f99d",
@@ -2817,7 +3083,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#3f6212",
@@ -2827,7 +3094,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#15803d"
@@ -2839,7 +3107,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#b45309"
@@ -2850,7 +3122,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#3f6212"
@@ -2859,16 +3132,20 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#1e2912"
+                  "foreground": "#1a260e"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#047857"
@@ -2876,17 +3153,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#65a30d",
+                  "foreground": "#4d7c0f",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#c2410c"
@@ -2894,15 +3176,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#3f6212"
+                  "foreground": "#1a260e"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#15803d"
@@ -2919,43 +3204,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#d97706",
     colors: {
-      "foreground": "#381401",
+      "foreground": "#301201",
       "descriptionForeground": "#78350f",
-      "disabledForeground": "#b45309",
+      "disabledForeground": "#92400e",
       "icon.foreground": "#d97706",
       "editor.background": "#fffbeb",
-      "editor.foreground": "#381401",
-      "editorLineNumber.foreground": "#b45309",
+      "editor.foreground": "#301201",
+      "editorLineNumber.foreground": "#92400e",
       "editorLineNumber.activeForeground": "#d97706",
       "editorCursor.foreground": "#d97706",
       "editor.selectionBackground": "#fde68a",
       "editor.lineHighlightBackground": "#fde68a",
       "editorHoverWidget.background": "#fef3c7",
-      "editorHoverWidget.foreground": "#381401",
+      "editorHoverWidget.foreground": "#301201",
       "editorHoverWidget.border": "#fde68a",
       "editorHoverWidget.statusBarBackground": "#fde68a",
       "editorSuggestWidget.background": "#fef3c7",
-      "editorSuggestWidget.foreground": "#381401",
+      "editorSuggestWidget.foreground": "#301201",
       "editorSuggestWidget.border": "#fde68a",
       "editorSuggestWidget.selectedBackground": "#fde68a",
       "editorSuggestWidget.selectedForeground": "#92400e",
       "editorSuggestWidget.highlightForeground": "#d97706",
       "editorWidget.background": "#fef3c7",
-      "editorWidget.foreground": "#381401",
+      "editorWidget.foreground": "#301201",
       "editorWidget.border": "#fde68a",
       "focusBorder": "#d97706",
       "activityBar.background": "#fde68a",
       "activityBar.foreground": "#d97706",
-      "activityBar.inactiveForeground": "#b45309",
+      "activityBar.inactiveForeground": "#92400e",
       "activityBarBadge.background": "#d97706",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#fef3c7",
-      "sideBar.foreground": "#381401",
+      "sideBar.foreground": "#301201",
       "sideBarTitle.foreground": "#92400e",
       "sideBarSectionHeader.background": "#fde68a",
-      "sideBarSectionHeader.foreground": "#381401",
+      "sideBarSectionHeader.foreground": "#301201",
       "titleBar.activeBackground": "#fde68a",
-      "titleBar.activeForeground": "#381401",
+      "titleBar.activeForeground": "#301201",
       "statusBar.background": "#b45309",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -2968,13 +3253,13 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.hoverBackground": "#fde68a",
       "breadcrumb.foreground": "#78350f",
       "terminal.background": "#fffbeb",
-      "terminal.foreground": "#381401",
+      "terminal.foreground": "#301201",
       "terminalCursor.foreground": "#d97706",
       "terminal.ansiGreen": "#78350f",
       "terminal.ansiCyan": "#b91c1c",
       "terminal.ansiYellow": "#047857",
       "input.background": "#fef3c7",
-      "input.foreground": "#381401",
+      "input.foreground": "#301201",
       "input.placeholderForeground": "#78350f",
       "panel.background": "#fffbeb",
       "panel.border": "#fef3c7",
@@ -2994,7 +3279,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#b45309",
@@ -3004,7 +3290,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#78350f"
@@ -3016,7 +3303,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#047857"
@@ -3027,7 +3318,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#b45309"
@@ -3036,16 +3328,20 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#381401"
+                  "foreground": "#301201"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#b91c1c"
@@ -3053,17 +3349,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#b45309",
+                  "foreground": "#92400e",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#c2410c"
@@ -3071,15 +3372,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#b45309"
+                  "foreground": "#301201"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#78350f"
@@ -3096,43 +3400,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#9a3412",
     colors: {
-      "foreground": "#2c1a0c",
+      "foreground": "#241407",
       "descriptionForeground": "#78350f",
-      "disabledForeground": "#8a6e55",
+      "disabledForeground": "#785b42",
       "icon.foreground": "#9a3412",
       "editor.background": "#faf5ee",
-      "editor.foreground": "#2c1a0c",
-      "editorLineNumber.foreground": "#8a6e55",
+      "editor.foreground": "#241407",
+      "editorLineNumber.foreground": "#785b42",
       "editorLineNumber.activeForeground": "#9a3412",
       "editorCursor.foreground": "#9a3412",
       "editor.selectionBackground": "#ebd8c3",
       "editor.lineHighlightBackground": "#ebd8c3",
       "editorHoverWidget.background": "#f3e8da",
-      "editorHoverWidget.foreground": "#2c1a0c",
+      "editorHoverWidget.foreground": "#241407",
       "editorHoverWidget.border": "#ebd8c3",
       "editorHoverWidget.statusBarBackground": "#ebd8c3",
       "editorSuggestWidget.background": "#f3e8da",
-      "editorSuggestWidget.foreground": "#2c1a0c",
+      "editorSuggestWidget.foreground": "#241407",
       "editorSuggestWidget.border": "#ebd8c3",
       "editorSuggestWidget.selectedBackground": "#ebd8c3",
       "editorSuggestWidget.selectedForeground": "#7c2d12",
       "editorSuggestWidget.highlightForeground": "#9a3412",
       "editorWidget.background": "#f3e8da",
-      "editorWidget.foreground": "#2c1a0c",
+      "editorWidget.foreground": "#241407",
       "editorWidget.border": "#ebd8c3",
       "focusBorder": "#9a3412",
       "activityBar.background": "#ebd8c3",
       "activityBar.foreground": "#9a3412",
-      "activityBar.inactiveForeground": "#8a6e55",
+      "activityBar.inactiveForeground": "#785b42",
       "activityBarBadge.background": "#9a3412",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#f3e8da",
-      "sideBar.foreground": "#2c1a0c",
+      "sideBar.foreground": "#241407",
       "sideBarTitle.foreground": "#7c2d12",
       "sideBarSectionHeader.background": "#ebd8c3",
-      "sideBarSectionHeader.foreground": "#2c1a0c",
+      "sideBarSectionHeader.foreground": "#241407",
       "titleBar.activeBackground": "#ebd8c3",
-      "titleBar.activeForeground": "#2c1a0c",
+      "titleBar.activeForeground": "#241407",
       "statusBar.background": "#7c2d12",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -3145,13 +3449,13 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.hoverBackground": "#ebd8c3",
       "breadcrumb.foreground": "#78350f",
       "terminal.background": "#faf5ee",
-      "terminal.foreground": "#2c1a0c",
+      "terminal.foreground": "#241407",
       "terminalCursor.foreground": "#9a3412",
       "terminal.ansiGreen": "#1e4d30",
-      "terminal.ansiCyan": "#7c3aed",
+      "terminal.ansiCyan": "#6d28d9",
       "terminal.ansiYellow": "#b45309",
       "input.background": "#f3e8da",
-      "input.foreground": "#2c1a0c",
+      "input.foreground": "#241407",
       "input.placeholderForeground": "#78350f",
       "panel.background": "#faf5ee",
       "panel.border": "#f3e8da",
@@ -3171,7 +3475,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#9a3412",
@@ -3181,7 +3486,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#1e4d30"
@@ -3193,7 +3499,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#b45309"
@@ -3204,7 +3514,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#9a3412"
@@ -3213,34 +3524,43 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#2c1a0c"
+                  "foreground": "#241407"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
-                  "foreground": "#7c3aed"
+                  "foreground": "#6d28d9"
             }
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#8a6e55",
+                  "foreground": "#785b42",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#c2410c"
@@ -3248,15 +3568,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#9a3412"
+                  "foreground": "#241407"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#1e4d30"
@@ -3273,43 +3596,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#eab308",
     colors: {
-      "foreground": "#2a1e08",
+      "foreground": "#241804",
       "descriptionForeground": "#713f12",
-      "disabledForeground": "#a16207",
+      "disabledForeground": "#854d0e",
       "icon.foreground": "#eab308",
       "editor.background": "#fefce8",
-      "editor.foreground": "#2a1e08",
-      "editorLineNumber.foreground": "#a16207",
+      "editor.foreground": "#241804",
+      "editorLineNumber.foreground": "#854d0e",
       "editorLineNumber.activeForeground": "#eab308",
       "editorCursor.foreground": "#eab308",
       "editor.selectionBackground": "#fde047",
       "editor.lineHighlightBackground": "#fde047",
       "editorHoverWidget.background": "#fef08a",
-      "editorHoverWidget.foreground": "#2a1e08",
+      "editorHoverWidget.foreground": "#241804",
       "editorHoverWidget.border": "#fde047",
       "editorHoverWidget.statusBarBackground": "#fde047",
       "editorSuggestWidget.background": "#fef08a",
-      "editorSuggestWidget.foreground": "#2a1e08",
+      "editorSuggestWidget.foreground": "#241804",
       "editorSuggestWidget.border": "#fde047",
       "editorSuggestWidget.selectedBackground": "#fde047",
       "editorSuggestWidget.selectedForeground": "#854d0e",
       "editorSuggestWidget.highlightForeground": "#eab308",
       "editorWidget.background": "#fef08a",
-      "editorWidget.foreground": "#2a1e08",
+      "editorWidget.foreground": "#241804",
       "editorWidget.border": "#fde047",
       "focusBorder": "#eab308",
       "activityBar.background": "#fde047",
       "activityBar.foreground": "#eab308",
-      "activityBar.inactiveForeground": "#a16207",
+      "activityBar.inactiveForeground": "#854d0e",
       "activityBarBadge.background": "#eab308",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#fef08a",
-      "sideBar.foreground": "#2a1e08",
+      "sideBar.foreground": "#241804",
       "sideBarTitle.foreground": "#854d0e",
       "sideBarSectionHeader.background": "#fde047",
-      "sideBarSectionHeader.foreground": "#2a1e08",
+      "sideBarSectionHeader.foreground": "#241804",
       "titleBar.activeBackground": "#fde047",
-      "titleBar.activeForeground": "#2a1e08",
+      "titleBar.activeForeground": "#241804",
       "statusBar.background": "#ca8a04",
       "statusBar.foreground": "#000000",
       "statusBar.debuggingBackground": "#e11d48",
@@ -3322,13 +3645,13 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.hoverBackground": "#fde047",
       "breadcrumb.foreground": "#713f12",
       "terminal.background": "#fefce8",
-      "terminal.foreground": "#2a1e08",
+      "terminal.foreground": "#241804",
       "terminalCursor.foreground": "#eab308",
       "terminal.ansiGreen": "#15803d",
-      "terminal.ansiCyan": "#0369a1",
+      "terminal.ansiCyan": "#1d4ed8",
       "terminal.ansiYellow": "#b45309",
       "input.background": "#fef9c3",
-      "input.foreground": "#2a1e08",
+      "input.foreground": "#241804",
       "input.placeholderForeground": "#713f12",
       "panel.background": "#fefce8",
       "panel.border": "#fef08a",
@@ -3348,7 +3671,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#c2410c",
@@ -3358,7 +3682,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#15803d"
@@ -3370,7 +3695,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#b45309"
@@ -3381,7 +3710,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#c2410c"
@@ -3390,34 +3720,43 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#2a1e08"
+                  "foreground": "#241804"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
-                  "foreground": "#0369a1"
+                  "foreground": "#1d4ed8"
             }
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#a16207",
+                  "foreground": "#854d0e",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#dc2626"
@@ -3425,15 +3764,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#c2410c"
+                  "foreground": "#241804"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#15803d"
@@ -3450,43 +3792,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#e11d48",
     colors: {
-      "foreground": "#3b0211",
+      "foreground": "#30010c",
       "descriptionForeground": "#881337",
-      "disabledForeground": "#e11d48",
+      "disabledForeground": "#9f1239",
       "icon.foreground": "#e11d48",
       "editor.background": "#fff1f2",
-      "editor.foreground": "#3b0211",
-      "editorLineNumber.foreground": "#e11d48",
+      "editor.foreground": "#30010c",
+      "editorLineNumber.foreground": "#9f1239",
       "editorLineNumber.activeForeground": "#e11d48",
       "editorCursor.foreground": "#e11d48",
       "editor.selectionBackground": "#fecdd3",
       "editor.lineHighlightBackground": "#fecdd3",
       "editorHoverWidget.background": "#ffe4e6",
-      "editorHoverWidget.foreground": "#3b0211",
+      "editorHoverWidget.foreground": "#30010c",
       "editorHoverWidget.border": "#fecdd3",
       "editorHoverWidget.statusBarBackground": "#fecdd3",
       "editorSuggestWidget.background": "#ffe4e6",
-      "editorSuggestWidget.foreground": "#3b0211",
+      "editorSuggestWidget.foreground": "#30010c",
       "editorSuggestWidget.border": "#fecdd3",
       "editorSuggestWidget.selectedBackground": "#fecdd3",
       "editorSuggestWidget.selectedForeground": "#9f1239",
       "editorSuggestWidget.highlightForeground": "#e11d48",
       "editorWidget.background": "#ffe4e6",
-      "editorWidget.foreground": "#3b0211",
+      "editorWidget.foreground": "#30010c",
       "editorWidget.border": "#fecdd3",
       "focusBorder": "#e11d48",
       "activityBar.background": "#fecdd3",
       "activityBar.foreground": "#e11d48",
-      "activityBar.inactiveForeground": "#e11d48",
+      "activityBar.inactiveForeground": "#9f1239",
       "activityBarBadge.background": "#e11d48",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#ffe4e6",
-      "sideBar.foreground": "#3b0211",
+      "sideBar.foreground": "#30010c",
       "sideBarTitle.foreground": "#9f1239",
       "sideBarSectionHeader.background": "#fecdd3",
-      "sideBarSectionHeader.foreground": "#3b0211",
+      "sideBarSectionHeader.foreground": "#30010c",
       "titleBar.activeBackground": "#fecdd3",
-      "titleBar.activeForeground": "#3b0211",
+      "titleBar.activeForeground": "#30010c",
       "statusBar.background": "#be123c",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -3499,13 +3841,13 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.hoverBackground": "#fecdd3",
       "breadcrumb.foreground": "#881337",
       "terminal.background": "#fff1f2",
-      "terminal.foreground": "#3b0211",
+      "terminal.foreground": "#30010c",
       "terminalCursor.foreground": "#e11d48",
       "terminal.ansiGreen": "#a21caf",
-      "terminal.ansiCyan": "#0369a1",
+      "terminal.ansiCyan": "#1d4ed8",
       "terminal.ansiYellow": "#b45309",
       "input.background": "#ffe4e6",
-      "input.foreground": "#3b0211",
+      "input.foreground": "#30010c",
       "input.placeholderForeground": "#881337",
       "panel.background": "#fff1f2",
       "panel.border": "#ffe4e6",
@@ -3525,7 +3867,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#be123c",
@@ -3535,7 +3878,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#a21caf"
@@ -3547,7 +3891,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#b45309"
@@ -3558,7 +3906,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#be123c"
@@ -3567,34 +3916,43 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#3b0211"
+                  "foreground": "#30010c"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
-                  "foreground": "#0369a1"
+                  "foreground": "#1d4ed8"
             }
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#e11d48",
+                  "foreground": "#9f1239",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#e11d48"
@@ -3602,15 +3960,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#be123c"
+                  "foreground": "#30010c"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#a21caf"
@@ -3702,7 +4063,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#ff0055",
@@ -3712,7 +4074,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#00f0ff"
@@ -3724,7 +4087,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#ffe600"
@@ -3735,7 +4102,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#ff0055"
@@ -3744,7 +4112,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#f0f0f8"
@@ -3753,7 +4123,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#b829ff"
@@ -3761,7 +4133,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#4c4c66",
@@ -3771,7 +4145,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#ff9900"
@@ -3779,15 +4156,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#ff0055"
+                  "foreground": "#f0f0f8"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#00f0ff"
@@ -3879,7 +4259,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#bb9af7",
@@ -3889,7 +4270,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#7aa2f7"
@@ -3901,7 +4283,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#9ece6a"
@@ -3912,7 +4298,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#bb9af7"
@@ -3921,7 +4308,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#c0caf5"
@@ -3930,7 +4319,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#2ac3de"
@@ -3938,7 +4329,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#565f89",
@@ -3948,7 +4341,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#ff9e64"
@@ -3956,15 +4352,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#bb9af7"
+                  "foreground": "#a9b1d6"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#7aa2f7"
@@ -4056,7 +4455,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#ff79c6",
@@ -4066,7 +4466,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#50fa7b"
@@ -4078,7 +4479,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#f1fa8c"
@@ -4089,7 +4494,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#ff79c6"
@@ -4098,7 +4504,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#f8f8f2"
@@ -4107,7 +4515,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#8be9fd"
@@ -4115,7 +4525,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#6272a4",
@@ -4125,7 +4537,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#bd93f9"
@@ -4133,15 +4548,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#ff79c6"
+                  "foreground": "#f8f8f2"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#50fa7b"
@@ -4233,7 +4651,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#cba6f7",
@@ -4243,7 +4662,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#89b4fa"
@@ -4255,7 +4675,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#a6e3a1"
@@ -4266,7 +4690,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#cba6f7"
@@ -4275,7 +4700,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#cdd6f4"
@@ -4284,7 +4711,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#f9e2af"
@@ -4292,7 +4721,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#6c7086",
@@ -4302,7 +4733,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#fab387"
@@ -4310,15 +4744,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#cba6f7"
+                  "foreground": "#cdd6f4"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#89b4fa"
@@ -4335,43 +4772,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#8839ef",
     colors: {
-      "foreground": "#363a4f",
-      "descriptionForeground": "#6c6f85",
-      "disabledForeground": "#7c7f93",
+      "foreground": "#2c2e3d",
+      "descriptionForeground": "#5c5f77",
+      "disabledForeground": "#6c6f85",
       "icon.foreground": "#8839ef",
       "editor.background": "#eff1f5",
-      "editor.foreground": "#363a4f",
-      "editorLineNumber.foreground": "#7c7f93",
+      "editor.foreground": "#2c2e3d",
+      "editorLineNumber.foreground": "#6c6f85",
       "editorLineNumber.activeForeground": "#8839ef",
       "editorCursor.foreground": "#8839ef",
       "editor.selectionBackground": "#dce0e8",
       "editor.lineHighlightBackground": "#dce0e8",
       "editorHoverWidget.background": "#e6e9ef",
-      "editorHoverWidget.foreground": "#363a4f",
+      "editorHoverWidget.foreground": "#2c2e3d",
       "editorHoverWidget.border": "#dce0e8",
       "editorHoverWidget.statusBarBackground": "#dce0e8",
       "editorSuggestWidget.background": "#e6e9ef",
-      "editorSuggestWidget.foreground": "#363a4f",
+      "editorSuggestWidget.foreground": "#2c2e3d",
       "editorSuggestWidget.border": "#dce0e8",
       "editorSuggestWidget.selectedBackground": "#dce0e8",
       "editorSuggestWidget.selectedForeground": "#8839ef",
       "editorSuggestWidget.highlightForeground": "#8839ef",
       "editorWidget.background": "#e6e9ef",
-      "editorWidget.foreground": "#363a4f",
+      "editorWidget.foreground": "#2c2e3d",
       "editorWidget.border": "#dce0e8",
       "focusBorder": "#8839ef",
       "activityBar.background": "#dce0e8",
       "activityBar.foreground": "#8839ef",
-      "activityBar.inactiveForeground": "#7c7f93",
+      "activityBar.inactiveForeground": "#6c6f85",
       "activityBarBadge.background": "#8839ef",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#e6e9ef",
-      "sideBar.foreground": "#363a4f",
+      "sideBar.foreground": "#2c2e3d",
       "sideBarTitle.foreground": "#8839ef",
       "sideBarSectionHeader.background": "#dce0e8",
-      "sideBarSectionHeader.foreground": "#363a4f",
+      "sideBarSectionHeader.foreground": "#2c2e3d",
       "titleBar.activeBackground": "#dce0e8",
-      "titleBar.activeForeground": "#363a4f",
+      "titleBar.activeForeground": "#2c2e3d",
       "statusBar.background": "#8839ef",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -4380,22 +4817,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#8839ef",
       "tab.activeBorderTop": "#8839ef",
       "tab.inactiveBackground": "#dce0e8",
-      "tab.inactiveForeground": "#6c6f85",
+      "tab.inactiveForeground": "#5c5f77",
       "tab.hoverBackground": "#dce0e8",
-      "breadcrumb.foreground": "#6c6f85",
+      "breadcrumb.foreground": "#5c5f77",
       "terminal.background": "#eff1f5",
-      "terminal.foreground": "#363a4f",
+      "terminal.foreground": "#2c2e3d",
       "terminalCursor.foreground": "#8839ef",
       "terminal.ansiGreen": "#1e66f5",
-      "terminal.ansiCyan": "#b86e0a",
-      "terminal.ansiYellow": "#2d7a1e",
+      "terminal.ansiCyan": "#a66004",
+      "terminal.ansiYellow": "#1e5f12",
       "input.background": "#e6e9ef",
-      "input.foreground": "#363a4f",
-      "input.placeholderForeground": "#6c6f85",
+      "input.foreground": "#2c2e3d",
+      "input.placeholderForeground": "#5c5f77",
       "panel.background": "#eff1f5",
       "panel.border": "#e6e9ef",
       "panelTitle.activeForeground": "#8839ef",
-      "panelTitle.inactiveForeground": "#6c6f85",
+      "panelTitle.inactiveForeground": "#5c5f77",
       "panelTitle.activeBorder": "#8839ef",
       "chat.requestBackground": "#e6e9ef",
       "chat.requestBorder": "#dce0e8",
@@ -4410,7 +4847,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#8839ef",
@@ -4420,7 +4858,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#1e66f5"
@@ -4432,10 +4871,14 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
-                  "foreground": "#2d7a1e"
+                  "foreground": "#1e5f12"
             }
       },
       {
@@ -4443,7 +4886,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#8839ef"
@@ -4452,50 +4896,62 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#363a4f"
+                  "foreground": "#2c2e3d"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
-                  "foreground": "#b86e0a"
+                  "foreground": "#a66004"
             }
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#7c7f93",
+                  "foreground": "#6c6f85",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
-                  "foreground": "#d24e01"
+                  "foreground": "#b83e02"
             }
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#8839ef"
+                  "foreground": "#2c2e3d"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#1e66f5"
@@ -4587,7 +5043,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#81a1c1",
@@ -4597,7 +5054,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#88c0d0"
@@ -4609,7 +5067,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#a3be8c"
@@ -4620,7 +5082,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#81a1c1"
@@ -4629,7 +5092,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#d8dee9"
@@ -4638,7 +5103,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#8fbcbb"
@@ -4646,7 +5113,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#4c566a",
@@ -4656,7 +5125,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#b48ead"
@@ -4664,15 +5136,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#81a1c1"
+                  "foreground": "#d8dee9"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#88c0d0"
@@ -4689,43 +5164,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#5e81ac",
     colors: {
-      "foreground": "#21262d",
+      "foreground": "#1c2128",
       "descriptionForeground": "#4c566a",
-      "disabledForeground": "#616e88",
+      "disabledForeground": "#4c566a",
       "icon.foreground": "#5e81ac",
       "editor.background": "#eceff4",
-      "editor.foreground": "#21262d",
-      "editorLineNumber.foreground": "#616e88",
+      "editor.foreground": "#1c2128",
+      "editorLineNumber.foreground": "#4c566a",
       "editorLineNumber.activeForeground": "#5e81ac",
       "editorCursor.foreground": "#5e81ac",
       "editor.selectionBackground": "#d8dee9",
       "editor.lineHighlightBackground": "#d8dee9",
       "editorHoverWidget.background": "#e5e9f0",
-      "editorHoverWidget.foreground": "#21262d",
+      "editorHoverWidget.foreground": "#1c2128",
       "editorHoverWidget.border": "#d8dee9",
       "editorHoverWidget.statusBarBackground": "#d8dee9",
       "editorSuggestWidget.background": "#e5e9f0",
-      "editorSuggestWidget.foreground": "#21262d",
+      "editorSuggestWidget.foreground": "#1c2128",
       "editorSuggestWidget.border": "#d8dee9",
       "editorSuggestWidget.selectedBackground": "#d8dee9",
       "editorSuggestWidget.selectedForeground": "#5e81ac",
       "editorSuggestWidget.highlightForeground": "#5e81ac",
       "editorWidget.background": "#e5e9f0",
-      "editorWidget.foreground": "#21262d",
+      "editorWidget.foreground": "#1c2128",
       "editorWidget.border": "#d8dee9",
       "focusBorder": "#5e81ac",
       "activityBar.background": "#d8dee9",
       "activityBar.foreground": "#5e81ac",
-      "activityBar.inactiveForeground": "#616e88",
+      "activityBar.inactiveForeground": "#4c566a",
       "activityBarBadge.background": "#5e81ac",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#e5e9f0",
-      "sideBar.foreground": "#21262d",
+      "sideBar.foreground": "#1c2128",
       "sideBarTitle.foreground": "#5e81ac",
       "sideBarSectionHeader.background": "#d8dee9",
-      "sideBarSectionHeader.foreground": "#21262d",
+      "sideBarSectionHeader.foreground": "#1c2128",
       "titleBar.activeBackground": "#d8dee9",
-      "titleBar.activeForeground": "#21262d",
+      "titleBar.activeForeground": "#1c2128",
       "statusBar.background": "#5e81ac",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -4738,13 +5213,13 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.hoverBackground": "#d8dee9",
       "breadcrumb.foreground": "#4c566a",
       "terminal.background": "#eceff4",
-      "terminal.foreground": "#21262d",
+      "terminal.foreground": "#1c2128",
       "terminalCursor.foreground": "#5e81ac",
-      "terminal.ansiGreen": "#0284c7",
+      "terminal.ansiGreen": "#1d4ed8",
       "terminal.ansiCyan": "#0f766e",
-      "terminal.ansiYellow": "#2e7d32",
+      "terminal.ansiYellow": "#1b5e20",
       "input.background": "#e5e9f0",
-      "input.foreground": "#21262d",
+      "input.foreground": "#1c2128",
       "input.placeholderForeground": "#4c566a",
       "panel.background": "#eceff4",
       "panel.border": "#e5e9f0",
@@ -4764,7 +5239,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#5e81ac",
@@ -4774,10 +5250,11 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
-                  "foreground": "#0284c7"
+                  "foreground": "#1d4ed8"
             }
       },
       {
@@ -4786,10 +5263,14 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
-                  "foreground": "#2e7d32"
+                  "foreground": "#1b5e20"
             }
       },
       {
@@ -4797,7 +5278,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#5e81ac"
@@ -4806,16 +5288,20 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#21262d"
+                  "foreground": "#1c2128"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#0f766e"
@@ -4823,36 +5309,44 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#616e88",
+                  "foreground": "#4c566a",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
-                  "foreground": "#d08770"
+                  "foreground": "#b84e32"
             }
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#5e81ac"
+                  "foreground": "#1c2128"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
-                  "foreground": "#0284c7"
+                  "foreground": "#1d4ed8"
             }
       }
 ],
@@ -4941,7 +5435,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#ff3366",
@@ -4951,7 +5446,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#00ff88"
@@ -4963,7 +5459,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#ffe600"
@@ -4974,7 +5474,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#ff3366"
@@ -4983,7 +5484,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#ffffff"
@@ -4992,7 +5495,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#00f0ff"
@@ -5000,7 +5505,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#555555",
@@ -5010,7 +5517,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#ff9900"
@@ -5018,15 +5528,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#ff3366"
+                  "foreground": "#ffffff"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#00ff88"
@@ -5118,7 +5631,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#fed049",
@@ -5128,7 +5642,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#36f9f6"
@@ -5140,7 +5655,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#ff7edb"
@@ -5151,7 +5670,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#fed049"
@@ -5160,7 +5680,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#ffffff"
@@ -5169,7 +5691,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#fe4450"
@@ -5177,7 +5701,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#614d85",
@@ -5187,7 +5713,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#f97e72"
@@ -5195,15 +5724,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#fed049"
+                  "foreground": "#f92aad"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#36f9f6"
@@ -5295,7 +5827,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#50fa7b",
@@ -5305,7 +5838,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#00ff41"
@@ -5317,7 +5851,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#a6e22e"
@@ -5328,7 +5866,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#50fa7b"
@@ -5337,7 +5876,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#ffffff"
@@ -5346,7 +5887,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#00ffff"
@@ -5354,7 +5897,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#005f00",
@@ -5364,7 +5909,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#a3e635"
@@ -5372,15 +5920,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#50fa7b"
+                  "foreground": "#00ff41"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#00ff41"
@@ -5472,7 +6023,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#ff2a5f",
@@ -5482,7 +6034,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#f43f5e"
@@ -5494,7 +6047,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#fb7185"
@@ -5505,7 +6062,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#ff2a5f"
@@ -5514,7 +6072,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#fce7f3"
@@ -5523,7 +6083,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#fda4af"
@@ -5531,7 +6093,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#831843",
@@ -5541,7 +6105,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#fb923c"
@@ -5549,15 +6116,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#ff2a5f"
+                  "foreground": "#fce7f3"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#f43f5e"
@@ -5649,7 +6219,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#eb6f92",
@@ -5659,7 +6230,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#9ccfd8"
@@ -5671,7 +6243,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#f6c177"
@@ -5682,7 +6258,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#eb6f92"
@@ -5691,7 +6268,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#e0def4"
@@ -5700,7 +6279,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#c4a7e7"
@@ -5708,7 +6289,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#6e6a86",
@@ -5718,7 +6301,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#ebbcba"
@@ -5726,15 +6312,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#eb6f92"
+                  "foreground": "#e0def4"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#9ccfd8"
@@ -5826,7 +6415,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#c084fc",
@@ -5836,7 +6426,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#a855f7"
@@ -5848,7 +6439,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#e879f9"
@@ -5859,7 +6454,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#c084fc"
@@ -5868,7 +6464,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#f3e8ff"
@@ -5877,7 +6475,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#818cf8"
@@ -5885,7 +6485,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#581c87",
@@ -5895,7 +6497,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#fb7185"
@@ -5903,15 +6508,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#c084fc"
+                  "foreground": "#f3e8ff"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#a855f7"
@@ -6003,7 +6611,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#ea580c",
@@ -6013,7 +6622,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#f59e0b"
@@ -6025,7 +6635,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#fde047"
@@ -6036,7 +6650,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#ea580c"
@@ -6045,7 +6660,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#fff7ed"
@@ -6054,7 +6671,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#fb923c"
@@ -6062,7 +6681,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#7c2d12",
@@ -6072,7 +6693,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#ef4444"
@@ -6080,15 +6704,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#ea580c"
+                  "foreground": "#fff7ed"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#f59e0b"
@@ -6180,7 +6807,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#4ade80",
@@ -6190,7 +6818,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#2dd4bf"
@@ -6202,7 +6831,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#a3e635"
@@ -6213,7 +6846,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#4ade80"
@@ -6222,7 +6856,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#f0fdf4"
@@ -6231,7 +6867,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#38bdf8"
@@ -6239,7 +6877,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#14532d",
@@ -6249,7 +6889,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#facc15"
@@ -6257,15 +6900,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#4ade80"
+                  "foreground": "#f0fdf4"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#2dd4bf"
@@ -6357,7 +7003,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#22d3ee",
@@ -6367,7 +7014,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#38bdf8"
@@ -6379,7 +7027,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#34d399"
@@ -6390,7 +7042,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#22d3ee"
@@ -6399,7 +7052,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#ecfeff"
@@ -6408,7 +7063,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#818cf8"
@@ -6416,7 +7073,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#1e3a8a",
@@ -6426,7 +7085,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#f472b6"
@@ -6434,15 +7096,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#22d3ee"
+                  "foreground": "#ecfeff"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#38bdf8"
@@ -6534,7 +7199,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#6d28d9",
@@ -6544,7 +7210,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#1d4ed8"
@@ -6556,7 +7223,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#047857"
@@ -6567,7 +7238,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#6d28d9"
@@ -6576,7 +7248,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#0f172a"
@@ -6585,7 +7259,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#0284c7"
@@ -6593,7 +7269,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#64748b",
@@ -6603,7 +7281,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#c2410c"
@@ -6611,15 +7292,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#6d28d9"
+                  "foreground": "#0f172a"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#1d4ed8"
@@ -6636,43 +7320,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#db2777",
     colors: {
-      "foreground": "#3b0730",
-      "descriptionForeground": "#9d174d",
-      "disabledForeground": "#db2777",
+      "foreground": "#300326",
+      "descriptionForeground": "#831843",
+      "disabledForeground": "#9d174d",
       "icon.foreground": "#db2777",
       "editor.background": "#fff5f7",
-      "editor.foreground": "#3b0730",
-      "editorLineNumber.foreground": "#db2777",
+      "editor.foreground": "#300326",
+      "editorLineNumber.foreground": "#9d174d",
       "editorLineNumber.activeForeground": "#db2777",
       "editorCursor.foreground": "#db2777",
       "editor.selectionBackground": "#fce7f3",
       "editor.lineHighlightBackground": "#fce7f3",
       "editorHoverWidget.background": "#fdf2f8",
-      "editorHoverWidget.foreground": "#3b0730",
+      "editorHoverWidget.foreground": "#300326",
       "editorHoverWidget.border": "#fce7f3",
       "editorHoverWidget.statusBarBackground": "#fce7f3",
       "editorSuggestWidget.background": "#fdf2f8",
-      "editorSuggestWidget.foreground": "#3b0730",
+      "editorSuggestWidget.foreground": "#300326",
       "editorSuggestWidget.border": "#fce7f3",
       "editorSuggestWidget.selectedBackground": "#fce7f3",
       "editorSuggestWidget.selectedForeground": "#db2777",
       "editorSuggestWidget.highlightForeground": "#db2777",
       "editorWidget.background": "#fdf2f8",
-      "editorWidget.foreground": "#3b0730",
+      "editorWidget.foreground": "#300326",
       "editorWidget.border": "#fce7f3",
       "focusBorder": "#db2777",
       "activityBar.background": "#fce7f3",
       "activityBar.foreground": "#db2777",
-      "activityBar.inactiveForeground": "#db2777",
+      "activityBar.inactiveForeground": "#9d174d",
       "activityBarBadge.background": "#db2777",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#fdf2f8",
-      "sideBar.foreground": "#3b0730",
+      "sideBar.foreground": "#300326",
       "sideBarTitle.foreground": "#db2777",
       "sideBarSectionHeader.background": "#fce7f3",
-      "sideBarSectionHeader.foreground": "#3b0730",
+      "sideBarSectionHeader.foreground": "#300326",
       "titleBar.activeBackground": "#fce7f3",
-      "titleBar.activeForeground": "#3b0730",
+      "titleBar.activeForeground": "#300326",
       "statusBar.background": "#db2777",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -6681,22 +7365,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#db2777",
       "tab.activeBorderTop": "#db2777",
       "tab.inactiveBackground": "#fce7f3",
-      "tab.inactiveForeground": "#9d174d",
+      "tab.inactiveForeground": "#831843",
       "tab.hoverBackground": "#fce7f3",
-      "breadcrumb.foreground": "#9d174d",
+      "breadcrumb.foreground": "#831843",
       "terminal.background": "#fff5f7",
-      "terminal.foreground": "#3b0730",
+      "terminal.foreground": "#300326",
       "terminalCursor.foreground": "#db2777",
       "terminal.ansiGreen": "#047857",
       "terminal.ansiCyan": "#7e22ce",
       "terminal.ansiYellow": "#b45309",
       "input.background": "#fdf2f8",
-      "input.foreground": "#3b0730",
-      "input.placeholderForeground": "#9d174d",
+      "input.foreground": "#300326",
+      "input.placeholderForeground": "#831843",
       "panel.background": "#fff5f7",
       "panel.border": "#fdf2f8",
       "panelTitle.activeForeground": "#db2777",
-      "panelTitle.inactiveForeground": "#9d174d",
+      "panelTitle.inactiveForeground": "#831843",
       "panelTitle.activeBorder": "#db2777",
       "chat.requestBackground": "#fdf2f8",
       "chat.requestBorder": "#fce7f3",
@@ -6711,7 +7395,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#be185d",
@@ -6721,7 +7406,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#047857"
@@ -6733,7 +7419,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#b45309"
@@ -6744,7 +7434,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#be185d"
@@ -6753,16 +7444,20 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#3b0730"
+                  "foreground": "#300326"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#7e22ce"
@@ -6770,17 +7465,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#db2777",
+                  "foreground": "#9d174d",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#be123c"
@@ -6788,15 +7488,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#be185d"
+                  "foreground": "#300326"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#047857"
@@ -6813,43 +7516,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#ec4899",
     colors: {
-      "foreground": "#2e0854",
-      "descriptionForeground": "#7e22ce",
-      "disabledForeground": "#a855f7",
+      "foreground": "#240444",
+      "descriptionForeground": "#581c87",
+      "disabledForeground": "#7e22ce",
       "icon.foreground": "#ec4899",
       "editor.background": "#faf5ff",
-      "editor.foreground": "#2e0854",
-      "editorLineNumber.foreground": "#a855f7",
+      "editor.foreground": "#240444",
+      "editorLineNumber.foreground": "#7e22ce",
       "editorLineNumber.activeForeground": "#ec4899",
       "editorCursor.foreground": "#ec4899",
       "editor.selectionBackground": "#e9d5ff",
       "editor.lineHighlightBackground": "#e9d5ff",
       "editorHoverWidget.background": "#f3e8ff",
-      "editorHoverWidget.foreground": "#2e0854",
+      "editorHoverWidget.foreground": "#240444",
       "editorHoverWidget.border": "#e9d5ff",
       "editorHoverWidget.statusBarBackground": "#e9d5ff",
       "editorSuggestWidget.background": "#f3e8ff",
-      "editorSuggestWidget.foreground": "#2e0854",
+      "editorSuggestWidget.foreground": "#240444",
       "editorSuggestWidget.border": "#e9d5ff",
       "editorSuggestWidget.selectedBackground": "#e9d5ff",
       "editorSuggestWidget.selectedForeground": "#9333ea",
       "editorSuggestWidget.highlightForeground": "#ec4899",
       "editorWidget.background": "#f3e8ff",
-      "editorWidget.foreground": "#2e0854",
+      "editorWidget.foreground": "#240444",
       "editorWidget.border": "#e9d5ff",
       "focusBorder": "#ec4899",
       "activityBar.background": "#e9d5ff",
       "activityBar.foreground": "#ec4899",
-      "activityBar.inactiveForeground": "#a855f7",
+      "activityBar.inactiveForeground": "#7e22ce",
       "activityBarBadge.background": "#ec4899",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#f3e8ff",
-      "sideBar.foreground": "#2e0854",
+      "sideBar.foreground": "#240444",
       "sideBarTitle.foreground": "#9333ea",
       "sideBarSectionHeader.background": "#e9d5ff",
-      "sideBarSectionHeader.foreground": "#2e0854",
+      "sideBarSectionHeader.foreground": "#240444",
       "titleBar.activeBackground": "#e9d5ff",
-      "titleBar.activeForeground": "#2e0854",
+      "titleBar.activeForeground": "#240444",
       "statusBar.background": "#9333ea",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -6858,22 +7561,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#9333ea",
       "tab.activeBorderTop": "#ec4899",
       "tab.inactiveBackground": "#e9d5ff",
-      "tab.inactiveForeground": "#7e22ce",
+      "tab.inactiveForeground": "#581c87",
       "tab.hoverBackground": "#e9d5ff",
-      "breadcrumb.foreground": "#7e22ce",
+      "breadcrumb.foreground": "#581c87",
       "terminal.background": "#faf5ff",
-      "terminal.foreground": "#2e0854",
+      "terminal.foreground": "#240444",
       "terminalCursor.foreground": "#ec4899",
-      "terminal.ansiGreen": "#0284c7",
+      "terminal.ansiGreen": "#1d4ed8",
       "terminal.ansiCyan": "#6d28d9",
-      "terminal.ansiYellow": "#059669",
+      "terminal.ansiYellow": "#047857",
       "input.background": "#f3e8ff",
-      "input.foreground": "#2e0854",
-      "input.placeholderForeground": "#7e22ce",
+      "input.foreground": "#240444",
+      "input.placeholderForeground": "#581c87",
       "panel.background": "#faf5ff",
       "panel.border": "#f3e8ff",
       "panelTitle.activeForeground": "#ec4899",
-      "panelTitle.inactiveForeground": "#7e22ce",
+      "panelTitle.inactiveForeground": "#581c87",
       "panelTitle.activeBorder": "#ec4899",
       "chat.requestBackground": "#f3e8ff",
       "chat.requestBorder": "#e9d5ff",
@@ -6888,7 +7591,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#db2777",
@@ -6898,10 +7602,11 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
-                  "foreground": "#0284c7"
+                  "foreground": "#1d4ed8"
             }
       },
       {
@@ -6910,10 +7615,14 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
-                  "foreground": "#059669"
+                  "foreground": "#047857"
             }
       },
       {
@@ -6921,7 +7630,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#db2777"
@@ -6930,16 +7640,20 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#2e0854"
+                  "foreground": "#240444"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#6d28d9"
@@ -6947,36 +7661,44 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#a855f7",
+                  "foreground": "#7e22ce",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
-                  "foreground": "#d97706"
+                  "foreground": "#b45309"
             }
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#db2777"
+                  "foreground": "#240444"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
-                  "foreground": "#0284c7"
+                  "foreground": "#1d4ed8"
             }
       }
 ],
@@ -7065,7 +7787,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#0f172a",
@@ -7075,7 +7798,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#1d4ed8"
@@ -7087,7 +7811,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#047857"
@@ -7098,7 +7826,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#0f172a"
@@ -7107,7 +7836,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#0f172a"
@@ -7116,7 +7847,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#334155"
@@ -7124,7 +7857,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#64748b",
@@ -7134,7 +7869,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#b45309"
@@ -7142,7 +7880,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
                   "foreground": "#0f172a"
@@ -7150,7 +7890,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#1d4ed8"
@@ -7167,29 +7908,29 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#ca8a04",
     colors: {
-      "foreground": "#262220",
+      "foreground": "#1c1816",
       "descriptionForeground": "#78350f",
       "disabledForeground": "#78716c",
       "icon.foreground": "#ca8a04",
       "editor.background": "#fefdf8",
-      "editor.foreground": "#262220",
+      "editor.foreground": "#1c1816",
       "editorLineNumber.foreground": "#78716c",
       "editorLineNumber.activeForeground": "#ca8a04",
       "editorCursor.foreground": "#ca8a04",
       "editor.selectionBackground": "#f5f0db",
       "editor.lineHighlightBackground": "#f5f0db",
       "editorHoverWidget.background": "#fbf8ee",
-      "editorHoverWidget.foreground": "#262220",
+      "editorHoverWidget.foreground": "#1c1816",
       "editorHoverWidget.border": "#f5f0db",
       "editorHoverWidget.statusBarBackground": "#f5f0db",
       "editorSuggestWidget.background": "#fbf8ee",
-      "editorSuggestWidget.foreground": "#262220",
+      "editorSuggestWidget.foreground": "#1c1816",
       "editorSuggestWidget.border": "#f5f0db",
       "editorSuggestWidget.selectedBackground": "#f5f0db",
       "editorSuggestWidget.selectedForeground": "#78350f",
       "editorSuggestWidget.highlightForeground": "#ca8a04",
       "editorWidget.background": "#fbf8ee",
-      "editorWidget.foreground": "#262220",
+      "editorWidget.foreground": "#1c1816",
       "editorWidget.border": "#f5f0db",
       "focusBorder": "#ca8a04",
       "activityBar.background": "#f5f0db",
@@ -7198,12 +7939,12 @@ export const THEME_PRESETS: ThemePreset[] = [
       "activityBarBadge.background": "#ca8a04",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#fbf8ee",
-      "sideBar.foreground": "#262220",
+      "sideBar.foreground": "#1c1816",
       "sideBarTitle.foreground": "#78350f",
       "sideBarSectionHeader.background": "#f5f0db",
-      "sideBarSectionHeader.foreground": "#262220",
+      "sideBarSectionHeader.foreground": "#1c1816",
       "titleBar.activeBackground": "#f5f0db",
-      "titleBar.activeForeground": "#262220",
+      "titleBar.activeForeground": "#1c1816",
       "statusBar.background": "#78350f",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -7216,13 +7957,13 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.hoverBackground": "#f5f0db",
       "breadcrumb.foreground": "#78350f",
       "terminal.background": "#fefdf8",
-      "terminal.foreground": "#262220",
+      "terminal.foreground": "#1c1816",
       "terminalCursor.foreground": "#ca8a04",
       "terminal.ansiGreen": "#047857",
       "terminal.ansiCyan": "#3730a3",
-      "terminal.ansiYellow": "#92400e",
+      "terminal.ansiYellow": "#7c2d12",
       "input.background": "#fbf8ee",
-      "input.foreground": "#262220",
+      "input.foreground": "#1c1816",
       "input.placeholderForeground": "#78350f",
       "panel.background": "#fefdf8",
       "panel.border": "#fbf8ee",
@@ -7242,7 +7983,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#b45309",
@@ -7252,7 +7994,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#047857"
@@ -7264,10 +8007,14 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
-                  "foreground": "#92400e"
+                  "foreground": "#7c2d12"
             }
       },
       {
@@ -7275,7 +8022,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#b45309"
@@ -7284,16 +8032,20 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#262220"
+                  "foreground": "#1c1816"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#3730a3"
@@ -7301,7 +8053,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#78716c",
@@ -7311,7 +8065,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#991b1b"
@@ -7319,15 +8076,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#b45309"
+                  "foreground": "#1c1816"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#047857"
@@ -7344,43 +8104,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#ea580c",
     colors: {
-      "foreground": "#3b1004",
-      "descriptionForeground": "#9a3412",
-      "disabledForeground": "#ea580c",
+      "foreground": "#300b02",
+      "descriptionForeground": "#7c2d12",
+      "disabledForeground": "#9a3412",
       "icon.foreground": "#ea580c",
       "editor.background": "#fff7ed",
-      "editor.foreground": "#3b1004",
-      "editorLineNumber.foreground": "#ea580c",
+      "editor.foreground": "#300b02",
+      "editorLineNumber.foreground": "#9a3412",
       "editorLineNumber.activeForeground": "#ea580c",
       "editorCursor.foreground": "#ea580c",
       "editor.selectionBackground": "#fed7aa",
       "editor.lineHighlightBackground": "#fed7aa",
       "editorHoverWidget.background": "#ffedd5",
-      "editorHoverWidget.foreground": "#3b1004",
+      "editorHoverWidget.foreground": "#300b02",
       "editorHoverWidget.border": "#fed7aa",
       "editorHoverWidget.statusBarBackground": "#fed7aa",
       "editorSuggestWidget.background": "#ffedd5",
-      "editorSuggestWidget.foreground": "#3b1004",
+      "editorSuggestWidget.foreground": "#300b02",
       "editorSuggestWidget.border": "#fed7aa",
       "editorSuggestWidget.selectedBackground": "#fed7aa",
       "editorSuggestWidget.selectedForeground": "#c2410c",
       "editorSuggestWidget.highlightForeground": "#ea580c",
       "editorWidget.background": "#ffedd5",
-      "editorWidget.foreground": "#3b1004",
+      "editorWidget.foreground": "#300b02",
       "editorWidget.border": "#fed7aa",
       "focusBorder": "#ea580c",
       "activityBar.background": "#fed7aa",
       "activityBar.foreground": "#ea580c",
-      "activityBar.inactiveForeground": "#ea580c",
+      "activityBar.inactiveForeground": "#9a3412",
       "activityBarBadge.background": "#ea580c",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#ffedd5",
-      "sideBar.foreground": "#3b1004",
+      "sideBar.foreground": "#300b02",
       "sideBarTitle.foreground": "#c2410c",
       "sideBarSectionHeader.background": "#fed7aa",
-      "sideBarSectionHeader.foreground": "#3b1004",
+      "sideBarSectionHeader.foreground": "#300b02",
       "titleBar.activeBackground": "#fed7aa",
-      "titleBar.activeForeground": "#3b1004",
+      "titleBar.activeForeground": "#300b02",
       "statusBar.background": "#ea580c",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -7389,22 +8149,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#c2410c",
       "tab.activeBorderTop": "#ea580c",
       "tab.inactiveBackground": "#fed7aa",
-      "tab.inactiveForeground": "#9a3412",
+      "tab.inactiveForeground": "#7c2d12",
       "tab.hoverBackground": "#fed7aa",
-      "breadcrumb.foreground": "#9a3412",
+      "breadcrumb.foreground": "#7c2d12",
       "terminal.background": "#fff7ed",
-      "terminal.foreground": "#3b1004",
+      "terminal.foreground": "#300b02",
       "terminalCursor.foreground": "#ea580c",
       "terminal.ansiGreen": "#be185d",
       "terminal.ansiCyan": "#6d28d9",
       "terminal.ansiYellow": "#15803d",
       "input.background": "#ffedd5",
-      "input.foreground": "#3b1004",
-      "input.placeholderForeground": "#9a3412",
+      "input.foreground": "#300b02",
+      "input.placeholderForeground": "#7c2d12",
       "panel.background": "#fff7ed",
       "panel.border": "#ffedd5",
       "panelTitle.activeForeground": "#ea580c",
-      "panelTitle.inactiveForeground": "#9a3412",
+      "panelTitle.inactiveForeground": "#7c2d12",
       "panelTitle.activeBorder": "#ea580c",
       "chat.requestBackground": "#ffedd5",
       "chat.requestBorder": "#fed7aa",
@@ -7419,7 +8179,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#c2410c",
@@ -7429,7 +8190,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#be185d"
@@ -7441,7 +8203,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#15803d"
@@ -7452,7 +8218,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#c2410c"
@@ -7461,16 +8228,20 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#3b1004"
+                  "foreground": "#300b02"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#6d28d9"
@@ -7478,17 +8249,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#ea580c",
+                  "foreground": "#9a3412",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#b91c1c"
@@ -7496,15 +8272,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#c2410c"
+                  "foreground": "#300b02"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#be185d"
@@ -7521,43 +8300,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#7c3aed",
     colors: {
-      "foreground": "#210947",
-      "descriptionForeground": "#6b21a8",
-      "disabledForeground": "#7c3aed",
+      "foreground": "#1a0538",
+      "descriptionForeground": "#581c87",
+      "disabledForeground": "#6b21a8",
       "icon.foreground": "#7c3aed",
       "editor.background": "#faf5ff",
-      "editor.foreground": "#210947",
-      "editorLineNumber.foreground": "#7c3aed",
+      "editor.foreground": "#1a0538",
+      "editorLineNumber.foreground": "#6b21a8",
       "editorLineNumber.activeForeground": "#7c3aed",
       "editorCursor.foreground": "#7c3aed",
       "editor.selectionBackground": "#e9d5ff",
       "editor.lineHighlightBackground": "#e9d5ff",
       "editorHoverWidget.background": "#f3e8ff",
-      "editorHoverWidget.foreground": "#210947",
+      "editorHoverWidget.foreground": "#1a0538",
       "editorHoverWidget.border": "#e9d5ff",
       "editorHoverWidget.statusBarBackground": "#e9d5ff",
       "editorSuggestWidget.background": "#f3e8ff",
-      "editorSuggestWidget.foreground": "#210947",
+      "editorSuggestWidget.foreground": "#1a0538",
       "editorSuggestWidget.border": "#e9d5ff",
       "editorSuggestWidget.selectedBackground": "#e9d5ff",
       "editorSuggestWidget.selectedForeground": "#7c3aed",
       "editorSuggestWidget.highlightForeground": "#7c3aed",
       "editorWidget.background": "#f3e8ff",
-      "editorWidget.foreground": "#210947",
+      "editorWidget.foreground": "#1a0538",
       "editorWidget.border": "#e9d5ff",
       "focusBorder": "#7c3aed",
       "activityBar.background": "#e9d5ff",
       "activityBar.foreground": "#7c3aed",
-      "activityBar.inactiveForeground": "#7c3aed",
+      "activityBar.inactiveForeground": "#6b21a8",
       "activityBarBadge.background": "#7c3aed",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#f3e8ff",
-      "sideBar.foreground": "#210947",
+      "sideBar.foreground": "#1a0538",
       "sideBarTitle.foreground": "#7c3aed",
       "sideBarSectionHeader.background": "#e9d5ff",
-      "sideBarSectionHeader.foreground": "#210947",
+      "sideBarSectionHeader.foreground": "#1a0538",
       "titleBar.activeBackground": "#e9d5ff",
-      "titleBar.activeForeground": "#210947",
+      "titleBar.activeForeground": "#1a0538",
       "statusBar.background": "#7c3aed",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -7566,22 +8345,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#7c3aed",
       "tab.activeBorderTop": "#7c3aed",
       "tab.inactiveBackground": "#e9d5ff",
-      "tab.inactiveForeground": "#6b21a8",
+      "tab.inactiveForeground": "#581c87",
       "tab.hoverBackground": "#e9d5ff",
-      "breadcrumb.foreground": "#6b21a8",
+      "breadcrumb.foreground": "#581c87",
       "terminal.background": "#faf5ff",
-      "terminal.foreground": "#210947",
+      "terminal.foreground": "#1a0538",
       "terminalCursor.foreground": "#7c3aed",
       "terminal.ansiGreen": "#1d4ed8",
       "terminal.ansiCyan": "#be185d",
       "terminal.ansiYellow": "#047857",
       "input.background": "#f3e8ff",
-      "input.foreground": "#210947",
-      "input.placeholderForeground": "#6b21a8",
+      "input.foreground": "#1a0538",
+      "input.placeholderForeground": "#581c87",
       "panel.background": "#faf5ff",
       "panel.border": "#f3e8ff",
       "panelTitle.activeForeground": "#7c3aed",
-      "panelTitle.inactiveForeground": "#6b21a8",
+      "panelTitle.inactiveForeground": "#581c87",
       "panelTitle.activeBorder": "#7c3aed",
       "chat.requestBackground": "#f3e8ff",
       "chat.requestBorder": "#e9d5ff",
@@ -7596,7 +8375,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#6d28d9",
@@ -7606,7 +8386,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#1d4ed8"
@@ -7618,7 +8399,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#047857"
@@ -7629,7 +8414,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#6d28d9"
@@ -7638,16 +8424,20 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#210947"
+                  "foreground": "#1a0538"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#be185d"
@@ -7655,17 +8445,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#7c3aed",
+                  "foreground": "#6b21a8",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#c2410c"
@@ -7673,15 +8468,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#6d28d9"
+                  "foreground": "#1a0538"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#1d4ed8"
@@ -7698,43 +8496,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#059669",
     colors: {
-      "foreground": "#03200f",
-      "descriptionForeground": "#15803d",
-      "disabledForeground": "#16a34a",
+      "foreground": "#021a0c",
+      "descriptionForeground": "#14532d",
+      "disabledForeground": "#15803d",
       "icon.foreground": "#059669",
       "editor.background": "#f0fdf4",
-      "editor.foreground": "#03200f",
-      "editorLineNumber.foreground": "#16a34a",
+      "editor.foreground": "#021a0c",
+      "editorLineNumber.foreground": "#15803d",
       "editorLineNumber.activeForeground": "#059669",
       "editorCursor.foreground": "#059669",
       "editor.selectionBackground": "#bbf7d0",
       "editor.lineHighlightBackground": "#bbf7d0",
       "editorHoverWidget.background": "#dcfce7",
-      "editorHoverWidget.foreground": "#03200f",
+      "editorHoverWidget.foreground": "#021a0c",
       "editorHoverWidget.border": "#bbf7d0",
       "editorHoverWidget.statusBarBackground": "#bbf7d0",
       "editorSuggestWidget.background": "#dcfce7",
-      "editorSuggestWidget.foreground": "#03200f",
+      "editorSuggestWidget.foreground": "#021a0c",
       "editorSuggestWidget.border": "#bbf7d0",
       "editorSuggestWidget.selectedBackground": "#bbf7d0",
       "editorSuggestWidget.selectedForeground": "#166534",
       "editorSuggestWidget.highlightForeground": "#059669",
       "editorWidget.background": "#dcfce7",
-      "editorWidget.foreground": "#03200f",
+      "editorWidget.foreground": "#021a0c",
       "editorWidget.border": "#bbf7d0",
       "focusBorder": "#059669",
       "activityBar.background": "#bbf7d0",
       "activityBar.foreground": "#059669",
-      "activityBar.inactiveForeground": "#16a34a",
+      "activityBar.inactiveForeground": "#15803d",
       "activityBarBadge.background": "#059669",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#dcfce7",
-      "sideBar.foreground": "#03200f",
+      "sideBar.foreground": "#021a0c",
       "sideBarTitle.foreground": "#166534",
       "sideBarSectionHeader.background": "#bbf7d0",
-      "sideBarSectionHeader.foreground": "#03200f",
+      "sideBarSectionHeader.foreground": "#021a0c",
       "titleBar.activeBackground": "#bbf7d0",
-      "titleBar.activeForeground": "#03200f",
+      "titleBar.activeForeground": "#021a0c",
       "statusBar.background": "#059669",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -7743,22 +8541,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#166534",
       "tab.activeBorderTop": "#059669",
       "tab.inactiveBackground": "#bbf7d0",
-      "tab.inactiveForeground": "#15803d",
+      "tab.inactiveForeground": "#14532d",
       "tab.hoverBackground": "#bbf7d0",
-      "breadcrumb.foreground": "#15803d",
+      "breadcrumb.foreground": "#14532d",
       "terminal.background": "#f0fdf4",
-      "terminal.foreground": "#03200f",
+      "terminal.foreground": "#021a0c",
       "terminalCursor.foreground": "#059669",
-      "terminal.ansiGreen": "#0284c7",
+      "terminal.ansiGreen": "#1d4ed8",
       "terminal.ansiCyan": "#6d28d9",
       "terminal.ansiYellow": "#b45309",
       "input.background": "#dcfce7",
-      "input.foreground": "#03200f",
-      "input.placeholderForeground": "#15803d",
+      "input.foreground": "#021a0c",
+      "input.placeholderForeground": "#14532d",
       "panel.background": "#f0fdf4",
       "panel.border": "#dcfce7",
       "panelTitle.activeForeground": "#059669",
-      "panelTitle.inactiveForeground": "#15803d",
+      "panelTitle.inactiveForeground": "#14532d",
       "panelTitle.activeBorder": "#059669",
       "chat.requestBackground": "#dcfce7",
       "chat.requestBorder": "#bbf7d0",
@@ -7773,7 +8571,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#047857",
@@ -7783,10 +8582,11 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
-                  "foreground": "#0284c7"
+                  "foreground": "#1d4ed8"
             }
       },
       {
@@ -7795,7 +8595,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#b45309"
@@ -7806,7 +8610,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#047857"
@@ -7815,16 +8620,20 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
-                  "foreground": "#03200f"
+                  "foreground": "#021a0c"
             }
       },
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#6d28d9"
@@ -7832,17 +8641,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#16a34a",
+                  "foreground": "#15803d",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#b91c1c"
@@ -7850,18 +8664,21 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#047857"
+                  "foreground": "#021a0c"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
-                  "foreground": "#0284c7"
+                  "foreground": "#1d4ed8"
             }
       }
 ],
@@ -7877,11 +8694,11 @@ export const THEME_PRESETS: ThemePreset[] = [
     colors: {
       "foreground": "#0f380f",
       "descriptionForeground": "#306230",
-      "disabledForeground": "#8bac0f",
+      "disabledForeground": "#306230",
       "icon.foreground": "#306230",
       "editor.background": "#9bbc0f",
       "editor.foreground": "#0f380f",
-      "editorLineNumber.foreground": "#8bac0f",
+      "editorLineNumber.foreground": "#306230",
       "editorLineNumber.activeForeground": "#306230",
       "editorCursor.foreground": "#306230",
       "editor.selectionBackground": "#8bac0f",
@@ -7902,7 +8719,7 @@ export const THEME_PRESETS: ThemePreset[] = [
       "focusBorder": "#306230",
       "activityBar.background": "#8bac0f",
       "activityBar.foreground": "#306230",
-      "activityBar.inactiveForeground": "#8bac0f",
+      "activityBar.inactiveForeground": "#306230",
       "activityBarBadge.background": "#306230",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#8bac0f",
@@ -7950,7 +8767,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#0f380f",
@@ -7960,7 +8778,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#306230"
@@ -7972,7 +8791,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#0f380f"
@@ -7983,7 +8806,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#0f380f"
@@ -7992,7 +8816,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#0f380f"
@@ -8001,7 +8827,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#306230"
@@ -8009,17 +8837,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
-                  "foreground": "#8bac0f",
+                  "foreground": "#306230",
                   "fontStyle": "italic"
             }
       },
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#0f380f"
@@ -8027,7 +8860,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
                   "foreground": "#0f380f"
@@ -8035,7 +8870,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#306230"
@@ -8053,7 +8889,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     accentColor: "#dc2626",
     colors: {
       "foreground": "#0f172a",
-      "descriptionForeground": "#854d0e",
+      "descriptionForeground": "#713f12",
       "disabledForeground": "#64748b",
       "icon.foreground": "#dc2626",
       "editor.background": "#ffffff",
@@ -8097,9 +8933,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#dc2626",
       "tab.activeBorderTop": "#dc2626",
       "tab.inactiveBackground": "#fee2e2",
-      "tab.inactiveForeground": "#854d0e",
+      "tab.inactiveForeground": "#713f12",
       "tab.hoverBackground": "#fee2e2",
-      "breadcrumb.foreground": "#854d0e",
+      "breadcrumb.foreground": "#713f12",
       "terminal.background": "#ffffff",
       "terminal.foreground": "#0f172a",
       "terminalCursor.foreground": "#dc2626",
@@ -8108,11 +8944,11 @@ export const THEME_PRESETS: ThemePreset[] = [
       "terminal.ansiYellow": "#15803d",
       "input.background": "#fef9c3",
       "input.foreground": "#0f172a",
-      "input.placeholderForeground": "#854d0e",
+      "input.placeholderForeground": "#713f12",
       "panel.background": "#ffffff",
       "panel.border": "#fef08a",
       "panelTitle.activeForeground": "#dc2626",
-      "panelTitle.inactiveForeground": "#854d0e",
+      "panelTitle.inactiveForeground": "#713f12",
       "panelTitle.activeBorder": "#dc2626",
       "chat.requestBackground": "#fef9c3",
       "chat.requestBorder": "#fee2e2",
@@ -8127,7 +8963,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#dc2626",
@@ -8137,7 +8974,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#1d4ed8"
@@ -8149,7 +8987,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#15803d"
@@ -8160,7 +9002,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#dc2626"
@@ -8169,7 +9012,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#0f172a"
@@ -8178,7 +9023,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#b45309"
@@ -8186,7 +9033,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#64748b",
@@ -8196,7 +9045,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#c2410c"
@@ -8204,15 +9056,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#dc2626"
+                  "foreground": "#0f172a"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#1d4ed8"
@@ -8304,7 +9159,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#67e8f9",
@@ -8314,7 +9170,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#38bdf8"
@@ -8326,7 +9183,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#fed7aa"
@@ -8337,7 +9198,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#67e8f9"
@@ -8346,7 +9208,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#f8fafc"
@@ -8355,7 +9219,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#93c5fd"
@@ -8363,7 +9229,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#475569",
@@ -8373,7 +9241,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#fb923c"
@@ -8381,15 +9252,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#67e8f9"
+                  "foreground": "#e2e8f0"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#38bdf8"
@@ -8481,7 +9355,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#ff7700",
@@ -8491,7 +9366,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#39ff14"
@@ -8503,7 +9379,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#ffea00"
@@ -8514,7 +9394,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#ff7700"
@@ -8523,7 +9404,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#fff1e6"
@@ -8532,7 +9415,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#bf00ff"
@@ -8540,7 +9425,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#6b4724",
@@ -8550,7 +9437,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#ff0055"
@@ -8558,15 +9448,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#ff7700"
+                  "foreground": "#fff1e6"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#39ff14"
@@ -8658,7 +9551,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#ffd43b",
@@ -8668,7 +9562,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#4b8bbe"
@@ -8680,7 +9575,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#69f0ae"
@@ -8691,7 +9590,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#ffd43b"
@@ -8700,7 +9600,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#e8f5e9"
@@ -8709,7 +9611,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#40c4ff"
@@ -8717,7 +9621,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#426759",
@@ -8727,7 +9633,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#ff9100"
@@ -8735,15 +9644,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#ffd43b"
+                  "foreground": "#e8f5e9"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#4b8bbe"
@@ -8835,7 +9747,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#f74c00",
@@ -8845,7 +9758,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#ff9e3b"
@@ -8857,7 +9771,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#7fb4ca"
@@ -8868,7 +9786,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#f74c00"
@@ -8877,7 +9796,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#f5ece7"
@@ -8886,7 +9807,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#e46876"
@@ -8894,7 +9817,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#71584c",
@@ -8904,7 +9829,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#ffa066"
@@ -8912,15 +9840,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#f74c00"
+                  "foreground": "#f5ece7"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#ff9e3b"
@@ -9012,7 +9943,8 @@ export const THEME_PRESETS: ThemePreset[] = [
             "scope": [
                   "keyword",
                   "keyword.control",
-                  "storage.type"
+                  "storage.type",
+                  "storage.modifier"
             ],
             "settings": {
                   "foreground": "#dc2626",
@@ -9022,7 +9954,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.function",
-                  "support.function"
+                  "support.function",
+                  "meta.function-call"
             ],
             "settings": {
                   "foreground": "#2563eb"
@@ -9034,7 +9967,11 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "string.quoted",
                   "string.quoted.double",
                   "string.quoted.single",
-                  "string.template"
+                  "string.template",
+                  "string.unquoted",
+                  "string.json",
+                  "source.json string",
+                  "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#facc15"
@@ -9045,7 +9982,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type.property-name",
                   "meta.object-literal.key",
                   "support.type.property-name.json",
-                  "meta.structure.dictionary.json string.quoted.double.json"
+                  "meta.structure.dictionary.json string.quoted.double.json",
+                  "entity.name.tag.json"
             ],
             "settings": {
                   "foreground": "#dc2626"
@@ -9054,7 +9992,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "variable",
-                  "variable.other"
+                  "variable.other",
+                  "variable.parameter",
+                  "variable.language"
             ],
             "settings": {
                   "foreground": "#ffffff"
@@ -9063,7 +10003,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "entity.name.type",
-                  "support.type"
+                  "support.type",
+                  "entity.name.class",
+                  "entity.other.inherited-class"
             ],
             "settings": {
                   "foreground": "#06b6d4"
@@ -9071,7 +10013,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "comment"
+                  "comment",
+                  "comment.line",
+                  "comment.block"
             ],
             "settings": {
                   "foreground": "#666677",
@@ -9081,7 +10025,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "constant.numeric",
-                  "constant.language.boolean"
+                  "constant.numeric.json",
+                  "constant.language.boolean",
+                  "constant.language.json",
+                  "constant.language"
             ],
             "settings": {
                   "foreground": "#f97316"
@@ -9089,15 +10036,18 @@ export const THEME_PRESETS: ThemePreset[] = [
       },
       {
             "scope": [
-                  "keyword.operator"
+                  "keyword.operator",
+                  "punctuation.separator",
+                  "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#dc2626"
+                  "foreground": "#ffffff"
             }
       },
       {
             "scope": [
-                  "entity.name.tag"
+                  "entity.name.tag",
+                  "entity.other.attribute-name"
             ],
             "settings": {
                   "foreground": "#2563eb"

@@ -713,10 +713,15 @@ export class ThemeStudioWebview {
 
       <!-- Tab 3: Presets Library -->
       <div id="tab-presets" class="tab-pane" style="display: none;">
-        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">
-          Curated designer themes. Click any preset to instantly apply it to VS Code!
+        <div class="filter-bar" style="margin-bottom: 14px;">
+          <input type="text" class="search-input" id="presetSearchInput" placeholder="🔍 Search presets (e.g. lemonade, solarized, warm, cyberpunk)..." />
+          <div class="pill-filters">
+            <span class="pill preset-pill active" data-preset-type="all">⚡ All (${THEME_PRESETS.length})</span>
+            <span class="pill preset-pill" data-preset-type="dark">🌙 Dark (${THEME_PRESETS.filter((p) => p.type === 'dark').length})</span>
+            <span class="pill preset-pill" data-preset-type="light">☀️ Light (${THEME_PRESETS.filter((p) => p.type === 'light').length})</span>
+          </div>
         </div>
-        <div class="preset-grid">
+        <div class="preset-grid" id="presetGrid">
           ${THEME_PRESETS.map((preset) => {
             const bg = preset.colors['editor.background'] || '#1e1e1e';
             const fg = preset.colors['editor.foreground'] || '#d4d4d4';
@@ -724,10 +729,10 @@ export class ThemeStudioWebview {
             const tab = preset.colors['tab.activeBackground'] || '#1e1e1e';
             const act = preset.accentColor || '#ffe600';
             return `
-            <div class="preset-card" data-preset-id="${preset.id}">
+            <div class="preset-card" data-preset-id="${preset.id}" data-preset-type="${preset.type}" data-preset-name="${preset.name.toLowerCase()} ${preset.description.toLowerCase()}">
               <div class="preset-header">
                 <span class="preset-title">${preset.name}</span>
-                <span class="color-category-badge">${preset.type}</span>
+                <span class="color-category-badge">${preset.type.toUpperCase()}</span>
               </div>
               <div class="color-desc">${preset.description}</div>
               <div class="palette-swatches">
@@ -869,11 +874,10 @@ export class ThemeStudioWebview {
       });
 
       // 2. Category Filter Pills
-      document.querySelectorAll('.pill').forEach(pill => {
+      document.querySelectorAll('.pill:not(.preset-pill)').forEach(pill => {
         pill.addEventListener('click', function() {
-          document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+          document.querySelectorAll('.pill:not(.preset-pill)').forEach(p => p.classList.remove('active'));
           this.classList.add('active');
-          const cat = this.getAttribute('data-category');
           filterColors();
         });
       });
@@ -886,7 +890,7 @@ export class ThemeStudioWebview {
 
       function filterColors() {
         const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
-        const activePill = document.querySelector('.pill.active');
+        const activePill = document.querySelector('.pill:not(.preset-pill).active');
         const cat = activePill ? activePill.getAttribute('data-category') : 'all';
 
         document.querySelectorAll('.color-card[data-category]').forEach(card => {
@@ -896,6 +900,39 @@ export class ThemeStudioWebview {
           const matchesQuery = !query || cardName.includes(query);
 
           if (matchesCat && matchesQuery) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      }
+
+      // 3b. Preset Type Filter Pills & Search
+      document.querySelectorAll('.preset-pill').forEach(pill => {
+        pill.addEventListener('click', function() {
+          document.querySelectorAll('.preset-pill').forEach(p => p.classList.remove('active'));
+          this.classList.add('active');
+          filterPresets();
+        });
+      });
+
+      const presetSearchInput = document.getElementById('presetSearchInput');
+      if (presetSearchInput) {
+        presetSearchInput.addEventListener('input', filterPresets);
+      }
+
+      function filterPresets() {
+        const query = (presetSearchInput ? presetSearchInput.value : '').toLowerCase().trim();
+        const activePill = document.querySelector('.preset-pill.active');
+        const type = activePill ? activePill.getAttribute('data-preset-type') : 'all';
+
+        document.querySelectorAll('.preset-card[data-preset-type]').forEach(card => {
+          const pType = card.getAttribute('data-preset-type');
+          const pName = card.getAttribute('data-preset-name') || '';
+          const matchesType = type === 'all' || pType === type;
+          const matchesQuery = !query || pName.includes(query);
+
+          if (matchesType && matchesQuery) {
             card.style.display = 'flex';
           } else {
             card.style.display = 'none';

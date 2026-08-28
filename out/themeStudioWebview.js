@@ -153,8 +153,7 @@ class ThemeStudioWebview {
       --text: #f0f0f8;
       --text-muted: #858599;
       --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      --preview-width: 440px;
-      --preview-height: 480px;
+      --preview-height: 420px;
       --preview-scale: 1;
     }
 
@@ -170,7 +169,7 @@ class ThemeStudioWebview {
       font-family: var(--font);
       font-size: 13px;
       line-height: 1.4;
-      padding: 20px;
+      padding: 16px;
       overflow-x: hidden;
     }
 
@@ -179,40 +178,44 @@ class ThemeStudioWebview {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 20px;
+      padding: 14px 18px;
       background: linear-gradient(135deg, rgba(255, 230, 0, 0.08) 0%, rgba(0, 240, 255, 0.04) 100%);
       border: 1px solid rgba(255, 230, 0, 0.2);
       border-radius: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
     .brand-title {
       display: flex;
       align-items: center;
-      gap: 12px;
-    }
-
-    .brand-logo {
-      width: 32px;
-      height: 32px;
-      color: var(--accent);
-      filter: drop-shadow(0 0 8px var(--accent-glow));
-    }
-
-    .header-title {
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      display: flex;
-      align-items: center;
       gap: 10px;
     }
 
+    .brand-logo {
+      width: 28px;
+      height: 28px;
+      color: var(--accent);
+      filter: drop-shadow(0 0 8px var(--accent-glow));
+      flex-shrink: 0;
+    }
+
+    .header-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
     .profile-pill {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
-      padding: 3px 9px;
+      padding: 2px 8px;
       background: var(--accent);
       color: #000;
       border-radius: 20px;
@@ -222,7 +225,7 @@ class ThemeStudioWebview {
 
     .toolbar {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
       flex-wrap: wrap;
     }
@@ -230,16 +233,17 @@ class ThemeStudioWebview {
     .btn {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 7px 14px;
+      gap: 5px;
+      padding: 6px 12px;
       border-radius: 6px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       cursor: pointer;
       border: 1px solid var(--card-border);
       background: rgba(255, 255, 255, 0.06);
       color: var(--text);
       transition: all 0.15s ease;
+      white-space: nowrap;
     }
 
     .btn:hover {
@@ -274,7 +278,7 @@ class ThemeStudioWebview {
       background: rgba(0, 240, 255, 0.2);
       border-color: #00f0ff;
       color: #fff;
-      box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
     }
 
     .btn-danger {
@@ -289,20 +293,30 @@ class ThemeStudioWebview {
       color: #fff;
     }
 
-    /* Layout Grid - Right Dock Mode (Default) */
+    /* Main Responsive Layout */
     .studio-layout {
       display: grid;
-      grid-template-columns: 1fr var(--preview-width);
-      gap: 20px;
+      grid-template-columns: minmax(0, 1.4fr) minmax(300px, 1fr);
+      gap: 16px;
       align-items: start;
       transition: all 0.2s ease;
     }
 
-    /* Layout Grid - Bottom Dock Mode */
+    .main-column {
+      min-width: 0;
+      width: 100%;
+    }
+
+    .preview-column {
+      min-width: 0;
+      width: 100%;
+    }
+
+    /* Bottom Docked Layout */
     .studio-layout.dock-bottom {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
     }
 
     .studio-layout.dock-bottom .main-column {
@@ -311,44 +325,37 @@ class ThemeStudioWebview {
 
     .studio-layout.dock-bottom .preview-column {
       width: 100%;
-      position: sticky;
-      bottom: 12px;
-      z-index: 100;
+      margin-top: 8px;
     }
 
-    .studio-layout.dock-bottom .preview-sticky {
-      box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 230, 0, 0.2);
-    }
-
-    @media (max-width: 1080px) {
+    @media (max-width: 900px) {
       .studio-layout {
         display: flex;
         flex-direction: column;
-      }
-      .preview-column {
-        width: 100% !important;
       }
     }
 
     /* Navigation Tabs */
     .nav-tabs {
       display: flex;
-      gap: 6px;
-      margin-bottom: 16px;
+      gap: 4px;
+      margin-bottom: 14px;
       border-bottom: 1px solid var(--card-border);
-      padding-bottom: 8px;
+      padding-bottom: 6px;
+      overflow-x: auto;
     }
 
     .nav-tab {
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 13px;
+      padding: 7px 13px;
+      border-radius: 6px;
+      font-size: 12px;
       font-weight: 700;
       cursor: pointer;
       background: transparent;
       border: 1px solid transparent;
       color: var(--text-muted);
       transition: all 0.15s;
+      white-space: nowrap;
     }
 
     .nav-tab:hover {
@@ -369,25 +376,27 @@ class ThemeStudioWebview {
       justify-content: space-between;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 8px 14px;
-      margin-bottom: 16px;
+      border-radius: 8px;
+      padding: 6px 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .mode-toggle-group {
       display: flex;
-      gap: 4px;
+      gap: 3px;
       background: rgba(0, 0, 0, 0.4);
       padding: 3px;
-      border-radius: 8px;
+      border-radius: 6px;
       border: 1px solid var(--card-border);
     }
 
     .mode-btn {
-      padding: 5px 14px;
+      padding: 4px 10px;
       font-size: 11px;
-      font-weight: 800;
-      border-radius: 6px;
+      font-weight: 700;
+      border-radius: 4px;
       cursor: pointer;
       border: none;
       background: transparent;
@@ -398,27 +407,27 @@ class ThemeStudioWebview {
     .mode-btn.active {
       background: var(--accent);
       color: #000;
-      box-shadow: 0 0 10px var(--accent-glow);
+      box-shadow: 0 0 8px var(--accent-glow);
     }
 
     /* Filter Pill Bars */
     .filter-bar {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       flex-wrap: wrap;
     }
 
     .search-input {
       flex: 1;
-      min-width: 200px;
-      padding: 8px 12px;
-      border-radius: 8px;
+      min-width: 160px;
+      padding: 7px 10px;
+      border-radius: 6px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       color: var(--text);
-      font-size: 12px;
+      font-size: 11px;
     }
 
     .search-input:focus {
@@ -428,15 +437,15 @@ class ThemeStudioWebview {
 
     .pill-filters {
       display: flex;
-      gap: 6px;
+      gap: 4px;
       flex-wrap: wrap;
     }
 
     .pill {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
-      padding: 5px 11px;
-      border-radius: 20px;
+      padding: 4px 9px;
+      border-radius: 14px;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--card-border);
       color: var(--text-muted);
@@ -459,96 +468,105 @@ class ThemeStudioWebview {
     /* Color Pickers Grid */
     .color-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
     }
 
     .color-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 12px;
+      border-radius: 8px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
+      min-width: 0;
       transition: all 0.15s ease;
     }
 
     .color-card:hover {
       border-color: rgba(255, 230, 0, 0.3);
       transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
 
     .simple-card {
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 16px;
+      border-radius: 10px;
+      padding: 12px 14px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
+      min-width: 0;
       transition: all 0.15s ease;
     }
 
     .simple-card:hover {
       border-color: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
 
     .color-card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 6px;
     }
 
     .color-name {
       font-weight: 700;
-      font-size: 13px;
+      font-size: 12px;
       color: var(--text);
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .color-category-badge {
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 4px;
+      padding: 1px 5px;
+      border-radius: 3px;
       background: rgba(255, 255, 255, 0.08);
       color: var(--text-muted);
       text-transform: uppercase;
+      flex-shrink: 0;
     }
 
     .color-desc {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--text-muted);
-      min-height: 28px;
+      line-height: 1.3;
+      min-height: 24px;
     }
 
     .color-input-row {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       background: rgba(0, 0, 0, 0.25);
       border: 1px solid var(--card-border);
       border-radius: 6px;
-      padding: 4px 8px;
+      padding: 3px 6px;
+      min-width: 0;
     }
 
     .color-picker {
       -webkit-appearance: none;
       -moz-appearance: none;
       appearance: none;
-      width: 26px;
-      height: 26px;
+      width: 22px;
+      height: 22px;
       background: transparent;
       border: none;
       cursor: pointer;
       border-radius: 4px;
       overflow: hidden;
+      flex-shrink: 0;
     }
 
     .color-picker::-webkit-color-swatch-wrapper {
@@ -557,18 +575,19 @@ class ThemeStudioWebview {
 
     .color-picker::-webkit-color-swatch {
       border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 4px;
+      border-radius: 3px;
     }
 
     .hex-input {
       flex: 1;
-      padding: 5px 8px;
+      min-width: 0;
+      padding: 4px 6px;
       border-radius: 4px;
       background: rgba(0, 0, 0, 0.3);
       border: 1px solid var(--card-border);
       color: var(--text);
       font-family: monospace;
-      font-size: 11px;
+      font-size: 10px;
       text-transform: uppercase;
     }
 
@@ -580,44 +599,49 @@ class ThemeStudioWebview {
     /* Preset Cards */
     .preset-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
     }
 
     .preset-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 14px;
+      border-radius: 8px;
+      padding: 12px;
       cursor: pointer;
       transition: all 0.15s ease;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
+      min-width: 0;
     }
 
     .preset-card:hover {
       border-color: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
     }
 
     .preset-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 4px;
     }
 
     .preset-title {
       font-weight: 800;
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .palette-swatches {
       display: flex;
-      height: 22px;
-      border-radius: 6px;
+      height: 18px;
+      border-radius: 4px;
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
@@ -630,136 +654,123 @@ class ThemeStudioWebview {
     /* Mock Editor Preview Panel */
     .preview-sticky {
       position: sticky;
-      top: 20px;
+      top: 16px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 12px;
+      border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-      transition: box-shadow 0.2s ease;
-    }
-
-    /* Resizer Drag Handle */
-    .preview-resizer-handle {
-      height: 6px;
-      background: rgba(255, 255, 255, 0.08);
-      cursor: row-resize;
-      transition: background 0.15s ease;
-      display: none;
-    }
-
-    .studio-layout.dock-bottom .preview-resizer-handle {
-      display: block;
-    }
-
-    .preview-resizer-handle:hover,
-    .preview-resizer-handle.dragging {
-      background: var(--accent);
-      box-shadow: 0 0 8px var(--accent-glow);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+      width: 100%;
     }
 
     .preview-header-bar {
-      padding: 8px 12px;
+      padding: 6px 10px;
       background: rgba(255, 255, 255, 0.04);
       border-bottom: 1px solid var(--card-border);
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       display: flex;
       justify-content: space-between;
       align-items: center;
       color: var(--text-muted);
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
     }
 
     .preview-controls-row {
       display: flex;
       align-items: center;
-      gap: 10px;
-    }
-
-    .size-control {
-      display: flex;
-      align-items: center;
       gap: 6px;
-      font-size: 10px;
+      flex-wrap: wrap;
+    }
+
+    .size-btn-group {
+      display: flex;
+      gap: 2px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 2px;
+      border-radius: 4px;
+      border: 1px solid var(--card-border);
+    }
+
+    .size-btn {
+      padding: 2px 6px;
+      font-size: 9px;
+      font-weight: 700;
+      border-radius: 3px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
       color: var(--text-muted);
+      transition: all 0.1s;
     }
 
-    .size-slider {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 80px;
-      height: 4px;
-      border-radius: 2px;
-      background: rgba(255, 255, 255, 0.2);
-      outline: none;
-      cursor: pointer;
+    .size-btn:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.08);
     }
 
-    .size-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
+    .size-btn.active {
       background: var(--accent);
-      cursor: pointer;
-      box-shadow: 0 0 6px var(--accent-glow);
+      color: #000;
     }
 
     .mock-window {
       font-family: 'Consolas', 'Courier New', monospace;
-      font-size: calc(11px * var(--preview-scale));
+      font-size: calc(10.5px * var(--preview-scale));
       display: flex;
       flex-direction: column;
       height: var(--preview-height);
-      min-height: 220px;
-      max-height: 800px;
+      min-height: 200px;
       background: #1e1e1e;
       overflow: hidden;
     }
 
     .mock-titlebar {
-      height: 26px;
+      height: 24px;
       background: #3c3c3c;
       color: #cccccc;
       display: flex;
       align-items: center;
-      padding: 0 10px;
-      font-size: calc(11px * var(--preview-scale));
+      padding: 0 8px;
+      font-size: calc(10px * var(--preview-scale));
       border-bottom: 1px solid rgba(0, 0, 0, 0.2);
       flex-shrink: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
 
     .mock-body {
       display: flex;
       flex: 1;
+      min-height: 0;
       overflow: hidden;
     }
 
     .mock-activitybar {
-      width: 44px;
+      width: 36px;
       background: #333333;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 10px 0;
-      gap: 12px;
+      padding: 8px 0;
+      gap: 10px;
       color: #ffffff;
       border-right: 1px solid rgba(0, 0, 0, 0.1);
       flex-shrink: 0;
+      font-size: 11px;
     }
 
     .mock-sidebar {
-      width: 140px;
+      width: 110px;
       background: #252526;
       color: #cccccc;
-      padding: 10px;
-      font-size: calc(10px * var(--preview-scale));
+      padding: 8px;
+      font-size: calc(9.5px * var(--preview-scale));
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
       border-right: 1px solid rgba(0, 0, 0, 0.1);
       flex-shrink: 0;
       overflow: hidden;
@@ -769,28 +780,31 @@ class ThemeStudioWebview {
       flex: 1;
       display: flex;
       flex-direction: column;
+      min-width: 0;
       overflow: hidden;
     }
 
     .mock-tabs-bar {
-      height: 28px;
+      height: 24px;
       background: #252526;
       display: flex;
       align-items: flex-end;
-      padding-left: 6px;
+      padding-left: 4px;
       gap: 2px;
       flex-shrink: 0;
+      overflow: hidden;
     }
 
     .mock-tab {
-      padding: 5px 12px;
-      font-size: calc(10px * var(--preview-scale));
+      padding: 4px 8px;
+      font-size: calc(9.5px * var(--preview-scale));
       background: #2d2d2d;
       color: #858585;
-      border-radius: 4px 4px 0 0;
+      border-radius: 3px 3px 0 0;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
+      white-space: nowrap;
     }
 
     .mock-tab.active {
@@ -803,21 +817,22 @@ class ThemeStudioWebview {
       flex: 1;
       background: #1e1e1e;
       color: #d4d4d4;
-      padding: 12px;
-      line-height: 1.5;
-      font-size: calc(11px * var(--preview-scale));
+      padding: 10px;
+      line-height: 1.45;
+      font-size: calc(10.5px * var(--preview-scale));
       overflow: auto;
+      min-width: 0;
     }
 
     .mock-statusbar {
-      height: 22px;
+      height: 20px;
       background: #007acc;
       color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 10px;
-      font-size: calc(10px * var(--preview-scale));
+      padding: 0 8px;
+      font-size: calc(9.5px * var(--preview-scale));
       flex-shrink: 0;
     }
   </style>
@@ -840,7 +855,6 @@ class ThemeStudioWebview {
     </div>
 
     <div class="toolbar">
-      <!-- Lock / Dock Preview Toggle Button -->
       <button class="btn btn-dock" id="btnToggleDock" onclick="toggleDockPosition()">
         <span id="dockBtnIcon">⬇️</span>
         <span id="dockBtnLabel">Lock to Bottom</span>
@@ -883,8 +897,8 @@ class ThemeStudioWebview {
 
         <!-- Tab 1A: Simple Mode UI (6 Master Colors) -->
         <div id="uiSimpleContainer">
-          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">
-            Set these 6 master colors and the theme engine will automatically map and harmonize the entire VS Code interface in real-time!
+          <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
+            Set these 6 master colors to style the entire VS Code workbench.
           </div>
           <div class="color-grid">
             ${presets_1.SIMPLE_UI_DEFINITIONS.map((def) => {
@@ -913,10 +927,10 @@ class ThemeStudioWebview {
             <div class="pill-filters">
               <span class="pill active" data-category="all">All</span>
               <span class="pill" data-category="core">Core Editor</span>
-              <span class="pill" data-category="bars">Bars & Headers</span>
-              <span class="pill" data-category="tabs">Tabs & Nav</span>
+              <span class="pill" data-category="bars">Bars</span>
+              <span class="pill" data-category="tabs">Tabs</span>
               <span class="pill" data-category="terminal">Terminal</span>
-              <span class="pill" data-category="chat">Chat & AI</span>
+              <span class="pill" data-category="chat">Chat</span>
             </div>
           </div>
 
@@ -957,7 +971,7 @@ class ThemeStudioWebview {
 
         <!-- Tab 2A: Simple Mode Syntax (6 Master Tokens) -->
         <div id="syntaxSimpleContainer">
-          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">
+          <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
             Set 6 core syntax colors to instantly colorize code across all programming languages.
           </div>
           <div class="color-grid">
@@ -969,7 +983,7 @@ class ThemeStudioWebview {
               <div class="simple-card" data-simple-syntax-id="${def.id}">
                 <div class="color-card-header">
                   <span class="color-name">${def.icon} ${def.name}</span>
-                  <span class="color-category-badge">Core Token</span>
+                  <span class="color-category-badge">Token</span>
                 </div>
                 <div class="color-desc">${def.description}</div>
                 <div class="color-input-row">
@@ -983,8 +997,8 @@ class ThemeStudioWebview {
 
         <!-- Tab 2B: Advanced Mode Syntax (Full Scopes) -->
         <div id="syntaxAdvancedContainer" style="display: none;">
-          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">
-            Customize code syntax highlighting across all programming languages (TypeScript, Python, Luau, JavaScript, Rust, C++, HTML).
+          <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 14px;">
+            Customize code syntax highlighting across all programming languages.
           </div>
           <div class="color-grid" id="syntaxGrid">
             ${presets_1.SYNTAX_SCOPE_DEFINITIONS.map((item) => {
@@ -1010,7 +1024,7 @@ class ThemeStudioWebview {
 
       <!-- Tab 3: Presets Library -->
       <div id="tab-presets" class="tab-pane" style="display: none;">
-        <div class="filter-bar" style="margin-bottom: 14px;">
+        <div class="filter-bar" style="margin-bottom: 12px;">
           <input type="text" class="search-input" id="presetSearchInput" placeholder="🔍 Search presets (e.g. lemonade, solarized, warm, cyberpunk)..." />
           <div class="pill-filters">
             <span class="pill preset-pill active" data-preset-type="all">⚡ All (${presets_1.THEME_PRESETS.length})</span>
@@ -1039,7 +1053,7 @@ class ThemeStudioWebview {
                 <div class="swatch" style="background: ${act};" title="Accent: ${act}"></div>
                 <div class="swatch" style="background: ${fg};" title="Text: ${fg}"></div>
               </div>
-              <button class="btn btn-primary" style="margin-top: 4px; justify-content: center;" onclick="loadPreset('${preset.id}')">⚡ Load & Apply</button>
+              <button class="btn btn-primary" style="margin-top: 2px; justify-content: center; width: 100%;" onclick="loadPreset('${preset.id}')">⚡ Load & Apply</button>
             </div>`;
         }).join('')}
         </div>
@@ -1047,12 +1061,12 @@ class ThemeStudioWebview {
 
       <!-- Tab 4: Saved Profiles -->
       <div id="tab-profiles" class="tab-pane" style="display: none;">
-        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">
+        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 14px;">
           Your personalized saved theme profiles.
         </div>
         <div class="preset-grid">
           ${savedProfiles.length === 0 ? `
-            <div style="grid-column: 1 / -1; padding: 30px; text-align: center; color: var(--text-muted); background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px;">
+            <div style="grid-column: 1 / -1; padding: 24px; text-align: center; color: var(--text-muted); background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px;">
               No saved custom profiles yet. Tweak colors and click "💾 Save Profile" above!
             </div>` : ''}
           ${savedProfiles.map((p) => {
@@ -1074,7 +1088,7 @@ class ThemeStudioWebview {
                 <div class="swatch" style="background: ${act};"></div>
                 <div class="swatch" style="background: ${fg};"></div>
               </div>
-              <div style="display: flex; gap: 8px; margin-top: 6px;">
+              <div style="display: flex; gap: 6px; margin-top: 4px;">
                 <button class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="loadSavedProfile('${p.id}')">Apply</button>
                 <button class="btn btn-danger" onclick="deleteSavedProfile('${p.id}', '${p.name}')">🗑️</button>
               </div>
@@ -1089,37 +1103,29 @@ class ThemeStudioWebview {
     <div class="preview-column" id="previewColumn">
       <div class="preview-sticky">
         
-        <!-- Drag Handle for Resizing in Bottom Dock Mode -->
-        <div class="preview-resizer-handle" id="previewDragHandle" title="Drag to resize preview height"></div>
-
         <!-- Preview Top Controls Bar -->
         <div class="preview-header-bar">
           <div style="display: flex; align-items: center; gap: 6px;">
-            <span>LIVE PREVIEW</span>
-            <span id="previewStatus" style="color: var(--accent); font-size: 10px;">● Live Sync</span>
+            <span>👁️ LIVE PREVIEW</span>
+            <span style="color: var(--accent); font-size: 9px;">● Active</span>
           </div>
 
-          <!-- Adjustable Size Controls -->
+          <!-- Compact Size & Scale Controls -->
           <div class="preview-controls-row">
             
-            <!-- Height Slider -->
-            <div class="size-control">
-              <span>📏 Height:</span>
-              <input type="range" class="size-slider" id="heightSlider" min="220" max="750" value="480" oninput="onHeightSliderChange(this.value)" title="Adjust Preview Height" />
-              <span id="heightLabel">480px</span>
+            <!-- Height Presets -->
+            <div class="size-btn-group">
+              <button class="size-btn" onclick="setHeightPreset(280)">Compact</button>
+              <button class="size-btn active" id="btnH420" onclick="setHeightPreset(420)">Standard</button>
+              <button class="size-btn" onclick="setHeightPreset(580)">Tall</button>
             </div>
 
-            <!-- Zoom / Scale Slider -->
-            <div class="size-control">
-              <span>🔍 Zoom:</span>
-              <input type="range" class="size-slider" id="zoomSlider" min="0.75" max="1.3" step="0.05" value="1" oninput="onZoomSliderChange(this.value)" title="Adjust Text & Window Zoom" />
-              <span id="zoomLabel">100%</span>
+            <!-- Zoom Presets -->
+            <div class="size-btn-group">
+              <button class="size-btn" onclick="setZoomDelta(-0.1)" title="Zoom Out">A-</button>
+              <button class="size-btn" id="zoomDisplay" onclick="resetZoom()" title="Reset Zoom">100%</button>
+              <button class="size-btn" onclick="setZoomDelta(0.1)" title="Zoom In">A+</button>
             </div>
-
-            <!-- Inline Dock Toggle -->
-            <button class="btn" style="padding: 3px 8px; font-size: 10px;" onclick="toggleDockPosition()" id="btnInlineDock" title="Toggle Dock to Bottom / Right">
-              <span id="inlineDockIcon">⬇️ Bottom</span>
-            </button>
 
           </div>
         </div>
@@ -1144,13 +1150,13 @@ class ThemeStudioWebview {
 
             <!-- Sidebar -->
             <div class="mock-sidebar" id="mockSidebar">
-              <div style="font-weight: 700; margin-bottom: 4px;" id="mockSidebarTitle">EXPLORER</div>
+              <div style="font-weight: 700; margin-bottom: 2px;" id="mockSidebarTitle">EXPLORER</div>
               <div>📁 src</div>
-              <div style="padding-left: 8px;">📄 themeEngine.ts</div>
-              <div style="padding-left: 8px; color: var(--accent);">📄 presets.ts</div>
-              <div style="padding-left: 8px;">📄 studio.tsx</div>
+              <div style="padding-left: 6px;">📄 themeEngine.ts</div>
+              <div style="padding-left: 6px; color: var(--accent);">📄 presets.ts</div>
+              <div style="padding-left: 6px;">📄 studio.tsx</div>
               <div>📁 media</div>
-              <div style="padding-left: 8px;">🖼️ logo.svg</div>
+              <div style="padding-left: 6px;">🖼️ logo.svg</div>
             </div>
 
             <!-- Editor Area -->
@@ -1168,7 +1174,7 @@ class ThemeStudioWebview {
 
               <!-- Editor Code Canvas -->
               <div class="mock-editor-canvas" id="mockCanvas">
-                <div style="color: #666; margin-bottom: 4px;">1  <span class="syn-comment" id="synComment">// SimpleSignal Theme Studio Live Preview</span></div>
+                <div style="color: #666; margin-bottom: 3px;">1  <span class="syn-comment" id="synComment">// SimpleSignal Live Preview</span></div>
                 <div>2  <span class="syn-keyword" id="synKw1">import</span> { <span class="syn-var" id="synVar1">SimpleSignal</span> } <span class="syn-keyword" id="synKw2">from</span> <span class="syn-string" id="synStr1">'simplesignal'</span>;</div>
                 <div>3  </div>
                 <div>4  <span class="syn-keyword" id="synKw3">export</span> <span class="syn-keyword" id="synKw4">interface</span> <span class="syn-type" id="synType1">ThemeProfile</span> {</div>
@@ -1209,7 +1215,7 @@ class ThemeStudioWebview {
         colors: ${JSON.stringify(currentColors)},
         tokenColors: ${JSON.stringify(currentTokens)},
         dockPosition: 'right', // 'right' | 'bottom'
-        previewHeight: 480,
+        previewHeight: 420,
         previewScale: 1.0,
       };
 
@@ -1236,87 +1242,48 @@ class ThemeStudioWebview {
         const layout = document.getElementById('studioLayout');
         const btnIcon = document.getElementById('dockBtnIcon');
         const btnLabel = document.getElementById('dockBtnLabel');
-        const inlineIcon = document.getElementById('inlineDockIcon');
-        const heightSlider = document.getElementById('heightSlider');
 
         if (activeState.dockPosition === 'right') {
           activeState.dockPosition = 'bottom';
           layout.classList.add('dock-bottom');
           btnIcon.innerText = '📌';
           btnLabel.innerText = 'Dock to Right';
-          inlineIcon.innerText = '📌 Right';
-          
-          // In bottom mode, set default comfortable height
-          if (activeState.previewHeight > 360) {
-            updateHeight(340);
-            if (heightSlider) heightSlider.value = 340;
-          }
         } else {
           activeState.dockPosition = 'right';
           layout.classList.remove('dock-bottom');
           btnIcon.innerText = '⬇️';
           btnLabel.innerText = 'Lock to Bottom';
-          inlineIcon.innerText = '⬇️ Bottom';
-          
-          updateHeight(480);
-          if (heightSlider) heightSlider.value = 480;
         }
       };
 
-      // 3. Adjustable Height & Zoom Handlers
-      window.onHeightSliderChange = function(val) {
-        updateHeight(parseInt(val, 10));
-      };
-
-      function updateHeight(h) {
+      // 3. Height Presets
+      window.setHeightPreset = function(h) {
         activeState.previewHeight = h;
         document.documentElement.style.setProperty('--preview-height', h + 'px');
-        const label = document.getElementById('heightLabel');
-        if (label) label.innerText = h + 'px';
-      }
-
-      window.onZoomSliderChange = function(val) {
-        const scale = parseFloat(val);
-        activeState.previewScale = scale;
-        document.documentElement.style.setProperty('--preview-scale', scale);
-        const label = document.getElementById('zoomLabel');
-        if (label) label.innerText = Math.round(scale * 100) + '%';
+        document.querySelectorAll('.size-btn-group .size-btn').forEach(b => {
+          if (b.innerText.toLowerCase().includes('compact') && h === 280) b.classList.add('active');
+          else if (b.innerText.toLowerCase().includes('standard') && h === 420) b.classList.add('active');
+          else if (b.innerText.toLowerCase().includes('tall') && h === 580) b.classList.add('active');
+          else if (!b.id && !b.innerText.includes('A') && !b.innerText.includes('%')) b.classList.remove('active');
+        });
       };
 
-      // 4. Interactive Drag Resizer Handle in Bottom Mode
-      const dragHandle = document.getElementById('previewDragHandle');
-      if (dragHandle) {
-        let isDragging = false;
-        let startY = 0;
-        let startHeight = 0;
+      // 4. Zoom Controls
+      window.setZoomDelta = function(delta) {
+        let nextScale = Math.round((activeState.previewScale + delta) * 10) / 10;
+        nextScale = Math.max(0.7, Math.min(1.4, nextScale));
+        activeState.previewScale = nextScale;
+        document.documentElement.style.setProperty('--preview-scale', nextScale);
+        const disp = document.getElementById('zoomDisplay');
+        if (disp) disp.innerText = Math.round(nextScale * 100) + '%';
+      };
 
-        dragHandle.addEventListener('mousedown', function(e) {
-          isDragging = true;
-          startY = e.clientY;
-          startHeight = activeState.previewHeight;
-          dragHandle.classList.add('dragging');
-          document.body.style.userSelect = 'none';
-          document.body.style.cursor = 'row-resize';
-        });
-
-        document.addEventListener('mousemove', function(e) {
-          if (!isDragging) return;
-          const deltaY = startY - e.clientY;
-          const newHeight = Math.max(200, Math.min(800, startHeight + deltaY));
-          updateHeight(newHeight);
-          const heightSlider = document.getElementById('heightSlider');
-          if (heightSlider) heightSlider.value = newHeight;
-        });
-
-        document.addEventListener('mouseup', function() {
-          if (isDragging) {
-            isDragging = false;
-            dragHandle.classList.remove('dragging');
-            document.body.style.userSelect = '';
-            document.body.style.cursor = '';
-          }
-        });
-      }
+      window.resetZoom = function() {
+        activeState.previewScale = 1.0;
+        document.documentElement.style.setProperty('--preview-scale', 1.0);
+        const disp = document.getElementById('zoomDisplay');
+        if (disp) disp.innerText = '100%';
+      };
 
       // 5. Mode Switches (Simple vs Advanced)
       window.setUiMode = function(mode) {
@@ -1474,7 +1441,6 @@ class ThemeStudioWebview {
           if (tb) tb.style.background = val;
         }
 
-        // Post live update to VS Code
         vscode.postMessage({ command: 'applyLiveColor', key, value: val });
       }
 
@@ -1493,7 +1459,6 @@ class ThemeStudioWebview {
           document.querySelectorAll('.syn-comment').forEach(el => el.style.color = color);
         }
 
-        // Update tokenColors list in activeState
         const item = SYNTAX_DEFS.find(s => s.id === syntaxId);
         if (item) {
           const scope = item.scopes;
@@ -1505,11 +1470,10 @@ class ThemeStudioWebview {
           }
         }
 
-        // Post live update to VS Code
         vscode.postMessage({ command: 'applyLiveTokenColor', syntaxId, color });
       }
 
-      // 9. Simple Mode UI Handlers (6 Master Colors)
+      // 9. Simple Mode UI Handlers
       document.querySelectorAll('.simple-ui-picker').forEach(picker => {
         picker.addEventListener('input', function() {
           const simpleId = this.getAttribute('data-simple-id');
@@ -1569,7 +1533,7 @@ class ThemeStudioWebview {
         });
       });
 
-      // 11. Simple Mode Syntax Handlers (6 Master Tokens)
+      // 11. Simple Mode Syntax Handlers
       document.querySelectorAll('.simple-syntax-picker').forEach(picker => {
         picker.addEventListener('input', function() {
           const simpleId = this.getAttribute('data-simple-syntax-id');

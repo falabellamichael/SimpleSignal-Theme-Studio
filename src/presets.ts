@@ -8,7 +8,7 @@ export const UI_COLOR_DEFINITIONS: UISectionColor[] = [
   { id: 'icon.foreground', name: 'Global UI Icons (+, ⚙️, X)', description: 'Toolbar icons, action buttons and window controls', category: 'core', defaultValue: '#cccccc' },
   { id: 'focusBorder', name: 'Focus Border', description: 'Global focus outline on interactive elements', category: 'core', defaultValue: '#007fd4' },
   
-  // 2. Editor Canvas
+  // 2. Editor Canvas & Hover Widgets
   { id: 'editor.background', name: 'Editor Background', description: 'Main coding canvas background color', category: 'core', defaultValue: '#1e1e1e' },
   { id: 'editor.foreground', name: 'Editor Code Text', description: 'Default code text / punctuation color', category: 'core', defaultValue: '#d4d4d4' },
   { id: 'editorLineNumber.foreground', name: 'Line Numbers', description: 'Gutter line number color', category: 'core', defaultValue: '#858585' },
@@ -16,6 +16,13 @@ export const UI_COLOR_DEFINITIONS: UISectionColor[] = [
   { id: 'editorCursor.foreground', name: 'Editor Cursor', description: 'Blinking text cursor color', category: 'core', defaultValue: '#aeafad' },
   { id: 'editor.selectionBackground', name: 'Selection Background', description: 'Highlighted text selection area', category: 'core', defaultValue: '#264f78' },
   { id: 'editor.lineHighlightBackground', name: 'Line Highlight', description: 'Background of line cursor is currently on', category: 'core', defaultValue: '#2a2d2e' },
+  { id: 'editorHoverWidget.background', name: 'Hover Popup / Tooltip BG', description: 'Background of hover info boxes & tooltips (e.g. Unknown Setting)', category: 'core', defaultValue: '#252526' },
+  { id: 'editorHoverWidget.foreground', name: 'Hover Popup Text', description: 'Text color inside hover tooltips & popups', category: 'core', defaultValue: '#cccccc' },
+  { id: 'editorHoverWidget.border', name: 'Hover Popup Border', description: 'Border outline of hover info boxes & tooltips', category: 'core', defaultValue: '#454545' },
+  { id: 'editorSuggestWidget.background', name: 'Autocomplete Dropdown BG', description: 'Background of code intellisense suggestions box', category: 'core', defaultValue: '#252526' },
+  { id: 'editorSuggestWidget.foreground', name: 'Autocomplete Text', description: 'Text inside code suggestions list', category: 'core', defaultValue: '#cccccc' },
+  { id: 'editorWidget.background', name: 'Find / Replace Widget BG', description: 'Background of search/replace and dialog widgets', category: 'core', defaultValue: '#252526' },
+  { id: 'editorWidget.border', name: 'Find / Replace Widget Border', description: 'Border of search/replace and dialog widgets', category: 'core', defaultValue: '#454545' },
 
   // 3. Navigation & Activity Bars
   { id: 'activityBar.background', name: 'Activity Bar Background', description: 'Leftmost primary icon strip', category: 'bars', defaultValue: '#333333' },
@@ -75,6 +82,7 @@ export const SYNTAX_SCOPE_DEFINITIONS: SyntaxScopeItem[] = [
   { id: 'functions', name: 'Functions & Methods', description: 'function names, method calls, constructors', scopes: ['entity.name.function', 'support.function', 'meta.function-call'], defaultColor: '#dcdcaa' },
   { id: 'strings', name: 'Strings & Templates', description: 'quoted text, template literals, character literals', scopes: ['string', 'string.quoted', 'string.template'], defaultColor: '#ce9178' },
   { id: 'variables', name: 'Variables & Identifiers', description: 'variable names, parameters, object properties', scopes: ['variable', 'variable.other', 'variable.parameter'], defaultColor: '#9cdcfe' },
+  { id: 'properties', name: 'Object & JSON Keys', description: 'JSON keys, object literal keys, dictionary keys', scopes: ['support.type.property-name', 'meta.object-literal.key', 'support.type.property-name.json'], defaultColor: '#dcdcaa' },
   { id: 'types', name: 'Types & Classes', description: 'interfaces, type aliases, classes, struct names', scopes: ['entity.name.type', 'support.type', 'entity.name.class'], defaultColor: '#4ec9b0' },
   { id: 'comments', name: 'Comments', description: 'single-line // and multi-line /* */ comments', scopes: ['comment', 'comment.line', 'comment.block'], defaultColor: '#6a9955' },
   { id: 'numbers', name: 'Numbers & Booleans', description: 'integers, floats, true, false, null, undefined', scopes: ['constant.numeric', 'constant.language.boolean', 'constant.language'], defaultColor: '#b5cea8' },
@@ -97,7 +105,7 @@ export const SIMPLE_UI_DEFINITIONS: SimpleColorDefinition[] = [
     name: 'Primary Accent',
     description: 'Borders, cursor, badges, buttons, links & active line highlights',
     icon: '✨',
-    targets: ['focusBorder', 'activityBarBadge.background', 'tab.activeBorderTop', 'editorCursor.foreground', 'textLink.foreground', 'badge.background', 'editorLineNumber.activeForeground', 'terminalCursor.foreground', 'panelTitle.activeBorder'],
+    targets: ['focusBorder', 'activityBarBadge.background', 'tab.activeBorderTop', 'editorCursor.foreground', 'textLink.foreground', 'badge.background', 'editorLineNumber.activeForeground', 'terminalCursor.foreground', 'panelTitle.activeBorder', 'editorSuggestWidget.highlightForeground'],
     defaultColor: '#ffe600',
   },
   {
@@ -152,6 +160,24 @@ export const SIMPLE_UI_DEFINITIONS: SimpleColorDefinition[] = [
     defaultColor: '#f0f0f8',
   },
   {
+    id: 'simple.popups',
+    name: 'Hover Tooltips & Popups',
+    description: 'Hover info popups (Unknown Setting), Autocomplete dropdown & Find/Replace dialogs',
+    icon: '🪟',
+    targets: [
+      'editorHoverWidget.background',
+      'editorHoverWidget.foreground',
+      'editorHoverWidget.border',
+      'editorSuggestWidget.background',
+      'editorSuggestWidget.foreground',
+      'editorSuggestWidget.border',
+      'editorWidget.background',
+      'editorWidget.foreground',
+      'editorWidget.border',
+    ],
+    defaultColor: '#181825',
+  },
+  {
     id: 'simple.tabsBg',
     name: 'Tabs & Sub-Panels BG',
     description: 'Tab bar background, inactive tabs, chat code blocks & popups',
@@ -187,9 +213,17 @@ export const SIMPLE_SYNTAX_DEFINITIONS: SimpleColorDefinition[] = [
     defaultColor: '#00f0ff',
   },
   {
+    id: 'simple.properties',
+    name: 'Object & JSON Keys',
+    description: 'JSON keys ("model":), object property keys, dictionary keys',
+    icon: '🔑',
+    targets: ['properties'],
+    defaultColor: '#ffd43b',
+  },
+  {
     id: 'simple.strings',
     name: 'Strings & Text Literals',
-    description: 'Single/double quoted strings, templates, literals',
+    description: 'Single/double quoted strings, URL values, text literals',
     icon: '📜',
     targets: ['strings'],
     defaultColor: '#ffe600',
@@ -220,6 +254,7 @@ export const SIMPLE_SYNTAX_DEFINITIONS: SimpleColorDefinition[] = [
   },
 ];
 
+
 export const THEME_PRESETS: ThemePreset[] = [
   // 🍋 Lemonade Dark
   {
@@ -240,6 +275,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#fff017",
       "editor.selectionBackground": "#131a10",
       "editor.lineHighlightBackground": "#131a10",
+      "editorHoverWidget.background": "#0f140c",
+      "editorHoverWidget.foreground": "#d8e2cb",
+      "editorHoverWidget.border": "#131a10",
+      "editorHoverWidget.statusBarBackground": "#131a10",
+      "editorSuggestWidget.background": "#0f140c",
+      "editorSuggestWidget.foreground": "#d8e2cb",
+      "editorSuggestWidget.border": "#131a10",
+      "editorSuggestWidget.selectedBackground": "#131a10",
+      "editorSuggestWidget.selectedForeground": "#fff017",
+      "editorSuggestWidget.highlightForeground": "#fff017",
+      "editorWidget.background": "#0f140c",
+      "editorWidget.foreground": "#d8e2cb",
+      "editorWidget.border": "#131a10",
       "focusBorder": "#fff017",
       "activityBar.background": "#080a06",
       "activityBar.foreground": "#fff017",
@@ -310,10 +358,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#bef264"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#facc15"
             }
       },
       {
@@ -381,19 +443,32 @@ export const THEME_PRESETS: ThemePreset[] = [
     colors: {
       "foreground": "#1c1917",
       "descriptionForeground": "#854d0e",
-      "disabledForeground": "#a8a29e",
+      "disabledForeground": "#78716c",
       "icon.foreground": "#ca8a04",
       "editor.background": "#fefce8",
       "editor.foreground": "#1c1917",
-      "editorLineNumber.foreground": "#a8a29e",
+      "editorLineNumber.foreground": "#78716c",
       "editorLineNumber.activeForeground": "#ca8a04",
       "editorCursor.foreground": "#ca8a04",
       "editor.selectionBackground": "#fef08a88",
       "editor.lineHighlightBackground": "#fef08a88",
+      "editorHoverWidget.background": "#fffbeb",
+      "editorHoverWidget.foreground": "#292524",
+      "editorHoverWidget.border": "#fef08a88",
+      "editorHoverWidget.statusBarBackground": "#fef08a88",
+      "editorSuggestWidget.background": "#fffbeb",
+      "editorSuggestWidget.foreground": "#292524",
+      "editorSuggestWidget.border": "#fef08a88",
+      "editorSuggestWidget.selectedBackground": "#fef08a88",
+      "editorSuggestWidget.selectedForeground": "#713f12",
+      "editorSuggestWidget.highlightForeground": "#ca8a04",
+      "editorWidget.background": "#fffbeb",
+      "editorWidget.foreground": "#292524",
+      "editorWidget.border": "#fef08a88",
       "focusBorder": "#ca8a04",
       "activityBar.background": "#fef08a",
       "activityBar.foreground": "#ca8a04",
-      "activityBar.inactiveForeground": "#a8a29e",
+      "activityBar.inactiveForeground": "#78716c",
       "activityBarBadge.background": "#ca8a04",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#fffbeb",
@@ -460,10 +535,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#0d9488"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#c2410c"
             }
       },
       {
@@ -489,7 +578,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#a8a29e",
+                  "foreground": "#78716c",
                   "fontStyle": "italic"
             }
       },
@@ -540,6 +629,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#00f0ff",
       "editor.selectionBackground": "#121212",
       "editor.lineHighlightBackground": "#121212",
+      "editorHoverWidget.background": "#0a0a0a",
+      "editorHoverWidget.foreground": "#f0f0f0",
+      "editorHoverWidget.border": "#121212",
+      "editorHoverWidget.statusBarBackground": "#121212",
+      "editorSuggestWidget.background": "#0a0a0a",
+      "editorSuggestWidget.foreground": "#f0f0f0",
+      "editorSuggestWidget.border": "#121212",
+      "editorSuggestWidget.selectedBackground": "#121212",
+      "editorSuggestWidget.selectedForeground": "#00f0ff",
+      "editorSuggestWidget.highlightForeground": "#00f0ff",
+      "editorWidget.background": "#0a0a0a",
+      "editorWidget.foreground": "#f0f0f0",
+      "editorWidget.border": "#121212",
       "focusBorder": "#00f0ff",
       "activityBar.background": "#050505",
       "activityBar.foreground": "#00f0ff",
@@ -610,10 +712,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#648fff"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#ffb000"
             }
       },
       {
@@ -690,6 +806,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#005ab5",
       "editor.selectionBackground": "#ebebeb",
       "editor.lineHighlightBackground": "#ebebeb",
+      "editorHoverWidget.background": "#f4f4f4",
+      "editorHoverWidget.foreground": "#111111",
+      "editorHoverWidget.border": "#ebebeb",
+      "editorHoverWidget.statusBarBackground": "#ebebeb",
+      "editorSuggestWidget.background": "#f4f4f4",
+      "editorSuggestWidget.foreground": "#111111",
+      "editorSuggestWidget.border": "#ebebeb",
+      "editorSuggestWidget.selectedBackground": "#ebebeb",
+      "editorSuggestWidget.selectedForeground": "#005ab5",
+      "editorSuggestWidget.highlightForeground": "#005ab5",
+      "editorWidget.background": "#f4f4f4",
+      "editorWidget.foreground": "#111111",
+      "editorWidget.border": "#ebebeb",
       "focusBorder": "#005ab5",
       "activityBar.background": "#e0e0e0",
       "activityBar.foreground": "#005ab5",
@@ -760,10 +889,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#2b8a3e"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#dc267f"
             }
       },
       {
@@ -840,6 +983,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#ffffff",
       "editor.selectionBackground": "#212121",
       "editor.lineHighlightBackground": "#212121",
+      "editorHoverWidget.background": "#171717",
+      "editorHoverWidget.foreground": "#e5e5e5",
+      "editorHoverWidget.border": "#212121",
+      "editorHoverWidget.statusBarBackground": "#212121",
+      "editorSuggestWidget.background": "#171717",
+      "editorSuggestWidget.foreground": "#e5e5e5",
+      "editorSuggestWidget.border": "#212121",
+      "editorSuggestWidget.selectedBackground": "#212121",
+      "editorSuggestWidget.selectedForeground": "#ffffff",
+      "editorSuggestWidget.highlightForeground": "#ffffff",
+      "editorWidget.background": "#171717",
+      "editorWidget.foreground": "#e5e5e5",
+      "editorWidget.border": "#212121",
       "focusBorder": "#ffffff",
       "activityBar.background": "#000000",
       "activityBar.foreground": "#ffffff",
@@ -910,10 +1066,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#cccccc"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#ffffff"
             }
       },
       {
@@ -990,6 +1160,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#111111",
       "editor.selectionBackground": "#e5e5e5",
       "editor.lineHighlightBackground": "#e5e5e5",
+      "editorHoverWidget.background": "#efefef",
+      "editorHoverWidget.foreground": "#1a1a1a",
+      "editorHoverWidget.border": "#e5e5e5",
+      "editorHoverWidget.statusBarBackground": "#e5e5e5",
+      "editorSuggestWidget.background": "#efefef",
+      "editorSuggestWidget.foreground": "#1a1a1a",
+      "editorSuggestWidget.border": "#e5e5e5",
+      "editorSuggestWidget.selectedBackground": "#e5e5e5",
+      "editorSuggestWidget.selectedForeground": "#000000",
+      "editorSuggestWidget.highlightForeground": "#111111",
+      "editorWidget.background": "#efefef",
+      "editorWidget.foreground": "#1a1a1a",
+      "editorWidget.border": "#e5e5e5",
       "focusBorder": "#111111",
       "activityBar.background": "#dcdcdc",
       "activityBar.foreground": "#111111",
@@ -1060,10 +1243,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#444444"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#000000"
             }
       },
       {
@@ -1140,6 +1337,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#ffffff",
       "editor.selectionBackground": "#1a1a1a",
       "editor.lineHighlightBackground": "#1a1a1a",
+      "editorHoverWidget.background": "#111111",
+      "editorHoverWidget.foreground": "#ffffff",
+      "editorHoverWidget.border": "#1a1a1a",
+      "editorHoverWidget.statusBarBackground": "#1a1a1a",
+      "editorSuggestWidget.background": "#111111",
+      "editorSuggestWidget.foreground": "#ffffff",
+      "editorSuggestWidget.border": "#1a1a1a",
+      "editorSuggestWidget.selectedBackground": "#1a1a1a",
+      "editorSuggestWidget.selectedForeground": "#ffffff",
+      "editorSuggestWidget.highlightForeground": "#ffffff",
+      "editorWidget.background": "#111111",
+      "editorWidget.foreground": "#ffffff",
+      "editorWidget.border": "#1a1a1a",
       "focusBorder": "#ffffff",
       "activityBar.background": "#000000",
       "activityBar.foreground": "#ffffff",
@@ -1210,10 +1420,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#dddddd"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#ffffff"
             }
       },
       {
@@ -1290,6 +1514,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#eab308",
       "editor.selectionBackground": "#27272a",
       "editor.lineHighlightBackground": "#27272a",
+      "editorHoverWidget.background": "#1c1c1f",
+      "editorHoverWidget.foreground": "#f4f4f5",
+      "editorHoverWidget.border": "#27272a",
+      "editorHoverWidget.statusBarBackground": "#27272a",
+      "editorSuggestWidget.background": "#1c1c1f",
+      "editorSuggestWidget.foreground": "#f4f4f5",
+      "editorSuggestWidget.border": "#27272a",
+      "editorSuggestWidget.selectedBackground": "#27272a",
+      "editorSuggestWidget.selectedForeground": "#eab308",
+      "editorSuggestWidget.highlightForeground": "#eab308",
+      "editorWidget.background": "#1c1c1f",
+      "editorWidget.foreground": "#f4f4f5",
+      "editorWidget.border": "#27272a",
       "focusBorder": "#eab308",
       "activityBar.background": "#0f0f11",
       "activityBar.foreground": "#eab308",
@@ -1360,10 +1597,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#ffffff"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#ef4444"
             }
       },
       {
@@ -1429,54 +1680,67 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#268bd2",
     colors: {
-      "foreground": "#657b83",
-      "descriptionForeground": "#839496",
-      "disabledForeground": "#93a1a1",
+      "foreground": "#475b62",
+      "descriptionForeground": "#657b83",
+      "disabledForeground": "#839496",
       "icon.foreground": "#268bd2",
       "editor.background": "#fdf6e3",
-      "editor.foreground": "#657b83",
-      "editorLineNumber.foreground": "#93a1a1",
+      "editor.foreground": "#475b62",
+      "editorLineNumber.foreground": "#839496",
       "editorLineNumber.activeForeground": "#268bd2",
       "editorCursor.foreground": "#268bd2",
       "editor.selectionBackground": "#eee8d5",
       "editor.lineHighlightBackground": "#eee8d5",
+      "editorHoverWidget.background": "#eee8d5",
+      "editorHoverWidget.foreground": "#475b62",
+      "editorHoverWidget.border": "#eee8d5",
+      "editorHoverWidget.statusBarBackground": "#eee8d5",
+      "editorSuggestWidget.background": "#eee8d5",
+      "editorSuggestWidget.foreground": "#475b62",
+      "editorSuggestWidget.border": "#eee8d5",
+      "editorSuggestWidget.selectedBackground": "#eee8d5",
+      "editorSuggestWidget.selectedForeground": "#268bd2",
+      "editorSuggestWidget.highlightForeground": "#268bd2",
+      "editorWidget.background": "#eee8d5",
+      "editorWidget.foreground": "#475b62",
+      "editorWidget.border": "#eee8d5",
       "focusBorder": "#268bd2",
       "activityBar.background": "#eee8d5",
       "activityBar.foreground": "#268bd2",
-      "activityBar.inactiveForeground": "#93a1a1",
+      "activityBar.inactiveForeground": "#839496",
       "activityBarBadge.background": "#268bd2",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#eee8d5",
-      "sideBar.foreground": "#657b83",
-      "sideBarTitle.foreground": "#586e75",
+      "sideBar.foreground": "#475b62",
+      "sideBarTitle.foreground": "#268bd2",
       "sideBarSectionHeader.background": "#eee8d5",
-      "sideBarSectionHeader.foreground": "#657b83",
+      "sideBarSectionHeader.foreground": "#475b62",
       "titleBar.activeBackground": "#eee8d5",
-      "titleBar.activeForeground": "#657b83",
+      "titleBar.activeForeground": "#475b62",
       "statusBar.background": "#eee8d5",
-      "statusBar.foreground": "#586e75",
+      "statusBar.foreground": "#475b62",
       "statusBar.debuggingBackground": "#e11d48",
       "editorGroupHeader.tabsBackground": "#eee8d5",
       "tab.activeBackground": "#fdf6e3",
-      "tab.activeForeground": "#586e75",
+      "tab.activeForeground": "#268bd2",
       "tab.activeBorderTop": "#268bd2",
       "tab.inactiveBackground": "#eee8d5",
-      "tab.inactiveForeground": "#839496",
+      "tab.inactiveForeground": "#657b83",
       "tab.hoverBackground": "#eee8d5",
-      "breadcrumb.foreground": "#839496",
+      "breadcrumb.foreground": "#657b83",
       "terminal.background": "#fdf6e3",
-      "terminal.foreground": "#657b83",
+      "terminal.foreground": "#475b62",
       "terminalCursor.foreground": "#268bd2",
       "terminal.ansiGreen": "#268bd2",
       "terminal.ansiCyan": "#b58900",
-      "terminal.ansiYellow": "#2aa198",
+      "terminal.ansiYellow": "#1f8c83",
       "input.background": "#eee8d5",
-      "input.foreground": "#586e75",
-      "input.placeholderForeground": "#839496",
+      "input.foreground": "#475b62",
+      "input.placeholderForeground": "#657b83",
       "panel.background": "#fdf6e3",
       "panel.border": "#eee8d5",
       "panelTitle.activeForeground": "#268bd2",
-      "panelTitle.inactiveForeground": "#839496",
+      "panelTitle.inactiveForeground": "#657b83",
       "panelTitle.activeBorder": "#268bd2",
       "chat.requestBackground": "#eee8d5",
       "chat.requestBorder": "#eee8d5",
@@ -1510,10 +1774,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
-                  "foreground": "#2aa198"
+                  "foreground": "#1f8c83"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#859900"
             }
       },
       {
@@ -1522,7 +1800,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.other"
             ],
             "settings": {
-                  "foreground": "#657b83"
+                  "foreground": "#475b62"
             }
       },
       {
@@ -1539,7 +1817,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#93a1a1",
+                  "foreground": "#839496",
                   "fontStyle": "italic"
             }
       },
@@ -1579,54 +1857,67 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#b58900",
     colors: {
-      "foreground": "#594d42",
-      "descriptionForeground": "#82715d",
-      "disabledForeground": "#9c8c78",
+      "foreground": "#3b2c1f",
+      "descriptionForeground": "#6e5a44",
+      "disabledForeground": "#85735f",
       "icon.foreground": "#b58900",
       "editor.background": "#faf2da",
-      "editor.foreground": "#594d42",
-      "editorLineNumber.foreground": "#9c8c78",
+      "editor.foreground": "#3b2c1f",
+      "editorLineNumber.foreground": "#85735f",
       "editorLineNumber.activeForeground": "#b58900",
       "editorCursor.foreground": "#b58900",
       "editor.selectionBackground": "#ecdab0",
       "editor.lineHighlightBackground": "#ecdab0",
+      "editorHoverWidget.background": "#f3e4c0",
+      "editorHoverWidget.foreground": "#3b2c1f",
+      "editorHoverWidget.border": "#ecdab0",
+      "editorHoverWidget.statusBarBackground": "#ecdab0",
+      "editorSuggestWidget.background": "#f3e4c0",
+      "editorSuggestWidget.foreground": "#3b2c1f",
+      "editorSuggestWidget.border": "#ecdab0",
+      "editorSuggestWidget.selectedBackground": "#ecdab0",
+      "editorSuggestWidget.selectedForeground": "#b58900",
+      "editorSuggestWidget.highlightForeground": "#b58900",
+      "editorWidget.background": "#f3e4c0",
+      "editorWidget.foreground": "#3b2c1f",
+      "editorWidget.border": "#ecdab0",
       "focusBorder": "#b58900",
       "activityBar.background": "#ecdab0",
       "activityBar.foreground": "#b58900",
-      "activityBar.inactiveForeground": "#9c8c78",
+      "activityBar.inactiveForeground": "#85735f",
       "activityBarBadge.background": "#b58900",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#f3e4c0",
-      "sideBar.foreground": "#544638",
-      "sideBarTitle.foreground": "#4f4133",
+      "sideBar.foreground": "#3b2c1f",
+      "sideBarTitle.foreground": "#b58900",
       "sideBarSectionHeader.background": "#ecdab0",
-      "sideBarSectionHeader.foreground": "#544638",
+      "sideBarSectionHeader.foreground": "#3b2c1f",
       "titleBar.activeBackground": "#ecdab0",
-      "titleBar.activeForeground": "#594d42",
+      "titleBar.activeForeground": "#3b2c1f",
       "statusBar.background": "#b58900",
       "statusBar.foreground": "#faf2da",
       "statusBar.debuggingBackground": "#e11d48",
       "editorGroupHeader.tabsBackground": "#f3e4c0",
       "tab.activeBackground": "#faf2da",
-      "tab.activeForeground": "#4f4133",
+      "tab.activeForeground": "#b58900",
       "tab.activeBorderTop": "#b58900",
       "tab.inactiveBackground": "#ecdab0",
-      "tab.inactiveForeground": "#82715d",
+      "tab.inactiveForeground": "#6e5a44",
       "tab.hoverBackground": "#ecdab0",
-      "breadcrumb.foreground": "#82715d",
+      "breadcrumb.foreground": "#6e5a44",
       "terminal.background": "#faf2da",
-      "terminal.foreground": "#594d42",
+      "terminal.foreground": "#3b2c1f",
       "terminalCursor.foreground": "#b58900",
-      "terminal.ansiGreen": "#2075b3",
+      "terminal.ansiGreen": "#1d4ed8",
       "terminal.ansiCyan": "#b58900",
-      "terminal.ansiYellow": "#1f8c83",
+      "terminal.ansiYellow": "#0f766e",
       "input.background": "#ecdab0",
-      "input.foreground": "#4f4133",
-      "input.placeholderForeground": "#82715d",
+      "input.foreground": "#3b2c1f",
+      "input.placeholderForeground": "#6e5a44",
       "panel.background": "#faf2da",
       "panel.border": "#f3e4c0",
       "panelTitle.activeForeground": "#b58900",
-      "panelTitle.inactiveForeground": "#82715d",
+      "panelTitle.inactiveForeground": "#6e5a44",
       "panelTitle.activeBorder": "#b58900",
       "chat.requestBackground": "#ecdab0",
       "chat.requestBorder": "#ecdab0",
@@ -1654,16 +1945,30 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.function"
             ],
             "settings": {
-                  "foreground": "#2075b3"
+                  "foreground": "#1d4ed8"
             }
       },
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
-                  "foreground": "#1f8c83"
+                  "foreground": "#0f766e"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#cb4b16"
             }
       },
       {
@@ -1672,7 +1977,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.other"
             ],
             "settings": {
-                  "foreground": "#594d42"
+                  "foreground": "#3b2c1f"
             }
       },
       {
@@ -1689,7 +1994,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#9c8c78",
+                  "foreground": "#85735f",
                   "fontStyle": "italic"
             }
       },
@@ -1699,7 +2004,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "constant.language.boolean"
             ],
             "settings": {
-                  "foreground": "#c72574"
+                  "foreground": "#b91c1c"
             }
       },
       {
@@ -1715,7 +2020,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.name.tag"
             ],
             "settings": {
-                  "foreground": "#2075b3"
+                  "foreground": "#1d4ed8"
             }
       }
 ],
@@ -1740,6 +2045,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#2aa198",
       "editor.selectionBackground": "#073642",
       "editor.lineHighlightBackground": "#073642",
+      "editorHoverWidget.background": "#073642",
+      "editorHoverWidget.foreground": "#93a1a1",
+      "editorHoverWidget.border": "#073642",
+      "editorHoverWidget.statusBarBackground": "#073642",
+      "editorSuggestWidget.background": "#073642",
+      "editorSuggestWidget.foreground": "#93a1a1",
+      "editorSuggestWidget.border": "#073642",
+      "editorSuggestWidget.selectedBackground": "#073642",
+      "editorSuggestWidget.selectedForeground": "#2aa198",
+      "editorSuggestWidget.highlightForeground": "#2aa198",
+      "editorWidget.background": "#073642",
+      "editorWidget.foreground": "#93a1a1",
+      "editorWidget.border": "#073642",
       "focusBorder": "#2aa198",
       "activityBar.background": "#00212b",
       "activityBar.foreground": "#2aa198",
@@ -1810,10 +2128,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#2aa198"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#859900"
             }
       },
       {
@@ -1879,54 +2211,67 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#d7827e",
     colors: {
-      "foreground": "#575279",
-      "descriptionForeground": "#9893a5",
-      "disabledForeground": "#9893a5",
+      "foreground": "#403a60",
+      "descriptionForeground": "#797593",
+      "disabledForeground": "#888299",
       "icon.foreground": "#d7827e",
       "editor.background": "#faf4ed",
-      "editor.foreground": "#575279",
-      "editorLineNumber.foreground": "#9893a5",
+      "editor.foreground": "#403a60",
+      "editorLineNumber.foreground": "#888299",
       "editorLineNumber.activeForeground": "#d7827e",
       "editorCursor.foreground": "#d7827e",
       "editor.selectionBackground": "#f2e9e1",
       "editor.lineHighlightBackground": "#f2e9e1",
+      "editorHoverWidget.background": "#f4ebe2",
+      "editorHoverWidget.foreground": "#403a60",
+      "editorHoverWidget.border": "#f2e9e1",
+      "editorHoverWidget.statusBarBackground": "#f2e9e1",
+      "editorSuggestWidget.background": "#f4ebe2",
+      "editorSuggestWidget.foreground": "#403a60",
+      "editorSuggestWidget.border": "#f2e9e1",
+      "editorSuggestWidget.selectedBackground": "#f2e9e1",
+      "editorSuggestWidget.selectedForeground": "#d7827e",
+      "editorSuggestWidget.highlightForeground": "#d7827e",
+      "editorWidget.background": "#f4ebe2",
+      "editorWidget.foreground": "#403a60",
+      "editorWidget.border": "#f2e9e1",
       "focusBorder": "#d7827e",
       "activityBar.background": "#f2e9e1",
       "activityBar.foreground": "#d7827e",
-      "activityBar.inactiveForeground": "#9893a5",
+      "activityBar.inactiveForeground": "#888299",
       "activityBarBadge.background": "#d7827e",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#f4ebe2",
-      "sideBar.foreground": "#575279",
-      "sideBarTitle.foreground": "#575279",
+      "sideBar.foreground": "#403a60",
+      "sideBarTitle.foreground": "#d7827e",
       "sideBarSectionHeader.background": "#f2e9e1",
-      "sideBarSectionHeader.foreground": "#575279",
+      "sideBarSectionHeader.foreground": "#403a60",
       "titleBar.activeBackground": "#f2e9e1",
-      "titleBar.activeForeground": "#575279",
+      "titleBar.activeForeground": "#403a60",
       "statusBar.background": "#f2e9e1",
-      "statusBar.foreground": "#575279",
+      "statusBar.foreground": "#403a60",
       "statusBar.debuggingBackground": "#e11d48",
       "editorGroupHeader.tabsBackground": "#f4ebe2",
       "tab.activeBackground": "#faf4ed",
-      "tab.activeForeground": "#575279",
+      "tab.activeForeground": "#d7827e",
       "tab.activeBorderTop": "#d7827e",
       "tab.inactiveBackground": "#f2e9e1",
-      "tab.inactiveForeground": "#9893a5",
+      "tab.inactiveForeground": "#797593",
       "tab.hoverBackground": "#f2e9e1",
-      "breadcrumb.foreground": "#9893a5",
+      "breadcrumb.foreground": "#797593",
       "terminal.background": "#faf4ed",
-      "terminal.foreground": "#575279",
+      "terminal.foreground": "#403a60",
       "terminalCursor.foreground": "#d7827e",
-      "terminal.ansiGreen": "#d7827e",
-      "terminal.ansiCyan": "#56949f",
-      "terminal.ansiYellow": "#ea9d34",
+      "terminal.ansiGreen": "#1d4ed8",
+      "terminal.ansiCyan": "#0f766e",
+      "terminal.ansiYellow": "#b45309",
       "input.background": "#f2e9e1",
-      "input.foreground": "#575279",
-      "input.placeholderForeground": "#9893a5",
+      "input.foreground": "#403a60",
+      "input.placeholderForeground": "#797593",
       "panel.background": "#faf4ed",
       "panel.border": "#f4ebe2",
       "panelTitle.activeForeground": "#d7827e",
-      "panelTitle.inactiveForeground": "#9893a5",
+      "panelTitle.inactiveForeground": "#797593",
       "panelTitle.activeBorder": "#d7827e",
       "chat.requestBackground": "#f2e9e1",
       "chat.requestBorder": "#f2e9e1",
@@ -1944,7 +2289,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "storage.type"
             ],
             "settings": {
-                  "foreground": "#286983",
+                  "foreground": "#b91c1c",
                   "fontStyle": "bold"
             }
       },
@@ -1954,16 +2299,30 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.function"
             ],
             "settings": {
-                  "foreground": "#d7827e"
+                  "foreground": "#1d4ed8"
             }
       },
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
-                  "foreground": "#ea9d34"
+                  "foreground": "#b45309"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#b91c1c"
             }
       },
       {
@@ -1972,7 +2331,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.other"
             ],
             "settings": {
-                  "foreground": "#575279"
+                  "foreground": "#403a60"
             }
       },
       {
@@ -1981,7 +2340,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type"
             ],
             "settings": {
-                  "foreground": "#56949f"
+                  "foreground": "#0f766e"
             }
       },
       {
@@ -1989,7 +2348,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#9893a5",
+                  "foreground": "#888299",
                   "fontStyle": "italic"
             }
       },
@@ -2007,7 +2366,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "keyword.operator"
             ],
             "settings": {
-                  "foreground": "#286983"
+                  "foreground": "#b91c1c"
             }
       },
       {
@@ -2015,7 +2374,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.name.tag"
             ],
             "settings": {
-                  "foreground": "#d7827e"
+                  "foreground": "#1d4ed8"
             }
       }
 ],
@@ -2029,30 +2388,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#b45309",
     colors: {
-      "foreground": "#382b22",
-      "descriptionForeground": "#9a3412",
-      "disabledForeground": "#a88d77",
+      "foreground": "#2d1f14",
+      "descriptionForeground": "#78350f",
+      "disabledForeground": "#8f7055",
       "icon.foreground": "#b45309",
       "editor.background": "#fffaf0",
-      "editor.foreground": "#382b22",
-      "editorLineNumber.foreground": "#a88d77",
+      "editor.foreground": "#2d1f14",
+      "editorLineNumber.foreground": "#8f7055",
       "editorLineNumber.activeForeground": "#b45309",
       "editorCursor.foreground": "#b45309",
       "editor.selectionBackground": "#ffedd5",
       "editor.lineHighlightBackground": "#ffedd5",
+      "editorHoverWidget.background": "#fff7ed",
+      "editorHoverWidget.foreground": "#2d1f14",
+      "editorHoverWidget.border": "#ffedd5",
+      "editorHoverWidget.statusBarBackground": "#ffedd5",
+      "editorSuggestWidget.background": "#fff7ed",
+      "editorSuggestWidget.foreground": "#2d1f14",
+      "editorSuggestWidget.border": "#ffedd5",
+      "editorSuggestWidget.selectedBackground": "#ffedd5",
+      "editorSuggestWidget.selectedForeground": "#7c2d12",
+      "editorSuggestWidget.highlightForeground": "#b45309",
+      "editorWidget.background": "#fff7ed",
+      "editorWidget.foreground": "#2d1f14",
+      "editorWidget.border": "#ffedd5",
       "focusBorder": "#b45309",
       "activityBar.background": "#ffedd5",
       "activityBar.foreground": "#b45309",
-      "activityBar.inactiveForeground": "#a88d77",
+      "activityBar.inactiveForeground": "#8f7055",
       "activityBarBadge.background": "#b45309",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#fff7ed",
-      "sideBar.foreground": "#431407",
+      "sideBar.foreground": "#2d1f14",
       "sideBarTitle.foreground": "#7c2d12",
       "sideBarSectionHeader.background": "#ffedd5",
-      "sideBarSectionHeader.foreground": "#431407",
+      "sideBarSectionHeader.foreground": "#2d1f14",
       "titleBar.activeBackground": "#ffedd5",
-      "titleBar.activeForeground": "#382b22",
+      "titleBar.activeForeground": "#2d1f14",
       "statusBar.background": "#c2410c",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -2061,22 +2433,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#7c2d12",
       "tab.activeBorderTop": "#b45309",
       "tab.inactiveBackground": "#ffedd5",
-      "tab.inactiveForeground": "#9a3412",
+      "tab.inactiveForeground": "#78350f",
       "tab.hoverBackground": "#ffedd5",
-      "breadcrumb.foreground": "#9a3412",
+      "breadcrumb.foreground": "#78350f",
       "terminal.background": "#fffaf0",
-      "terminal.foreground": "#382b22",
+      "terminal.foreground": "#2d1f14",
       "terminalCursor.foreground": "#b45309",
       "terminal.ansiGreen": "#b45309",
       "terminal.ansiCyan": "#0f766e",
-      "terminal.ansiYellow": "#4d7c0f",
+      "terminal.ansiYellow": "#15803d",
       "input.background": "#ffedd5",
-      "input.foreground": "#382b22",
-      "input.placeholderForeground": "#9a3412",
+      "input.foreground": "#2d1f14",
+      "input.placeholderForeground": "#78350f",
       "panel.background": "#fffaf0",
       "panel.border": "#fff7ed",
       "panelTitle.activeForeground": "#b45309",
-      "panelTitle.inactiveForeground": "#9a3412",
+      "panelTitle.inactiveForeground": "#78350f",
       "panelTitle.activeBorder": "#b45309",
       "chat.requestBackground": "#ffedd5",
       "chat.requestBorder": "#ffedd5",
@@ -2110,10 +2482,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
-                  "foreground": "#4d7c0f"
+                  "foreground": "#15803d"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#c2410c"
             }
       },
       {
@@ -2122,7 +2508,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.other"
             ],
             "settings": {
-                  "foreground": "#382b22"
+                  "foreground": "#2d1f14"
             }
       },
       {
@@ -2139,7 +2525,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#a88d77",
+                  "foreground": "#8f7055",
                   "fontStyle": "italic"
             }
       },
@@ -2179,54 +2565,67 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#8b4513",
     colors: {
-      "foreground": "#4a3728",
-      "descriptionForeground": "#8c7661",
-      "disabledForeground": "#9e8975",
+      "foreground": "#382312",
+      "descriptionForeground": "#6e553e",
+      "disabledForeground": "#856f5c",
       "icon.foreground": "#8b4513",
       "editor.background": "#f5eedb",
-      "editor.foreground": "#4a3728",
-      "editorLineNumber.foreground": "#9e8975",
+      "editor.foreground": "#382312",
+      "editorLineNumber.foreground": "#856f5c",
       "editorLineNumber.activeForeground": "#8b4513",
       "editorCursor.foreground": "#8b4513",
       "editor.selectionBackground": "#e8dcbe",
       "editor.lineHighlightBackground": "#e8dcbe",
+      "editorHoverWidget.background": "#eee3c8",
+      "editorHoverWidget.foreground": "#382312",
+      "editorHoverWidget.border": "#e8dcbe",
+      "editorHoverWidget.statusBarBackground": "#e8dcbe",
+      "editorSuggestWidget.background": "#eee3c8",
+      "editorSuggestWidget.foreground": "#382312",
+      "editorSuggestWidget.border": "#e8dcbe",
+      "editorSuggestWidget.selectedBackground": "#e8dcbe",
+      "editorSuggestWidget.selectedForeground": "#8b4513",
+      "editorSuggestWidget.highlightForeground": "#8b4513",
+      "editorWidget.background": "#eee3c8",
+      "editorWidget.foreground": "#382312",
+      "editorWidget.border": "#e8dcbe",
       "focusBorder": "#8b4513",
       "activityBar.background": "#e8dcbe",
       "activityBar.foreground": "#8b4513",
-      "activityBar.inactiveForeground": "#9e8975",
+      "activityBar.inactiveForeground": "#856f5c",
       "activityBarBadge.background": "#8b4513",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#eee3c8",
-      "sideBar.foreground": "#4a3728",
-      "sideBarTitle.foreground": "#4a3728",
+      "sideBar.foreground": "#382312",
+      "sideBarTitle.foreground": "#8b4513",
       "sideBarSectionHeader.background": "#e8dcbe",
-      "sideBarSectionHeader.foreground": "#4a3728",
+      "sideBarSectionHeader.foreground": "#382312",
       "titleBar.activeBackground": "#e8dcbe",
-      "titleBar.activeForeground": "#4a3728",
+      "titleBar.activeForeground": "#382312",
       "statusBar.background": "#8b4513",
       "statusBar.foreground": "#f5eedb",
       "statusBar.debuggingBackground": "#e11d48",
       "editorGroupHeader.tabsBackground": "#eee3c8",
       "tab.activeBackground": "#f5eedb",
-      "tab.activeForeground": "#4a3728",
+      "tab.activeForeground": "#8b4513",
       "tab.activeBorderTop": "#8b4513",
       "tab.inactiveBackground": "#e8dcbe",
-      "tab.inactiveForeground": "#8c7661",
+      "tab.inactiveForeground": "#6e553e",
       "tab.hoverBackground": "#e8dcbe",
-      "breadcrumb.foreground": "#8c7661",
+      "breadcrumb.foreground": "#6e553e",
       "terminal.background": "#f5eedb",
-      "terminal.foreground": "#4a3728",
+      "terminal.foreground": "#382312",
       "terminalCursor.foreground": "#8b4513",
-      "terminal.ansiGreen": "#556b2f",
-      "terminal.ansiCyan": "#2e8b57",
-      "terminal.ansiYellow": "#b8860b",
+      "terminal.ansiGreen": "#2b593f",
+      "terminal.ansiCyan": "#1e5b4f",
+      "terminal.ansiYellow": "#92400e",
       "input.background": "#e8dcbe",
-      "input.foreground": "#4a3728",
-      "input.placeholderForeground": "#8c7661",
+      "input.foreground": "#382312",
+      "input.placeholderForeground": "#6e553e",
       "panel.background": "#f5eedb",
       "panel.border": "#eee3c8",
       "panelTitle.activeForeground": "#8b4513",
-      "panelTitle.inactiveForeground": "#8c7661",
+      "panelTitle.inactiveForeground": "#6e553e",
       "panelTitle.activeBorder": "#8b4513",
       "chat.requestBackground": "#e8dcbe",
       "chat.requestBorder": "#e8dcbe",
@@ -2254,16 +2653,30 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.function"
             ],
             "settings": {
-                  "foreground": "#556b2f"
+                  "foreground": "#2b593f"
             }
       },
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
-                  "foreground": "#b8860b"
+                  "foreground": "#92400e"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#8b4513"
             }
       },
       {
@@ -2272,7 +2685,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.other"
             ],
             "settings": {
-                  "foreground": "#4a3728"
+                  "foreground": "#382312"
             }
       },
       {
@@ -2281,7 +2694,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type"
             ],
             "settings": {
-                  "foreground": "#2e8b57"
+                  "foreground": "#1e5b4f"
             }
       },
       {
@@ -2289,7 +2702,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#9e8975",
+                  "foreground": "#856f5c",
                   "fontStyle": "italic"
             }
       },
@@ -2315,7 +2728,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.name.tag"
             ],
             "settings": {
-                  "foreground": "#556b2f"
+                  "foreground": "#2b593f"
             }
       }
 ],
@@ -2329,30 +2742,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#4d7c0f",
     colors: {
-      "foreground": "#273618",
-      "descriptionForeground": "#65a30d",
-      "disabledForeground": "#84cc16",
+      "foreground": "#1e2912",
+      "descriptionForeground": "#4d7c0f",
+      "disabledForeground": "#65a30d",
       "icon.foreground": "#4d7c0f",
       "editor.background": "#f7fee7",
-      "editor.foreground": "#273618",
-      "editorLineNumber.foreground": "#84cc16",
+      "editor.foreground": "#1e2912",
+      "editorLineNumber.foreground": "#65a30d",
       "editorLineNumber.activeForeground": "#4d7c0f",
       "editorCursor.foreground": "#4d7c0f",
       "editor.selectionBackground": "#d9f99d",
       "editor.lineHighlightBackground": "#d9f99d",
+      "editorHoverWidget.background": "#ecfccb",
+      "editorHoverWidget.foreground": "#1e2912",
+      "editorHoverWidget.border": "#d9f99d",
+      "editorHoverWidget.statusBarBackground": "#d9f99d",
+      "editorSuggestWidget.background": "#ecfccb",
+      "editorSuggestWidget.foreground": "#1e2912",
+      "editorSuggestWidget.border": "#d9f99d",
+      "editorSuggestWidget.selectedBackground": "#d9f99d",
+      "editorSuggestWidget.selectedForeground": "#3f6212",
+      "editorSuggestWidget.highlightForeground": "#4d7c0f",
+      "editorWidget.background": "#ecfccb",
+      "editorWidget.foreground": "#1e2912",
+      "editorWidget.border": "#d9f99d",
       "focusBorder": "#4d7c0f",
       "activityBar.background": "#d9f99d",
       "activityBar.foreground": "#4d7c0f",
-      "activityBar.inactiveForeground": "#84cc16",
+      "activityBar.inactiveForeground": "#65a30d",
       "activityBarBadge.background": "#4d7c0f",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#ecfccb",
-      "sideBar.foreground": "#273618",
+      "sideBar.foreground": "#1e2912",
       "sideBarTitle.foreground": "#3f6212",
       "sideBarSectionHeader.background": "#d9f99d",
-      "sideBarSectionHeader.foreground": "#273618",
+      "sideBarSectionHeader.foreground": "#1e2912",
       "titleBar.activeBackground": "#d9f99d",
-      "titleBar.activeForeground": "#273618",
+      "titleBar.activeForeground": "#1e2912",
       "statusBar.background": "#4d7c0f",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -2361,22 +2787,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#3f6212",
       "tab.activeBorderTop": "#4d7c0f",
       "tab.inactiveBackground": "#d9f99d",
-      "tab.inactiveForeground": "#65a30d",
+      "tab.inactiveForeground": "#4d7c0f",
       "tab.hoverBackground": "#d9f99d",
-      "breadcrumb.foreground": "#65a30d",
+      "breadcrumb.foreground": "#4d7c0f",
       "terminal.background": "#f7fee7",
-      "terminal.foreground": "#273618",
+      "terminal.foreground": "#1e2912",
       "terminalCursor.foreground": "#4d7c0f",
       "terminal.ansiGreen": "#15803d",
       "terminal.ansiCyan": "#047857",
       "terminal.ansiYellow": "#b45309",
       "input.background": "#ecfccb",
-      "input.foreground": "#273618",
-      "input.placeholderForeground": "#65a30d",
+      "input.foreground": "#1e2912",
+      "input.placeholderForeground": "#4d7c0f",
       "panel.background": "#f7fee7",
       "panel.border": "#ecfccb",
       "panelTitle.activeForeground": "#4d7c0f",
-      "panelTitle.inactiveForeground": "#65a30d",
+      "panelTitle.inactiveForeground": "#4d7c0f",
       "panelTitle.activeBorder": "#4d7c0f",
       "chat.requestBackground": "#ecfccb",
       "chat.requestBorder": "#d9f99d",
@@ -2410,10 +2836,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#b45309"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#3f6212"
             }
       },
       {
@@ -2422,7 +2862,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.other"
             ],
             "settings": {
-                  "foreground": "#273618"
+                  "foreground": "#1e2912"
             }
       },
       {
@@ -2439,7 +2879,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#84cc16",
+                  "foreground": "#65a30d",
                   "fontStyle": "italic"
             }
       },
@@ -2479,30 +2919,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#d97706",
     colors: {
-      "foreground": "#451a03",
-      "descriptionForeground": "#b45309",
-      "disabledForeground": "#d97706",
+      "foreground": "#381401",
+      "descriptionForeground": "#78350f",
+      "disabledForeground": "#b45309",
       "icon.foreground": "#d97706",
       "editor.background": "#fffbeb",
-      "editor.foreground": "#451a03",
-      "editorLineNumber.foreground": "#d97706",
+      "editor.foreground": "#381401",
+      "editorLineNumber.foreground": "#b45309",
       "editorLineNumber.activeForeground": "#d97706",
       "editorCursor.foreground": "#d97706",
       "editor.selectionBackground": "#fde68a",
       "editor.lineHighlightBackground": "#fde68a",
+      "editorHoverWidget.background": "#fef3c7",
+      "editorHoverWidget.foreground": "#381401",
+      "editorHoverWidget.border": "#fde68a",
+      "editorHoverWidget.statusBarBackground": "#fde68a",
+      "editorSuggestWidget.background": "#fef3c7",
+      "editorSuggestWidget.foreground": "#381401",
+      "editorSuggestWidget.border": "#fde68a",
+      "editorSuggestWidget.selectedBackground": "#fde68a",
+      "editorSuggestWidget.selectedForeground": "#92400e",
+      "editorSuggestWidget.highlightForeground": "#d97706",
+      "editorWidget.background": "#fef3c7",
+      "editorWidget.foreground": "#381401",
+      "editorWidget.border": "#fde68a",
       "focusBorder": "#d97706",
       "activityBar.background": "#fde68a",
       "activityBar.foreground": "#d97706",
-      "activityBar.inactiveForeground": "#d97706",
+      "activityBar.inactiveForeground": "#b45309",
       "activityBarBadge.background": "#d97706",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#fef3c7",
-      "sideBar.foreground": "#451a03",
+      "sideBar.foreground": "#381401",
       "sideBarTitle.foreground": "#92400e",
       "sideBarSectionHeader.background": "#fde68a",
-      "sideBarSectionHeader.foreground": "#451a03",
+      "sideBarSectionHeader.foreground": "#381401",
       "titleBar.activeBackground": "#fde68a",
-      "titleBar.activeForeground": "#451a03",
+      "titleBar.activeForeground": "#381401",
       "statusBar.background": "#b45309",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -2511,22 +2964,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#92400e",
       "tab.activeBorderTop": "#d97706",
       "tab.inactiveBackground": "#fde68a",
-      "tab.inactiveForeground": "#b45309",
+      "tab.inactiveForeground": "#78350f",
       "tab.hoverBackground": "#fde68a",
-      "breadcrumb.foreground": "#b45309",
+      "breadcrumb.foreground": "#78350f",
       "terminal.background": "#fffbeb",
-      "terminal.foreground": "#451a03",
+      "terminal.foreground": "#381401",
       "terminalCursor.foreground": "#d97706",
       "terminal.ansiGreen": "#78350f",
       "terminal.ansiCyan": "#b91c1c",
-      "terminal.ansiYellow": "#059669",
+      "terminal.ansiYellow": "#047857",
       "input.background": "#fef3c7",
-      "input.foreground": "#451a03",
-      "input.placeholderForeground": "#b45309",
+      "input.foreground": "#381401",
+      "input.placeholderForeground": "#78350f",
       "panel.background": "#fffbeb",
       "panel.border": "#fef3c7",
       "panelTitle.activeForeground": "#d97706",
-      "panelTitle.inactiveForeground": "#b45309",
+      "panelTitle.inactiveForeground": "#78350f",
       "panelTitle.activeBorder": "#d97706",
       "chat.requestBackground": "#fef3c7",
       "chat.requestBorder": "#fde68a",
@@ -2560,10 +3013,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
-                  "foreground": "#059669"
+                  "foreground": "#047857"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#b45309"
             }
       },
       {
@@ -2572,7 +3039,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.other"
             ],
             "settings": {
-                  "foreground": "#451a03"
+                  "foreground": "#381401"
             }
       },
       {
@@ -2589,7 +3056,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#d97706",
+                  "foreground": "#b45309",
                   "fontStyle": "italic"
             }
       },
@@ -2629,30 +3096,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#9a3412",
     colors: {
-      "foreground": "#382314",
-      "descriptionForeground": "#9a3412",
-      "disabledForeground": "#a89078",
+      "foreground": "#2c1a0c",
+      "descriptionForeground": "#78350f",
+      "disabledForeground": "#8a6e55",
       "icon.foreground": "#9a3412",
       "editor.background": "#faf5ee",
-      "editor.foreground": "#382314",
-      "editorLineNumber.foreground": "#a89078",
+      "editor.foreground": "#2c1a0c",
+      "editorLineNumber.foreground": "#8a6e55",
       "editorLineNumber.activeForeground": "#9a3412",
       "editorCursor.foreground": "#9a3412",
       "editor.selectionBackground": "#ebd8c3",
       "editor.lineHighlightBackground": "#ebd8c3",
+      "editorHoverWidget.background": "#f3e8da",
+      "editorHoverWidget.foreground": "#2c1a0c",
+      "editorHoverWidget.border": "#ebd8c3",
+      "editorHoverWidget.statusBarBackground": "#ebd8c3",
+      "editorSuggestWidget.background": "#f3e8da",
+      "editorSuggestWidget.foreground": "#2c1a0c",
+      "editorSuggestWidget.border": "#ebd8c3",
+      "editorSuggestWidget.selectedBackground": "#ebd8c3",
+      "editorSuggestWidget.selectedForeground": "#7c2d12",
+      "editorSuggestWidget.highlightForeground": "#9a3412",
+      "editorWidget.background": "#f3e8da",
+      "editorWidget.foreground": "#2c1a0c",
+      "editorWidget.border": "#ebd8c3",
       "focusBorder": "#9a3412",
       "activityBar.background": "#ebd8c3",
       "activityBar.foreground": "#9a3412",
-      "activityBar.inactiveForeground": "#a89078",
+      "activityBar.inactiveForeground": "#8a6e55",
       "activityBarBadge.background": "#9a3412",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#f3e8da",
-      "sideBar.foreground": "#382314",
+      "sideBar.foreground": "#2c1a0c",
       "sideBarTitle.foreground": "#7c2d12",
       "sideBarSectionHeader.background": "#ebd8c3",
-      "sideBarSectionHeader.foreground": "#382314",
+      "sideBarSectionHeader.foreground": "#2c1a0c",
       "titleBar.activeBackground": "#ebd8c3",
-      "titleBar.activeForeground": "#382314",
+      "titleBar.activeForeground": "#2c1a0c",
       "statusBar.background": "#7c2d12",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -2661,22 +3141,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#7c2d12",
       "tab.activeBorderTop": "#9a3412",
       "tab.inactiveBackground": "#ebd8c3",
-      "tab.inactiveForeground": "#9a3412",
+      "tab.inactiveForeground": "#78350f",
       "tab.hoverBackground": "#ebd8c3",
-      "breadcrumb.foreground": "#9a3412",
+      "breadcrumb.foreground": "#78350f",
       "terminal.background": "#faf5ee",
-      "terminal.foreground": "#382314",
+      "terminal.foreground": "#2c1a0c",
       "terminalCursor.foreground": "#9a3412",
-      "terminal.ansiGreen": "#2b593f",
-      "terminal.ansiCyan": "#9333ea",
+      "terminal.ansiGreen": "#1e4d30",
+      "terminal.ansiCyan": "#7c3aed",
       "terminal.ansiYellow": "#b45309",
       "input.background": "#f3e8da",
-      "input.foreground": "#382314",
-      "input.placeholderForeground": "#9a3412",
+      "input.foreground": "#2c1a0c",
+      "input.placeholderForeground": "#78350f",
       "panel.background": "#faf5ee",
       "panel.border": "#f3e8da",
       "panelTitle.activeForeground": "#9a3412",
-      "panelTitle.inactiveForeground": "#9a3412",
+      "panelTitle.inactiveForeground": "#78350f",
       "panelTitle.activeBorder": "#9a3412",
       "chat.requestBackground": "#f3e8da",
       "chat.requestBorder": "#ebd8c3",
@@ -2704,16 +3184,30 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.function"
             ],
             "settings": {
-                  "foreground": "#2b593f"
+                  "foreground": "#1e4d30"
             }
       },
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#b45309"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#9a3412"
             }
       },
       {
@@ -2722,7 +3216,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.other"
             ],
             "settings": {
-                  "foreground": "#382314"
+                  "foreground": "#2c1a0c"
             }
       },
       {
@@ -2731,7 +3225,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type"
             ],
             "settings": {
-                  "foreground": "#9333ea"
+                  "foreground": "#7c3aed"
             }
       },
       {
@@ -2739,7 +3233,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#a89078",
+                  "foreground": "#8a6e55",
                   "fontStyle": "italic"
             }
       },
@@ -2765,7 +3259,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.name.tag"
             ],
             "settings": {
-                  "foreground": "#2b593f"
+                  "foreground": "#1e4d30"
             }
       }
 ],
@@ -2779,30 +3273,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#eab308",
     colors: {
-      "foreground": "#3b2c11",
-      "descriptionForeground": "#a16207",
-      "disabledForeground": "#ca8a04",
+      "foreground": "#2a1e08",
+      "descriptionForeground": "#713f12",
+      "disabledForeground": "#a16207",
       "icon.foreground": "#eab308",
       "editor.background": "#fefce8",
-      "editor.foreground": "#3b2c11",
-      "editorLineNumber.foreground": "#ca8a04",
+      "editor.foreground": "#2a1e08",
+      "editorLineNumber.foreground": "#a16207",
       "editorLineNumber.activeForeground": "#eab308",
       "editorCursor.foreground": "#eab308",
       "editor.selectionBackground": "#fde047",
       "editor.lineHighlightBackground": "#fde047",
+      "editorHoverWidget.background": "#fef08a",
+      "editorHoverWidget.foreground": "#2a1e08",
+      "editorHoverWidget.border": "#fde047",
+      "editorHoverWidget.statusBarBackground": "#fde047",
+      "editorSuggestWidget.background": "#fef08a",
+      "editorSuggestWidget.foreground": "#2a1e08",
+      "editorSuggestWidget.border": "#fde047",
+      "editorSuggestWidget.selectedBackground": "#fde047",
+      "editorSuggestWidget.selectedForeground": "#854d0e",
+      "editorSuggestWidget.highlightForeground": "#eab308",
+      "editorWidget.background": "#fef08a",
+      "editorWidget.foreground": "#2a1e08",
+      "editorWidget.border": "#fde047",
       "focusBorder": "#eab308",
       "activityBar.background": "#fde047",
       "activityBar.foreground": "#eab308",
-      "activityBar.inactiveForeground": "#ca8a04",
+      "activityBar.inactiveForeground": "#a16207",
       "activityBarBadge.background": "#eab308",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#fef08a",
-      "sideBar.foreground": "#3b2c11",
+      "sideBar.foreground": "#2a1e08",
       "sideBarTitle.foreground": "#854d0e",
       "sideBarSectionHeader.background": "#fde047",
-      "sideBarSectionHeader.foreground": "#3b2c11",
+      "sideBarSectionHeader.foreground": "#2a1e08",
       "titleBar.activeBackground": "#fde047",
-      "titleBar.activeForeground": "#3b2c11",
+      "titleBar.activeForeground": "#2a1e08",
       "statusBar.background": "#ca8a04",
       "statusBar.foreground": "#000000",
       "statusBar.debuggingBackground": "#e11d48",
@@ -2811,22 +3318,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#854d0e",
       "tab.activeBorderTop": "#eab308",
       "tab.inactiveBackground": "#fde047",
-      "tab.inactiveForeground": "#a16207",
+      "tab.inactiveForeground": "#713f12",
       "tab.hoverBackground": "#fde047",
-      "breadcrumb.foreground": "#a16207",
+      "breadcrumb.foreground": "#713f12",
       "terminal.background": "#fefce8",
-      "terminal.foreground": "#3b2c11",
+      "terminal.foreground": "#2a1e08",
       "terminalCursor.foreground": "#eab308",
       "terminal.ansiGreen": "#15803d",
       "terminal.ansiCyan": "#0369a1",
       "terminal.ansiYellow": "#b45309",
       "input.background": "#fef9c3",
-      "input.foreground": "#3b2c11",
-      "input.placeholderForeground": "#a16207",
+      "input.foreground": "#2a1e08",
+      "input.placeholderForeground": "#713f12",
       "panel.background": "#fefce8",
       "panel.border": "#fef08a",
       "panelTitle.activeForeground": "#eab308",
-      "panelTitle.inactiveForeground": "#a16207",
+      "panelTitle.inactiveForeground": "#713f12",
       "panelTitle.activeBorder": "#eab308",
       "chat.requestBackground": "#fef9c3",
       "chat.requestBorder": "#fde047",
@@ -2860,10 +3367,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#b45309"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#c2410c"
             }
       },
       {
@@ -2872,7 +3393,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.other"
             ],
             "settings": {
-                  "foreground": "#3b2c11"
+                  "foreground": "#2a1e08"
             }
       },
       {
@@ -2889,7 +3410,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#ca8a04",
+                  "foreground": "#a16207",
                   "fontStyle": "italic"
             }
       },
@@ -2929,30 +3450,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#e11d48",
     colors: {
-      "foreground": "#4c0519",
-      "descriptionForeground": "#be123c",
-      "disabledForeground": "#fb7185",
+      "foreground": "#3b0211",
+      "descriptionForeground": "#881337",
+      "disabledForeground": "#e11d48",
       "icon.foreground": "#e11d48",
       "editor.background": "#fff1f2",
-      "editor.foreground": "#4c0519",
-      "editorLineNumber.foreground": "#fb7185",
+      "editor.foreground": "#3b0211",
+      "editorLineNumber.foreground": "#e11d48",
       "editorLineNumber.activeForeground": "#e11d48",
       "editorCursor.foreground": "#e11d48",
       "editor.selectionBackground": "#fecdd3",
       "editor.lineHighlightBackground": "#fecdd3",
+      "editorHoverWidget.background": "#ffe4e6",
+      "editorHoverWidget.foreground": "#3b0211",
+      "editorHoverWidget.border": "#fecdd3",
+      "editorHoverWidget.statusBarBackground": "#fecdd3",
+      "editorSuggestWidget.background": "#ffe4e6",
+      "editorSuggestWidget.foreground": "#3b0211",
+      "editorSuggestWidget.border": "#fecdd3",
+      "editorSuggestWidget.selectedBackground": "#fecdd3",
+      "editorSuggestWidget.selectedForeground": "#9f1239",
+      "editorSuggestWidget.highlightForeground": "#e11d48",
+      "editorWidget.background": "#ffe4e6",
+      "editorWidget.foreground": "#3b0211",
+      "editorWidget.border": "#fecdd3",
       "focusBorder": "#e11d48",
       "activityBar.background": "#fecdd3",
       "activityBar.foreground": "#e11d48",
-      "activityBar.inactiveForeground": "#fb7185",
+      "activityBar.inactiveForeground": "#e11d48",
       "activityBarBadge.background": "#e11d48",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#ffe4e6",
-      "sideBar.foreground": "#4c0519",
+      "sideBar.foreground": "#3b0211",
       "sideBarTitle.foreground": "#9f1239",
       "sideBarSectionHeader.background": "#fecdd3",
-      "sideBarSectionHeader.foreground": "#4c0519",
+      "sideBarSectionHeader.foreground": "#3b0211",
       "titleBar.activeBackground": "#fecdd3",
-      "titleBar.activeForeground": "#4c0519",
+      "titleBar.activeForeground": "#3b0211",
       "statusBar.background": "#be123c",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -2961,22 +3495,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#9f1239",
       "tab.activeBorderTop": "#e11d48",
       "tab.inactiveBackground": "#fecdd3",
-      "tab.inactiveForeground": "#be123c",
+      "tab.inactiveForeground": "#881337",
       "tab.hoverBackground": "#fecdd3",
-      "breadcrumb.foreground": "#be123c",
+      "breadcrumb.foreground": "#881337",
       "terminal.background": "#fff1f2",
-      "terminal.foreground": "#4c0519",
+      "terminal.foreground": "#3b0211",
       "terminalCursor.foreground": "#e11d48",
-      "terminal.ansiGreen": "#c026d3",
-      "terminal.ansiCyan": "#0284c7",
-      "terminal.ansiYellow": "#d97706",
+      "terminal.ansiGreen": "#a21caf",
+      "terminal.ansiCyan": "#0369a1",
+      "terminal.ansiYellow": "#b45309",
       "input.background": "#ffe4e6",
-      "input.foreground": "#4c0519",
-      "input.placeholderForeground": "#be123c",
+      "input.foreground": "#3b0211",
+      "input.placeholderForeground": "#881337",
       "panel.background": "#fff1f2",
       "panel.border": "#ffe4e6",
       "panelTitle.activeForeground": "#e11d48",
-      "panelTitle.inactiveForeground": "#be123c",
+      "panelTitle.inactiveForeground": "#881337",
       "panelTitle.activeBorder": "#e11d48",
       "chat.requestBackground": "#ffe4e6",
       "chat.requestBorder": "#fecdd3",
@@ -3004,16 +3538,30 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.function"
             ],
             "settings": {
-                  "foreground": "#c026d3"
+                  "foreground": "#a21caf"
             }
       },
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
-                  "foreground": "#d97706"
+                  "foreground": "#b45309"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#be123c"
             }
       },
       {
@@ -3022,7 +3570,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.other"
             ],
             "settings": {
-                  "foreground": "#4c0519"
+                  "foreground": "#3b0211"
             }
       },
       {
@@ -3031,7 +3579,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type"
             ],
             "settings": {
-                  "foreground": "#0284c7"
+                  "foreground": "#0369a1"
             }
       },
       {
@@ -3039,7 +3587,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#fb7185",
+                  "foreground": "#e11d48",
                   "fontStyle": "italic"
             }
       },
@@ -3065,7 +3613,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.name.tag"
             ],
             "settings": {
-                  "foreground": "#c026d3"
+                  "foreground": "#a21caf"
             }
       }
 ],
@@ -3090,6 +3638,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#ffe600",
       "editor.selectionBackground": "#0d0d14",
       "editor.lineHighlightBackground": "#0d0d14",
+      "editorHoverWidget.background": "#09090e",
+      "editorHoverWidget.foreground": "#d0d0e0",
+      "editorHoverWidget.border": "#0d0d14",
+      "editorHoverWidget.statusBarBackground": "#0d0d14",
+      "editorSuggestWidget.background": "#09090e",
+      "editorSuggestWidget.foreground": "#d0d0e0",
+      "editorSuggestWidget.border": "#0d0d14",
+      "editorSuggestWidget.selectedBackground": "#0d0d14",
+      "editorSuggestWidget.selectedForeground": "#ffe600",
+      "editorSuggestWidget.highlightForeground": "#ffe600",
+      "editorWidget.background": "#09090e",
+      "editorWidget.foreground": "#d0d0e0",
+      "editorWidget.border": "#0d0d14",
       "focusBorder": "#ffe600",
       "activityBar.background": "#050508",
       "activityBar.foreground": "#ffe600",
@@ -3160,10 +3721,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#ffe600"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#ff0055"
             }
       },
       {
@@ -3240,6 +3815,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#7aa2f7",
       "editor.selectionBackground": "#16161e",
       "editor.lineHighlightBackground": "#16161e",
+      "editorHoverWidget.background": "#16161e",
+      "editorHoverWidget.foreground": "#a9b1d6",
+      "editorHoverWidget.border": "#16161e",
+      "editorHoverWidget.statusBarBackground": "#16161e",
+      "editorSuggestWidget.background": "#16161e",
+      "editorSuggestWidget.foreground": "#a9b1d6",
+      "editorSuggestWidget.border": "#16161e",
+      "editorSuggestWidget.selectedBackground": "#16161e",
+      "editorSuggestWidget.selectedForeground": "#7aa2f7",
+      "editorSuggestWidget.highlightForeground": "#7aa2f7",
+      "editorWidget.background": "#16161e",
+      "editorWidget.foreground": "#a9b1d6",
+      "editorWidget.border": "#16161e",
       "focusBorder": "#7aa2f7",
       "activityBar.background": "#16161e",
       "activityBar.foreground": "#7aa2f7",
@@ -3310,10 +3898,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#9ece6a"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#bb9af7"
             }
       },
       {
@@ -3390,6 +3992,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#bd93f9",
       "editor.selectionBackground": "#21222c",
       "editor.lineHighlightBackground": "#21222c",
+      "editorHoverWidget.background": "#21222c",
+      "editorHoverWidget.foreground": "#f8f8f2",
+      "editorHoverWidget.border": "#21222c",
+      "editorHoverWidget.statusBarBackground": "#21222c",
+      "editorSuggestWidget.background": "#21222c",
+      "editorSuggestWidget.foreground": "#f8f8f2",
+      "editorSuggestWidget.border": "#21222c",
+      "editorSuggestWidget.selectedBackground": "#21222c",
+      "editorSuggestWidget.selectedForeground": "#bd93f9",
+      "editorSuggestWidget.highlightForeground": "#bd93f9",
+      "editorWidget.background": "#21222c",
+      "editorWidget.foreground": "#f8f8f2",
+      "editorWidget.border": "#21222c",
       "focusBorder": "#bd93f9",
       "activityBar.background": "#1e1f29",
       "activityBar.foreground": "#bd93f9",
@@ -3460,10 +4075,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#f1fa8c"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#ff79c6"
             }
       },
       {
@@ -3540,6 +4169,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#cba6f7",
       "editor.selectionBackground": "#181825",
       "editor.lineHighlightBackground": "#181825",
+      "editorHoverWidget.background": "#181825",
+      "editorHoverWidget.foreground": "#cdd6f4",
+      "editorHoverWidget.border": "#181825",
+      "editorHoverWidget.statusBarBackground": "#181825",
+      "editorSuggestWidget.background": "#181825",
+      "editorSuggestWidget.foreground": "#cdd6f4",
+      "editorSuggestWidget.border": "#181825",
+      "editorSuggestWidget.selectedBackground": "#181825",
+      "editorSuggestWidget.selectedForeground": "#cba6f7",
+      "editorSuggestWidget.highlightForeground": "#cba6f7",
+      "editorWidget.background": "#181825",
+      "editorWidget.foreground": "#cdd6f4",
+      "editorWidget.border": "#181825",
       "focusBorder": "#cba6f7",
       "activityBar.background": "#11111b",
       "activityBar.foreground": "#cba6f7",
@@ -3610,10 +4252,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#a6e3a1"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#cba6f7"
             }
       },
       {
@@ -3679,30 +4335,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#8839ef",
     colors: {
-      "foreground": "#4c4f69",
-      "descriptionForeground": "#8c8fa1",
-      "disabledForeground": "#9ca0b0",
+      "foreground": "#363a4f",
+      "descriptionForeground": "#6c6f85",
+      "disabledForeground": "#7c7f93",
       "icon.foreground": "#8839ef",
       "editor.background": "#eff1f5",
-      "editor.foreground": "#4c4f69",
-      "editorLineNumber.foreground": "#9ca0b0",
+      "editor.foreground": "#363a4f",
+      "editorLineNumber.foreground": "#7c7f93",
       "editorLineNumber.activeForeground": "#8839ef",
       "editorCursor.foreground": "#8839ef",
       "editor.selectionBackground": "#dce0e8",
       "editor.lineHighlightBackground": "#dce0e8",
+      "editorHoverWidget.background": "#e6e9ef",
+      "editorHoverWidget.foreground": "#363a4f",
+      "editorHoverWidget.border": "#dce0e8",
+      "editorHoverWidget.statusBarBackground": "#dce0e8",
+      "editorSuggestWidget.background": "#e6e9ef",
+      "editorSuggestWidget.foreground": "#363a4f",
+      "editorSuggestWidget.border": "#dce0e8",
+      "editorSuggestWidget.selectedBackground": "#dce0e8",
+      "editorSuggestWidget.selectedForeground": "#8839ef",
+      "editorSuggestWidget.highlightForeground": "#8839ef",
+      "editorWidget.background": "#e6e9ef",
+      "editorWidget.foreground": "#363a4f",
+      "editorWidget.border": "#dce0e8",
       "focusBorder": "#8839ef",
       "activityBar.background": "#dce0e8",
       "activityBar.foreground": "#8839ef",
-      "activityBar.inactiveForeground": "#9ca0b0",
+      "activityBar.inactiveForeground": "#7c7f93",
       "activityBarBadge.background": "#8839ef",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#e6e9ef",
-      "sideBar.foreground": "#4c4f69",
+      "sideBar.foreground": "#363a4f",
       "sideBarTitle.foreground": "#8839ef",
       "sideBarSectionHeader.background": "#dce0e8",
-      "sideBarSectionHeader.foreground": "#4c4f69",
+      "sideBarSectionHeader.foreground": "#363a4f",
       "titleBar.activeBackground": "#dce0e8",
-      "titleBar.activeForeground": "#4c4f69",
+      "titleBar.activeForeground": "#363a4f",
       "statusBar.background": "#8839ef",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -3711,22 +4380,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#8839ef",
       "tab.activeBorderTop": "#8839ef",
       "tab.inactiveBackground": "#dce0e8",
-      "tab.inactiveForeground": "#8c8fa1",
+      "tab.inactiveForeground": "#6c6f85",
       "tab.hoverBackground": "#dce0e8",
-      "breadcrumb.foreground": "#8c8fa1",
+      "breadcrumb.foreground": "#6c6f85",
       "terminal.background": "#eff1f5",
-      "terminal.foreground": "#4c4f69",
+      "terminal.foreground": "#363a4f",
       "terminalCursor.foreground": "#8839ef",
       "terminal.ansiGreen": "#1e66f5",
-      "terminal.ansiCyan": "#df8e1d",
-      "terminal.ansiYellow": "#40a02b",
+      "terminal.ansiCyan": "#b86e0a",
+      "terminal.ansiYellow": "#2d7a1e",
       "input.background": "#e6e9ef",
-      "input.foreground": "#4c4f69",
-      "input.placeholderForeground": "#8c8fa1",
+      "input.foreground": "#363a4f",
+      "input.placeholderForeground": "#6c6f85",
       "panel.background": "#eff1f5",
       "panel.border": "#e6e9ef",
       "panelTitle.activeForeground": "#8839ef",
-      "panelTitle.inactiveForeground": "#8c8fa1",
+      "panelTitle.inactiveForeground": "#6c6f85",
       "panelTitle.activeBorder": "#8839ef",
       "chat.requestBackground": "#e6e9ef",
       "chat.requestBorder": "#dce0e8",
@@ -3760,10 +4429,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
-                  "foreground": "#40a02b"
+                  "foreground": "#2d7a1e"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#8839ef"
             }
       },
       {
@@ -3772,7 +4455,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.other"
             ],
             "settings": {
-                  "foreground": "#4c4f69"
+                  "foreground": "#363a4f"
             }
       },
       {
@@ -3781,7 +4464,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type"
             ],
             "settings": {
-                  "foreground": "#df8e1d"
+                  "foreground": "#b86e0a"
             }
       },
       {
@@ -3789,7 +4472,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#9ca0b0",
+                  "foreground": "#7c7f93",
                   "fontStyle": "italic"
             }
       },
@@ -3799,7 +4482,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "constant.language.boolean"
             ],
             "settings": {
-                  "foreground": "#fe640b"
+                  "foreground": "#d24e01"
             }
       },
       {
@@ -3840,6 +4523,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#88c0d0",
       "editor.selectionBackground": "#272c36",
       "editor.lineHighlightBackground": "#272c36",
+      "editorHoverWidget.background": "#272c36",
+      "editorHoverWidget.foreground": "#d8dee9",
+      "editorHoverWidget.border": "#272c36",
+      "editorHoverWidget.statusBarBackground": "#272c36",
+      "editorSuggestWidget.background": "#272c36",
+      "editorSuggestWidget.foreground": "#d8dee9",
+      "editorSuggestWidget.border": "#272c36",
+      "editorSuggestWidget.selectedBackground": "#272c36",
+      "editorSuggestWidget.selectedForeground": "#88c0d0",
+      "editorSuggestWidget.highlightForeground": "#88c0d0",
+      "editorWidget.background": "#272c36",
+      "editorWidget.foreground": "#d8dee9",
+      "editorWidget.border": "#272c36",
       "focusBorder": "#88c0d0",
       "activityBar.background": "#242933",
       "activityBar.foreground": "#88c0d0",
@@ -3910,10 +4606,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#a3be8c"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#81a1c1"
             }
       },
       {
@@ -3979,30 +4689,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#5e81ac",
     colors: {
-      "foreground": "#2e3440",
+      "foreground": "#21262d",
       "descriptionForeground": "#4c566a",
-      "disabledForeground": "#7b88a1",
+      "disabledForeground": "#616e88",
       "icon.foreground": "#5e81ac",
       "editor.background": "#eceff4",
-      "editor.foreground": "#2e3440",
-      "editorLineNumber.foreground": "#7b88a1",
+      "editor.foreground": "#21262d",
+      "editorLineNumber.foreground": "#616e88",
       "editorLineNumber.activeForeground": "#5e81ac",
       "editorCursor.foreground": "#5e81ac",
       "editor.selectionBackground": "#d8dee9",
       "editor.lineHighlightBackground": "#d8dee9",
+      "editorHoverWidget.background": "#e5e9f0",
+      "editorHoverWidget.foreground": "#21262d",
+      "editorHoverWidget.border": "#d8dee9",
+      "editorHoverWidget.statusBarBackground": "#d8dee9",
+      "editorSuggestWidget.background": "#e5e9f0",
+      "editorSuggestWidget.foreground": "#21262d",
+      "editorSuggestWidget.border": "#d8dee9",
+      "editorSuggestWidget.selectedBackground": "#d8dee9",
+      "editorSuggestWidget.selectedForeground": "#5e81ac",
+      "editorSuggestWidget.highlightForeground": "#5e81ac",
+      "editorWidget.background": "#e5e9f0",
+      "editorWidget.foreground": "#21262d",
+      "editorWidget.border": "#d8dee9",
       "focusBorder": "#5e81ac",
       "activityBar.background": "#d8dee9",
       "activityBar.foreground": "#5e81ac",
-      "activityBar.inactiveForeground": "#7b88a1",
+      "activityBar.inactiveForeground": "#616e88",
       "activityBarBadge.background": "#5e81ac",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#e5e9f0",
-      "sideBar.foreground": "#2e3440",
+      "sideBar.foreground": "#21262d",
       "sideBarTitle.foreground": "#5e81ac",
       "sideBarSectionHeader.background": "#d8dee9",
-      "sideBarSectionHeader.foreground": "#2e3440",
+      "sideBarSectionHeader.foreground": "#21262d",
       "titleBar.activeBackground": "#d8dee9",
-      "titleBar.activeForeground": "#2e3440",
+      "titleBar.activeForeground": "#21262d",
       "statusBar.background": "#5e81ac",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -4015,13 +4738,13 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.hoverBackground": "#d8dee9",
       "breadcrumb.foreground": "#4c566a",
       "terminal.background": "#eceff4",
-      "terminal.foreground": "#2e3440",
+      "terminal.foreground": "#21262d",
       "terminalCursor.foreground": "#5e81ac",
-      "terminal.ansiGreen": "#88c0d0",
-      "terminal.ansiCyan": "#8fbcbb",
-      "terminal.ansiYellow": "#a3be8c",
+      "terminal.ansiGreen": "#0284c7",
+      "terminal.ansiCyan": "#0f766e",
+      "terminal.ansiYellow": "#2e7d32",
       "input.background": "#e5e9f0",
-      "input.foreground": "#2e3440",
+      "input.foreground": "#21262d",
       "input.placeholderForeground": "#4c566a",
       "panel.background": "#eceff4",
       "panel.border": "#e5e9f0",
@@ -4054,16 +4777,30 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.function"
             ],
             "settings": {
-                  "foreground": "#88c0d0"
+                  "foreground": "#0284c7"
             }
       },
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
-                  "foreground": "#a3be8c"
+                  "foreground": "#2e7d32"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#5e81ac"
             }
       },
       {
@@ -4072,7 +4809,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.other"
             ],
             "settings": {
-                  "foreground": "#2e3440"
+                  "foreground": "#21262d"
             }
       },
       {
@@ -4081,7 +4818,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type"
             ],
             "settings": {
-                  "foreground": "#8fbcbb"
+                  "foreground": "#0f766e"
             }
       },
       {
@@ -4089,7 +4826,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#7b88a1",
+                  "foreground": "#616e88",
                   "fontStyle": "italic"
             }
       },
@@ -4115,7 +4852,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.name.tag"
             ],
             "settings": {
-                  "foreground": "#88c0d0"
+                  "foreground": "#0284c7"
             }
       }
 ],
@@ -4140,6 +4877,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#00ff88",
       "editor.selectionBackground": "#080808",
       "editor.lineHighlightBackground": "#080808",
+      "editorHoverWidget.background": "#050505",
+      "editorHoverWidget.foreground": "#dddddd",
+      "editorHoverWidget.border": "#080808",
+      "editorHoverWidget.statusBarBackground": "#080808",
+      "editorSuggestWidget.background": "#050505",
+      "editorSuggestWidget.foreground": "#dddddd",
+      "editorSuggestWidget.border": "#080808",
+      "editorSuggestWidget.selectedBackground": "#080808",
+      "editorSuggestWidget.selectedForeground": "#00ff88",
+      "editorSuggestWidget.highlightForeground": "#00ff88",
+      "editorWidget.background": "#050505",
+      "editorWidget.foreground": "#dddddd",
+      "editorWidget.border": "#080808",
       "focusBorder": "#00ff88",
       "activityBar.background": "#000000",
       "activityBar.foreground": "#00ff88",
@@ -4210,10 +4960,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#ffe600"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#ff3366"
             }
       },
       {
@@ -4290,6 +5054,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#ff7edb",
       "editor.selectionBackground": "#20172b",
       "editor.lineHighlightBackground": "#20172b",
+      "editorHoverWidget.background": "#241b2f",
+      "editorHoverWidget.foreground": "#ffffff",
+      "editorHoverWidget.border": "#20172b",
+      "editorHoverWidget.statusBarBackground": "#20172b",
+      "editorSuggestWidget.background": "#241b2f",
+      "editorSuggestWidget.foreground": "#ffffff",
+      "editorSuggestWidget.border": "#20172b",
+      "editorSuggestWidget.selectedBackground": "#20172b",
+      "editorSuggestWidget.selectedForeground": "#ff7edb",
+      "editorSuggestWidget.highlightForeground": "#ff7edb",
+      "editorWidget.background": "#241b2f",
+      "editorWidget.foreground": "#ffffff",
+      "editorWidget.border": "#20172b",
       "focusBorder": "#ff7edb",
       "activityBar.background": "#1a1025",
       "activityBar.foreground": "#ff7edb",
@@ -4360,10 +5137,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#ff7edb"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#fed049"
             }
       },
       {
@@ -4440,6 +5231,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#00ff41",
       "editor.selectionBackground": "#091009",
       "editor.lineHighlightBackground": "#091009",
+      "editorHoverWidget.background": "#070b07",
+      "editorHoverWidget.foreground": "#00dd38",
+      "editorHoverWidget.border": "#091009",
+      "editorHoverWidget.statusBarBackground": "#091009",
+      "editorSuggestWidget.background": "#070b07",
+      "editorSuggestWidget.foreground": "#00dd38",
+      "editorSuggestWidget.border": "#091009",
+      "editorSuggestWidget.selectedBackground": "#091009",
+      "editorSuggestWidget.selectedForeground": "#00ff41",
+      "editorSuggestWidget.highlightForeground": "#00ff41",
+      "editorWidget.background": "#070b07",
+      "editorWidget.foreground": "#00dd38",
+      "editorWidget.border": "#091009",
       "focusBorder": "#00ff41",
       "activityBar.background": "#040704",
       "activityBar.foreground": "#00ff41",
@@ -4510,10 +5314,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#a6e22e"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#50fa7b"
             }
       },
       {
@@ -4590,6 +5408,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#ff2a5f",
       "editor.selectionBackground": "#200d15",
       "editor.lineHighlightBackground": "#200d15",
+      "editorHoverWidget.background": "#1a0b10",
+      "editorHoverWidget.foreground": "#fbcfe8",
+      "editorHoverWidget.border": "#200d15",
+      "editorHoverWidget.statusBarBackground": "#200d15",
+      "editorSuggestWidget.background": "#1a0b10",
+      "editorSuggestWidget.foreground": "#fbcfe8",
+      "editorSuggestWidget.border": "#200d15",
+      "editorSuggestWidget.selectedBackground": "#200d15",
+      "editorSuggestWidget.selectedForeground": "#ff2a5f",
+      "editorSuggestWidget.highlightForeground": "#ff2a5f",
+      "editorWidget.background": "#1a0b10",
+      "editorWidget.foreground": "#fbcfe8",
+      "editorWidget.border": "#200d15",
       "focusBorder": "#ff2a5f",
       "activityBar.background": "#0e0508",
       "activityBar.foreground": "#ff2a5f",
@@ -4660,10 +5491,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#fb7185"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#ff2a5f"
             }
       },
       {
@@ -4740,6 +5585,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#f472b6",
       "editor.selectionBackground": "#26233a",
       "editor.lineHighlightBackground": "#26233a",
+      "editorHoverWidget.background": "#191724",
+      "editorHoverWidget.foreground": "#e0def4",
+      "editorHoverWidget.border": "#26233a",
+      "editorHoverWidget.statusBarBackground": "#26233a",
+      "editorSuggestWidget.background": "#191724",
+      "editorSuggestWidget.foreground": "#e0def4",
+      "editorSuggestWidget.border": "#26233a",
+      "editorSuggestWidget.selectedBackground": "#26233a",
+      "editorSuggestWidget.selectedForeground": "#f472b6",
+      "editorSuggestWidget.highlightForeground": "#f472b6",
+      "editorWidget.background": "#191724",
+      "editorWidget.foreground": "#e0def4",
+      "editorWidget.border": "#26233a",
       "focusBorder": "#f472b6",
       "activityBar.background": "#151322",
       "activityBar.foreground": "#f472b6",
@@ -4810,10 +5668,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#f6c177"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#eb6f92"
             }
       },
       {
@@ -4890,6 +5762,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#c084fc",
       "editor.selectionBackground": "#1e1233",
       "editor.lineHighlightBackground": "#1e1233",
+      "editorHoverWidget.background": "#170e28",
+      "editorHoverWidget.foreground": "#f3e8ff",
+      "editorHoverWidget.border": "#1e1233",
+      "editorHoverWidget.statusBarBackground": "#1e1233",
+      "editorSuggestWidget.background": "#170e28",
+      "editorSuggestWidget.foreground": "#f3e8ff",
+      "editorSuggestWidget.border": "#1e1233",
+      "editorSuggestWidget.selectedBackground": "#1e1233",
+      "editorSuggestWidget.selectedForeground": "#c084fc",
+      "editorSuggestWidget.highlightForeground": "#c084fc",
+      "editorWidget.background": "#170e28",
+      "editorWidget.foreground": "#f3e8ff",
+      "editorWidget.border": "#1e1233",
       "focusBorder": "#c084fc",
       "activityBar.background": "#0c0617",
       "activityBar.foreground": "#c084fc",
@@ -4960,10 +5845,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#e879f9"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#c084fc"
             }
       },
       {
@@ -5040,6 +5939,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#f97316",
       "editor.selectionBackground": "#241d16",
       "editor.lineHighlightBackground": "#241d16",
+      "editorHoverWidget.background": "#19140f",
+      "editorHoverWidget.foreground": "#ffedd5",
+      "editorHoverWidget.border": "#241d16",
+      "editorHoverWidget.statusBarBackground": "#241d16",
+      "editorSuggestWidget.background": "#19140f",
+      "editorSuggestWidget.foreground": "#ffedd5",
+      "editorSuggestWidget.border": "#241d16",
+      "editorSuggestWidget.selectedBackground": "#241d16",
+      "editorSuggestWidget.selectedForeground": "#f97316",
+      "editorSuggestWidget.highlightForeground": "#f97316",
+      "editorWidget.background": "#19140f",
+      "editorWidget.foreground": "#ffedd5",
+      "editorWidget.border": "#241d16",
       "focusBorder": "#f97316",
       "activityBar.background": "#0a0806",
       "activityBar.foreground": "#f97316",
@@ -5110,10 +6022,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#fde047"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#ea580c"
             }
       },
       {
@@ -5190,6 +6116,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#22c55e",
       "editor.selectionBackground": "#0f2917",
       "editor.lineHighlightBackground": "#0f2917",
+      "editorHoverWidget.background": "#0a1c0f",
+      "editorHoverWidget.foreground": "#dcfce7",
+      "editorHoverWidget.border": "#0f2917",
+      "editorHoverWidget.statusBarBackground": "#0f2917",
+      "editorSuggestWidget.background": "#0a1c0f",
+      "editorSuggestWidget.foreground": "#dcfce7",
+      "editorSuggestWidget.border": "#0f2917",
+      "editorSuggestWidget.selectedBackground": "#0f2917",
+      "editorSuggestWidget.selectedForeground": "#22c55e",
+      "editorSuggestWidget.highlightForeground": "#22c55e",
+      "editorWidget.background": "#0a1c0f",
+      "editorWidget.foreground": "#dcfce7",
+      "editorWidget.border": "#0f2917",
       "focusBorder": "#22c55e",
       "activityBar.background": "#030c06",
       "activityBar.foreground": "#22c55e",
@@ -5260,10 +6199,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#a3e635"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#4ade80"
             }
       },
       {
@@ -5340,6 +6293,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#06b6d4",
       "editor.selectionBackground": "#0d1f3b",
       "editor.lineHighlightBackground": "#0d1f3b",
+      "editorHoverWidget.background": "#081325",
+      "editorHoverWidget.foreground": "#cffafe",
+      "editorHoverWidget.border": "#0d1f3b",
+      "editorHoverWidget.statusBarBackground": "#0d1f3b",
+      "editorSuggestWidget.background": "#081325",
+      "editorSuggestWidget.foreground": "#cffafe",
+      "editorSuggestWidget.border": "#0d1f3b",
+      "editorSuggestWidget.selectedBackground": "#0d1f3b",
+      "editorSuggestWidget.selectedForeground": "#06b6d4",
+      "editorSuggestWidget.highlightForeground": "#06b6d4",
+      "editorWidget.background": "#081325",
+      "editorWidget.foreground": "#cffafe",
+      "editorWidget.border": "#0d1f3b",
       "focusBorder": "#06b6d4",
       "activityBar.background": "#02040a",
       "activityBar.foreground": "#06b6d4",
@@ -5410,10 +6376,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#34d399"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#22d3ee"
             }
       },
       {
@@ -5479,54 +6459,67 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#4f46e5",
     colors: {
-      "foreground": "#1e293b",
-      "descriptionForeground": "#64748b",
-      "disabledForeground": "#94a3b8",
+      "foreground": "#0f172a",
+      "descriptionForeground": "#475569",
+      "disabledForeground": "#64748b",
       "icon.foreground": "#4f46e5",
       "editor.background": "#ffffff",
-      "editor.foreground": "#1e293b",
-      "editorLineNumber.foreground": "#94a3b8",
+      "editor.foreground": "#0f172a",
+      "editorLineNumber.foreground": "#64748b",
       "editorLineNumber.activeForeground": "#4f46e5",
       "editorCursor.foreground": "#4f46e5",
       "editor.selectionBackground": "#f8fafc",
       "editor.lineHighlightBackground": "#f8fafc",
+      "editorHoverWidget.background": "#f8fafc",
+      "editorHoverWidget.foreground": "#0f172a",
+      "editorHoverWidget.border": "#f8fafc",
+      "editorHoverWidget.statusBarBackground": "#f8fafc",
+      "editorSuggestWidget.background": "#f8fafc",
+      "editorSuggestWidget.foreground": "#0f172a",
+      "editorSuggestWidget.border": "#f8fafc",
+      "editorSuggestWidget.selectedBackground": "#f8fafc",
+      "editorSuggestWidget.selectedForeground": "#4f46e5",
+      "editorSuggestWidget.highlightForeground": "#4f46e5",
+      "editorWidget.background": "#f8fafc",
+      "editorWidget.foreground": "#0f172a",
+      "editorWidget.border": "#f8fafc",
       "focusBorder": "#4f46e5",
       "activityBar.background": "#f1f5f9",
       "activityBar.foreground": "#4f46e5",
-      "activityBar.inactiveForeground": "#94a3b8",
+      "activityBar.inactiveForeground": "#64748b",
       "activityBarBadge.background": "#4f46e5",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#f8fafc",
-      "sideBar.foreground": "#334155",
-      "sideBarTitle.foreground": "#0f172a",
+      "sideBar.foreground": "#0f172a",
+      "sideBarTitle.foreground": "#4f46e5",
       "sideBarSectionHeader.background": "#f8fafc",
-      "sideBarSectionHeader.foreground": "#334155",
+      "sideBarSectionHeader.foreground": "#0f172a",
       "titleBar.activeBackground": "#f1f5f9",
-      "titleBar.activeForeground": "#1e293b",
+      "titleBar.activeForeground": "#0f172a",
       "statusBar.background": "#4f46e5",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
       "editorGroupHeader.tabsBackground": "#f8fafc",
       "tab.activeBackground": "#ffffff",
-      "tab.activeForeground": "#0f172a",
+      "tab.activeForeground": "#4f46e5",
       "tab.activeBorderTop": "#4f46e5",
       "tab.inactiveBackground": "#f8fafc",
-      "tab.inactiveForeground": "#64748b",
+      "tab.inactiveForeground": "#475569",
       "tab.hoverBackground": "#f8fafc",
-      "breadcrumb.foreground": "#64748b",
+      "breadcrumb.foreground": "#475569",
       "terminal.background": "#ffffff",
-      "terminal.foreground": "#1e293b",
+      "terminal.foreground": "#0f172a",
       "terminalCursor.foreground": "#4f46e5",
-      "terminal.ansiGreen": "#2563eb",
+      "terminal.ansiGreen": "#1d4ed8",
       "terminal.ansiCyan": "#0284c7",
-      "terminal.ansiYellow": "#059669",
+      "terminal.ansiYellow": "#047857",
       "input.background": "#f1f5f9",
-      "input.foreground": "#1e293b",
-      "input.placeholderForeground": "#64748b",
+      "input.foreground": "#0f172a",
+      "input.placeholderForeground": "#475569",
       "panel.background": "#ffffff",
       "panel.border": "#f8fafc",
       "panelTitle.activeForeground": "#4f46e5",
-      "panelTitle.inactiveForeground": "#64748b",
+      "panelTitle.inactiveForeground": "#475569",
       "panelTitle.activeBorder": "#4f46e5",
       "chat.requestBackground": "#f1f5f9",
       "chat.requestBorder": "#f8fafc",
@@ -5544,7 +6537,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "storage.type"
             ],
             "settings": {
-                  "foreground": "#7c3aed",
+                  "foreground": "#6d28d9",
                   "fontStyle": "bold"
             }
       },
@@ -5554,16 +6547,30 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.function"
             ],
             "settings": {
-                  "foreground": "#2563eb"
+                  "foreground": "#1d4ed8"
             }
       },
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
-                  "foreground": "#059669"
+                  "foreground": "#047857"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#6d28d9"
             }
       },
       {
@@ -5589,7 +6596,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#94a3b8",
+                  "foreground": "#64748b",
                   "fontStyle": "italic"
             }
       },
@@ -5599,7 +6606,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "constant.language.boolean"
             ],
             "settings": {
-                  "foreground": "#ea580c"
+                  "foreground": "#c2410c"
             }
       },
       {
@@ -5607,7 +6614,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "keyword.operator"
             ],
             "settings": {
-                  "foreground": "#7c3aed"
+                  "foreground": "#6d28d9"
             }
       },
       {
@@ -5615,7 +6622,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.name.tag"
             ],
             "settings": {
-                  "foreground": "#2563eb"
+                  "foreground": "#1d4ed8"
             }
       }
 ],
@@ -5629,30 +6636,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#db2777",
     colors: {
-      "foreground": "#4a044e",
-      "descriptionForeground": "#db2777",
-      "disabledForeground": "#f472b6",
+      "foreground": "#3b0730",
+      "descriptionForeground": "#9d174d",
+      "disabledForeground": "#db2777",
       "icon.foreground": "#db2777",
       "editor.background": "#fff5f7",
-      "editor.foreground": "#4a044e",
-      "editorLineNumber.foreground": "#f472b6",
+      "editor.foreground": "#3b0730",
+      "editorLineNumber.foreground": "#db2777",
       "editorLineNumber.activeForeground": "#db2777",
       "editorCursor.foreground": "#db2777",
       "editor.selectionBackground": "#fce7f3",
       "editor.lineHighlightBackground": "#fce7f3",
+      "editorHoverWidget.background": "#fdf2f8",
+      "editorHoverWidget.foreground": "#3b0730",
+      "editorHoverWidget.border": "#fce7f3",
+      "editorHoverWidget.statusBarBackground": "#fce7f3",
+      "editorSuggestWidget.background": "#fdf2f8",
+      "editorSuggestWidget.foreground": "#3b0730",
+      "editorSuggestWidget.border": "#fce7f3",
+      "editorSuggestWidget.selectedBackground": "#fce7f3",
+      "editorSuggestWidget.selectedForeground": "#db2777",
+      "editorSuggestWidget.highlightForeground": "#db2777",
+      "editorWidget.background": "#fdf2f8",
+      "editorWidget.foreground": "#3b0730",
+      "editorWidget.border": "#fce7f3",
       "focusBorder": "#db2777",
       "activityBar.background": "#fce7f3",
       "activityBar.foreground": "#db2777",
-      "activityBar.inactiveForeground": "#f472b6",
+      "activityBar.inactiveForeground": "#db2777",
       "activityBarBadge.background": "#db2777",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#fdf2f8",
-      "sideBar.foreground": "#4a044e",
+      "sideBar.foreground": "#3b0730",
       "sideBarTitle.foreground": "#db2777",
       "sideBarSectionHeader.background": "#fce7f3",
-      "sideBarSectionHeader.foreground": "#4a044e",
+      "sideBarSectionHeader.foreground": "#3b0730",
       "titleBar.activeBackground": "#fce7f3",
-      "titleBar.activeForeground": "#4a044e",
+      "titleBar.activeForeground": "#3b0730",
       "statusBar.background": "#db2777",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -5661,22 +6681,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#db2777",
       "tab.activeBorderTop": "#db2777",
       "tab.inactiveBackground": "#fce7f3",
-      "tab.inactiveForeground": "#db2777",
+      "tab.inactiveForeground": "#9d174d",
       "tab.hoverBackground": "#fce7f3",
-      "breadcrumb.foreground": "#db2777",
+      "breadcrumb.foreground": "#9d174d",
       "terminal.background": "#fff5f7",
-      "terminal.foreground": "#4a044e",
+      "terminal.foreground": "#3b0730",
       "terminalCursor.foreground": "#db2777",
-      "terminal.ansiGreen": "#059669",
-      "terminal.ansiCyan": "#9333ea",
-      "terminal.ansiYellow": "#d97706",
+      "terminal.ansiGreen": "#047857",
+      "terminal.ansiCyan": "#7e22ce",
+      "terminal.ansiYellow": "#b45309",
       "input.background": "#fdf2f8",
-      "input.foreground": "#4a044e",
-      "input.placeholderForeground": "#db2777",
+      "input.foreground": "#3b0730",
+      "input.placeholderForeground": "#9d174d",
       "panel.background": "#fff5f7",
       "panel.border": "#fdf2f8",
       "panelTitle.activeForeground": "#db2777",
-      "panelTitle.inactiveForeground": "#db2777",
+      "panelTitle.inactiveForeground": "#9d174d",
       "panelTitle.activeBorder": "#db2777",
       "chat.requestBackground": "#fdf2f8",
       "chat.requestBorder": "#fce7f3",
@@ -5684,6 +6704,183 @@ export const THEME_PRESETS: ThemePreset[] = [
       "textCodeBlock.background": "#fce7f3",
       "textLink.foreground": "#db2777",
       "badge.background": "#db2777",
+      "badge.foreground": "#ffffff"
+},
+    tokenColors: [
+      {
+            "scope": [
+                  "keyword",
+                  "keyword.control",
+                  "storage.type"
+            ],
+            "settings": {
+                  "foreground": "#be185d",
+                  "fontStyle": "bold"
+            }
+      },
+      {
+            "scope": [
+                  "entity.name.function",
+                  "support.function"
+            ],
+            "settings": {
+                  "foreground": "#047857"
+            }
+      },
+      {
+            "scope": [
+                  "string",
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
+            ],
+            "settings": {
+                  "foreground": "#b45309"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#be185d"
+            }
+      },
+      {
+            "scope": [
+                  "variable",
+                  "variable.other"
+            ],
+            "settings": {
+                  "foreground": "#3b0730"
+            }
+      },
+      {
+            "scope": [
+                  "entity.name.type",
+                  "support.type"
+            ],
+            "settings": {
+                  "foreground": "#7e22ce"
+            }
+      },
+      {
+            "scope": [
+                  "comment"
+            ],
+            "settings": {
+                  "foreground": "#db2777",
+                  "fontStyle": "italic"
+            }
+      },
+      {
+            "scope": [
+                  "constant.numeric",
+                  "constant.language.boolean"
+            ],
+            "settings": {
+                  "foreground": "#be123c"
+            }
+      },
+      {
+            "scope": [
+                  "keyword.operator"
+            ],
+            "settings": {
+                  "foreground": "#be185d"
+            }
+      },
+      {
+            "scope": [
+                  "entity.name.tag"
+            ],
+            "settings": {
+                  "foreground": "#047857"
+            }
+      }
+],
+  },
+
+  // 🍧 Cotton Candy Pastel Light
+  {
+    id: "cotton-candy",
+    name: "\ud83c\udf67 Cotton Candy Pastel Light",
+    description: "Playful, joyful pastel carnival tones of spun pink sugar, baby blue sky, and lavender.",
+    type: "light",
+    accentColor: "#ec4899",
+    colors: {
+      "foreground": "#2e0854",
+      "descriptionForeground": "#7e22ce",
+      "disabledForeground": "#a855f7",
+      "icon.foreground": "#ec4899",
+      "editor.background": "#faf5ff",
+      "editor.foreground": "#2e0854",
+      "editorLineNumber.foreground": "#a855f7",
+      "editorLineNumber.activeForeground": "#ec4899",
+      "editorCursor.foreground": "#ec4899",
+      "editor.selectionBackground": "#e9d5ff",
+      "editor.lineHighlightBackground": "#e9d5ff",
+      "editorHoverWidget.background": "#f3e8ff",
+      "editorHoverWidget.foreground": "#2e0854",
+      "editorHoverWidget.border": "#e9d5ff",
+      "editorHoverWidget.statusBarBackground": "#e9d5ff",
+      "editorSuggestWidget.background": "#f3e8ff",
+      "editorSuggestWidget.foreground": "#2e0854",
+      "editorSuggestWidget.border": "#e9d5ff",
+      "editorSuggestWidget.selectedBackground": "#e9d5ff",
+      "editorSuggestWidget.selectedForeground": "#9333ea",
+      "editorSuggestWidget.highlightForeground": "#ec4899",
+      "editorWidget.background": "#f3e8ff",
+      "editorWidget.foreground": "#2e0854",
+      "editorWidget.border": "#e9d5ff",
+      "focusBorder": "#ec4899",
+      "activityBar.background": "#e9d5ff",
+      "activityBar.foreground": "#ec4899",
+      "activityBar.inactiveForeground": "#a855f7",
+      "activityBarBadge.background": "#ec4899",
+      "activityBarBadge.foreground": "#ffffff",
+      "sideBar.background": "#f3e8ff",
+      "sideBar.foreground": "#2e0854",
+      "sideBarTitle.foreground": "#9333ea",
+      "sideBarSectionHeader.background": "#e9d5ff",
+      "sideBarSectionHeader.foreground": "#2e0854",
+      "titleBar.activeBackground": "#e9d5ff",
+      "titleBar.activeForeground": "#2e0854",
+      "statusBar.background": "#9333ea",
+      "statusBar.foreground": "#ffffff",
+      "statusBar.debuggingBackground": "#e11d48",
+      "editorGroupHeader.tabsBackground": "#f3e8ff",
+      "tab.activeBackground": "#faf5ff",
+      "tab.activeForeground": "#9333ea",
+      "tab.activeBorderTop": "#ec4899",
+      "tab.inactiveBackground": "#e9d5ff",
+      "tab.inactiveForeground": "#7e22ce",
+      "tab.hoverBackground": "#e9d5ff",
+      "breadcrumb.foreground": "#7e22ce",
+      "terminal.background": "#faf5ff",
+      "terminal.foreground": "#2e0854",
+      "terminalCursor.foreground": "#ec4899",
+      "terminal.ansiGreen": "#0284c7",
+      "terminal.ansiCyan": "#6d28d9",
+      "terminal.ansiYellow": "#059669",
+      "input.background": "#f3e8ff",
+      "input.foreground": "#2e0854",
+      "input.placeholderForeground": "#7e22ce",
+      "panel.background": "#faf5ff",
+      "panel.border": "#f3e8ff",
+      "panelTitle.activeForeground": "#ec4899",
+      "panelTitle.inactiveForeground": "#7e22ce",
+      "panelTitle.activeBorder": "#ec4899",
+      "chat.requestBackground": "#f3e8ff",
+      "chat.requestBorder": "#e9d5ff",
+      "interactive.requestBackground": "#f3e8ff",
+      "textCodeBlock.background": "#e9d5ff",
+      "textLink.foreground": "#ec4899",
+      "badge.background": "#ec4899",
       "badge.foreground": "#ffffff"
 },
     tokenColors: [
@@ -5704,16 +6901,30 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.function"
             ],
             "settings": {
-                  "foreground": "#059669"
+                  "foreground": "#0284c7"
             }
       },
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
-                  "foreground": "#d97706"
+                  "foreground": "#059669"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#db2777"
             }
       },
       {
@@ -5722,7 +6933,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.other"
             ],
             "settings": {
-                  "foreground": "#4a044e"
+                  "foreground": "#2e0854"
             }
       },
       {
@@ -5731,7 +6942,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type"
             ],
             "settings": {
-                  "foreground": "#9333ea"
+                  "foreground": "#6d28d9"
             }
       },
       {
@@ -5739,7 +6950,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#f472b6",
+                  "foreground": "#a855f7",
                   "fontStyle": "italic"
             }
       },
@@ -5749,7 +6960,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "constant.language.boolean"
             ],
             "settings": {
-                  "foreground": "#e11d48"
+                  "foreground": "#d97706"
             }
       },
       {
@@ -5758,156 +6969,6 @@ export const THEME_PRESETS: ThemePreset[] = [
             ],
             "settings": {
                   "foreground": "#db2777"
-            }
-      },
-      {
-            "scope": [
-                  "entity.name.tag"
-            ],
-            "settings": {
-                  "foreground": "#059669"
-            }
-      }
-],
-  },
-
-  // 🍧 Cotton Candy Pastel Light
-  {
-    id: "cotton-candy",
-    name: "\ud83c\udf67 Cotton Candy Pastel Light",
-    description: "Playful, joyful pastel carnival tones of spun pink sugar, baby blue sky, and lavender.",
-    type: "light",
-    accentColor: "#ec4899",
-    colors: {
-      "foreground": "#3b0764",
-      "descriptionForeground": "#a855f7",
-      "disabledForeground": "#c084fc",
-      "icon.foreground": "#ec4899",
-      "editor.background": "#faf5ff",
-      "editor.foreground": "#3b0764",
-      "editorLineNumber.foreground": "#c084fc",
-      "editorLineNumber.activeForeground": "#ec4899",
-      "editorCursor.foreground": "#ec4899",
-      "editor.selectionBackground": "#e9d5ff",
-      "editor.lineHighlightBackground": "#e9d5ff",
-      "focusBorder": "#ec4899",
-      "activityBar.background": "#e9d5ff",
-      "activityBar.foreground": "#ec4899",
-      "activityBar.inactiveForeground": "#c084fc",
-      "activityBarBadge.background": "#ec4899",
-      "activityBarBadge.foreground": "#ffffff",
-      "sideBar.background": "#f3e8ff",
-      "sideBar.foreground": "#3b0764",
-      "sideBarTitle.foreground": "#9333ea",
-      "sideBarSectionHeader.background": "#e9d5ff",
-      "sideBarSectionHeader.foreground": "#3b0764",
-      "titleBar.activeBackground": "#e9d5ff",
-      "titleBar.activeForeground": "#3b0764",
-      "statusBar.background": "#9333ea",
-      "statusBar.foreground": "#ffffff",
-      "statusBar.debuggingBackground": "#e11d48",
-      "editorGroupHeader.tabsBackground": "#f3e8ff",
-      "tab.activeBackground": "#faf5ff",
-      "tab.activeForeground": "#9333ea",
-      "tab.activeBorderTop": "#ec4899",
-      "tab.inactiveBackground": "#e9d5ff",
-      "tab.inactiveForeground": "#a855f7",
-      "tab.hoverBackground": "#e9d5ff",
-      "breadcrumb.foreground": "#a855f7",
-      "terminal.background": "#faf5ff",
-      "terminal.foreground": "#3b0764",
-      "terminalCursor.foreground": "#ec4899",
-      "terminal.ansiGreen": "#0284c7",
-      "terminal.ansiCyan": "#8b5cf6",
-      "terminal.ansiYellow": "#10b981",
-      "input.background": "#f3e8ff",
-      "input.foreground": "#3b0764",
-      "input.placeholderForeground": "#a855f7",
-      "panel.background": "#faf5ff",
-      "panel.border": "#f3e8ff",
-      "panelTitle.activeForeground": "#ec4899",
-      "panelTitle.inactiveForeground": "#a855f7",
-      "panelTitle.activeBorder": "#ec4899",
-      "chat.requestBackground": "#f3e8ff",
-      "chat.requestBorder": "#e9d5ff",
-      "interactive.requestBackground": "#f3e8ff",
-      "textCodeBlock.background": "#e9d5ff",
-      "textLink.foreground": "#ec4899",
-      "badge.background": "#ec4899",
-      "badge.foreground": "#ffffff"
-},
-    tokenColors: [
-      {
-            "scope": [
-                  "keyword",
-                  "keyword.control",
-                  "storage.type"
-            ],
-            "settings": {
-                  "foreground": "#ec4899",
-                  "fontStyle": "bold"
-            }
-      },
-      {
-            "scope": [
-                  "entity.name.function",
-                  "support.function"
-            ],
-            "settings": {
-                  "foreground": "#0284c7"
-            }
-      },
-      {
-            "scope": [
-                  "string",
-                  "string.quoted"
-            ],
-            "settings": {
-                  "foreground": "#10b981"
-            }
-      },
-      {
-            "scope": [
-                  "variable",
-                  "variable.other"
-            ],
-            "settings": {
-                  "foreground": "#3b0764"
-            }
-      },
-      {
-            "scope": [
-                  "entity.name.type",
-                  "support.type"
-            ],
-            "settings": {
-                  "foreground": "#8b5cf6"
-            }
-      },
-      {
-            "scope": [
-                  "comment"
-            ],
-            "settings": {
-                  "foreground": "#c084fc",
-                  "fontStyle": "italic"
-            }
-      },
-      {
-            "scope": [
-                  "constant.numeric",
-                  "constant.language.boolean"
-            ],
-            "settings": {
-                  "foreground": "#f59e0b"
-            }
-      },
-      {
-            "scope": [
-                  "keyword.operator"
-            ],
-            "settings": {
-                  "foreground": "#ec4899"
             }
       },
       {
@@ -5930,20 +6991,33 @@ export const THEME_PRESETS: ThemePreset[] = [
     accentColor: "#0f172a",
     colors: {
       "foreground": "#0f172a",
-      "descriptionForeground": "#64748b",
-      "disabledForeground": "#94a3b8",
+      "descriptionForeground": "#475569",
+      "disabledForeground": "#64748b",
       "icon.foreground": "#0f172a",
       "editor.background": "#ffffff",
       "editor.foreground": "#0f172a",
-      "editorLineNumber.foreground": "#94a3b8",
+      "editorLineNumber.foreground": "#64748b",
       "editorLineNumber.activeForeground": "#0f172a",
       "editorCursor.foreground": "#0f172a",
       "editor.selectionBackground": "#f1f5f9",
       "editor.lineHighlightBackground": "#f1f5f9",
+      "editorHoverWidget.background": "#f8fafc",
+      "editorHoverWidget.foreground": "#0f172a",
+      "editorHoverWidget.border": "#f1f5f9",
+      "editorHoverWidget.statusBarBackground": "#f1f5f9",
+      "editorSuggestWidget.background": "#f8fafc",
+      "editorSuggestWidget.foreground": "#0f172a",
+      "editorSuggestWidget.border": "#f1f5f9",
+      "editorSuggestWidget.selectedBackground": "#f1f5f9",
+      "editorSuggestWidget.selectedForeground": "#0f172a",
+      "editorSuggestWidget.highlightForeground": "#0f172a",
+      "editorWidget.background": "#f8fafc",
+      "editorWidget.foreground": "#0f172a",
+      "editorWidget.border": "#f1f5f9",
       "focusBorder": "#0f172a",
       "activityBar.background": "#f1f5f9",
       "activityBar.foreground": "#0f172a",
-      "activityBar.inactiveForeground": "#94a3b8",
+      "activityBar.inactiveForeground": "#64748b",
       "activityBarBadge.background": "#0f172a",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#f8fafc",
@@ -5961,22 +7035,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#0f172a",
       "tab.activeBorderTop": "#0f172a",
       "tab.inactiveBackground": "#f1f5f9",
-      "tab.inactiveForeground": "#64748b",
+      "tab.inactiveForeground": "#475569",
       "tab.hoverBackground": "#f1f5f9",
-      "breadcrumb.foreground": "#64748b",
+      "breadcrumb.foreground": "#475569",
       "terminal.background": "#ffffff",
       "terminal.foreground": "#0f172a",
       "terminalCursor.foreground": "#0f172a",
-      "terminal.ansiGreen": "#2563eb",
-      "terminal.ansiCyan": "#475569",
-      "terminal.ansiYellow": "#059669",
+      "terminal.ansiGreen": "#1d4ed8",
+      "terminal.ansiCyan": "#334155",
+      "terminal.ansiYellow": "#047857",
       "input.background": "#f8fafc",
       "input.foreground": "#0f172a",
-      "input.placeholderForeground": "#64748b",
+      "input.placeholderForeground": "#475569",
       "panel.background": "#ffffff",
       "panel.border": "#f8fafc",
       "panelTitle.activeForeground": "#0f172a",
-      "panelTitle.inactiveForeground": "#64748b",
+      "panelTitle.inactiveForeground": "#475569",
       "panelTitle.activeBorder": "#0f172a",
       "chat.requestBackground": "#f8fafc",
       "chat.requestBorder": "#f1f5f9",
@@ -6004,16 +7078,30 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.function"
             ],
             "settings": {
-                  "foreground": "#2563eb"
+                  "foreground": "#1d4ed8"
             }
       },
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
-                  "foreground": "#059669"
+                  "foreground": "#047857"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#0f172a"
             }
       },
       {
@@ -6031,7 +7119,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type"
             ],
             "settings": {
-                  "foreground": "#475569"
+                  "foreground": "#334155"
             }
       },
       {
@@ -6039,7 +7127,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#94a3b8",
+                  "foreground": "#64748b",
                   "fontStyle": "italic"
             }
       },
@@ -6049,7 +7137,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "constant.language.boolean"
             ],
             "settings": {
-                  "foreground": "#d97706"
+                  "foreground": "#b45309"
             }
       },
       {
@@ -6065,7 +7153,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.name.tag"
             ],
             "settings": {
-                  "foreground": "#2563eb"
+                  "foreground": "#1d4ed8"
             }
       }
 ],
@@ -6079,30 +7167,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#ca8a04",
     colors: {
-      "foreground": "#292524",
-      "descriptionForeground": "#a16207",
-      "disabledForeground": "#a8a29e",
+      "foreground": "#262220",
+      "descriptionForeground": "#78350f",
+      "disabledForeground": "#78716c",
       "icon.foreground": "#ca8a04",
       "editor.background": "#fefdf8",
-      "editor.foreground": "#292524",
-      "editorLineNumber.foreground": "#a8a29e",
+      "editor.foreground": "#262220",
+      "editorLineNumber.foreground": "#78716c",
       "editorLineNumber.activeForeground": "#ca8a04",
       "editorCursor.foreground": "#ca8a04",
       "editor.selectionBackground": "#f5f0db",
       "editor.lineHighlightBackground": "#f5f0db",
+      "editorHoverWidget.background": "#fbf8ee",
+      "editorHoverWidget.foreground": "#262220",
+      "editorHoverWidget.border": "#f5f0db",
+      "editorHoverWidget.statusBarBackground": "#f5f0db",
+      "editorSuggestWidget.background": "#fbf8ee",
+      "editorSuggestWidget.foreground": "#262220",
+      "editorSuggestWidget.border": "#f5f0db",
+      "editorSuggestWidget.selectedBackground": "#f5f0db",
+      "editorSuggestWidget.selectedForeground": "#78350f",
+      "editorSuggestWidget.highlightForeground": "#ca8a04",
+      "editorWidget.background": "#fbf8ee",
+      "editorWidget.foreground": "#262220",
+      "editorWidget.border": "#f5f0db",
       "focusBorder": "#ca8a04",
       "activityBar.background": "#f5f0db",
       "activityBar.foreground": "#ca8a04",
-      "activityBar.inactiveForeground": "#a8a29e",
+      "activityBar.inactiveForeground": "#78716c",
       "activityBarBadge.background": "#ca8a04",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#fbf8ee",
-      "sideBar.foreground": "#292524",
+      "sideBar.foreground": "#262220",
       "sideBarTitle.foreground": "#78350f",
       "sideBarSectionHeader.background": "#f5f0db",
-      "sideBarSectionHeader.foreground": "#292524",
+      "sideBarSectionHeader.foreground": "#262220",
       "titleBar.activeBackground": "#f5f0db",
-      "titleBar.activeForeground": "#292524",
+      "titleBar.activeForeground": "#262220",
       "statusBar.background": "#78350f",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -6111,22 +7212,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#78350f",
       "tab.activeBorderTop": "#ca8a04",
       "tab.inactiveBackground": "#f5f0db",
-      "tab.inactiveForeground": "#a16207",
+      "tab.inactiveForeground": "#78350f",
       "tab.hoverBackground": "#f5f0db",
-      "breadcrumb.foreground": "#a16207",
+      "breadcrumb.foreground": "#78350f",
       "terminal.background": "#fefdf8",
-      "terminal.foreground": "#292524",
+      "terminal.foreground": "#262220",
       "terminalCursor.foreground": "#ca8a04",
       "terminal.ansiGreen": "#047857",
-      "terminal.ansiCyan": "#4338ca",
-      "terminal.ansiYellow": "#b45309",
+      "terminal.ansiCyan": "#3730a3",
+      "terminal.ansiYellow": "#92400e",
       "input.background": "#fbf8ee",
-      "input.foreground": "#292524",
-      "input.placeholderForeground": "#a16207",
+      "input.foreground": "#262220",
+      "input.placeholderForeground": "#78350f",
       "panel.background": "#fefdf8",
       "panel.border": "#fbf8ee",
       "panelTitle.activeForeground": "#ca8a04",
-      "panelTitle.inactiveForeground": "#a16207",
+      "panelTitle.inactiveForeground": "#78350f",
       "panelTitle.activeBorder": "#ca8a04",
       "chat.requestBackground": "#fbf8ee",
       "chat.requestBorder": "#f5f0db",
@@ -6134,6 +7235,183 @@ export const THEME_PRESETS: ThemePreset[] = [
       "textCodeBlock.background": "#f5f0db",
       "textLink.foreground": "#ca8a04",
       "badge.background": "#ca8a04",
+      "badge.foreground": "#ffffff"
+},
+    tokenColors: [
+      {
+            "scope": [
+                  "keyword",
+                  "keyword.control",
+                  "storage.type"
+            ],
+            "settings": {
+                  "foreground": "#b45309",
+                  "fontStyle": "bold"
+            }
+      },
+      {
+            "scope": [
+                  "entity.name.function",
+                  "support.function"
+            ],
+            "settings": {
+                  "foreground": "#047857"
+            }
+      },
+      {
+            "scope": [
+                  "string",
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
+            ],
+            "settings": {
+                  "foreground": "#92400e"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#b45309"
+            }
+      },
+      {
+            "scope": [
+                  "variable",
+                  "variable.other"
+            ],
+            "settings": {
+                  "foreground": "#262220"
+            }
+      },
+      {
+            "scope": [
+                  "entity.name.type",
+                  "support.type"
+            ],
+            "settings": {
+                  "foreground": "#3730a3"
+            }
+      },
+      {
+            "scope": [
+                  "comment"
+            ],
+            "settings": {
+                  "foreground": "#78716c",
+                  "fontStyle": "italic"
+            }
+      },
+      {
+            "scope": [
+                  "constant.numeric",
+                  "constant.language.boolean"
+            ],
+            "settings": {
+                  "foreground": "#991b1b"
+            }
+      },
+      {
+            "scope": [
+                  "keyword.operator"
+            ],
+            "settings": {
+                  "foreground": "#b45309"
+            }
+      },
+      {
+            "scope": [
+                  "entity.name.tag"
+            ],
+            "settings": {
+                  "foreground": "#047857"
+            }
+      }
+],
+  },
+
+  // 🍑 Peach Bellini Light
+  {
+    id: "peach-bellini",
+    name: "\ud83c\udf51 Peach Bellini Light",
+    description: "Sun-ripened orchard peaches, prosecco bubbles, coral nectar, and sparkling apricot.",
+    type: "light",
+    accentColor: "#ea580c",
+    colors: {
+      "foreground": "#3b1004",
+      "descriptionForeground": "#9a3412",
+      "disabledForeground": "#ea580c",
+      "icon.foreground": "#ea580c",
+      "editor.background": "#fff7ed",
+      "editor.foreground": "#3b1004",
+      "editorLineNumber.foreground": "#ea580c",
+      "editorLineNumber.activeForeground": "#ea580c",
+      "editorCursor.foreground": "#ea580c",
+      "editor.selectionBackground": "#fed7aa",
+      "editor.lineHighlightBackground": "#fed7aa",
+      "editorHoverWidget.background": "#ffedd5",
+      "editorHoverWidget.foreground": "#3b1004",
+      "editorHoverWidget.border": "#fed7aa",
+      "editorHoverWidget.statusBarBackground": "#fed7aa",
+      "editorSuggestWidget.background": "#ffedd5",
+      "editorSuggestWidget.foreground": "#3b1004",
+      "editorSuggestWidget.border": "#fed7aa",
+      "editorSuggestWidget.selectedBackground": "#fed7aa",
+      "editorSuggestWidget.selectedForeground": "#c2410c",
+      "editorSuggestWidget.highlightForeground": "#ea580c",
+      "editorWidget.background": "#ffedd5",
+      "editorWidget.foreground": "#3b1004",
+      "editorWidget.border": "#fed7aa",
+      "focusBorder": "#ea580c",
+      "activityBar.background": "#fed7aa",
+      "activityBar.foreground": "#ea580c",
+      "activityBar.inactiveForeground": "#ea580c",
+      "activityBarBadge.background": "#ea580c",
+      "activityBarBadge.foreground": "#ffffff",
+      "sideBar.background": "#ffedd5",
+      "sideBar.foreground": "#3b1004",
+      "sideBarTitle.foreground": "#c2410c",
+      "sideBarSectionHeader.background": "#fed7aa",
+      "sideBarSectionHeader.foreground": "#3b1004",
+      "titleBar.activeBackground": "#fed7aa",
+      "titleBar.activeForeground": "#3b1004",
+      "statusBar.background": "#ea580c",
+      "statusBar.foreground": "#ffffff",
+      "statusBar.debuggingBackground": "#e11d48",
+      "editorGroupHeader.tabsBackground": "#ffedd5",
+      "tab.activeBackground": "#fff7ed",
+      "tab.activeForeground": "#c2410c",
+      "tab.activeBorderTop": "#ea580c",
+      "tab.inactiveBackground": "#fed7aa",
+      "tab.inactiveForeground": "#9a3412",
+      "tab.hoverBackground": "#fed7aa",
+      "breadcrumb.foreground": "#9a3412",
+      "terminal.background": "#fff7ed",
+      "terminal.foreground": "#3b1004",
+      "terminalCursor.foreground": "#ea580c",
+      "terminal.ansiGreen": "#be185d",
+      "terminal.ansiCyan": "#6d28d9",
+      "terminal.ansiYellow": "#15803d",
+      "input.background": "#ffedd5",
+      "input.foreground": "#3b1004",
+      "input.placeholderForeground": "#9a3412",
+      "panel.background": "#fff7ed",
+      "panel.border": "#ffedd5",
+      "panelTitle.activeForeground": "#ea580c",
+      "panelTitle.inactiveForeground": "#9a3412",
+      "panelTitle.activeBorder": "#ea580c",
+      "chat.requestBackground": "#ffedd5",
+      "chat.requestBorder": "#fed7aa",
+      "interactive.requestBackground": "#ffedd5",
+      "textCodeBlock.background": "#fed7aa",
+      "textLink.foreground": "#ea580c",
+      "badge.background": "#ea580c",
       "badge.foreground": "#ffffff"
 },
     tokenColors: [
@@ -6154,16 +7432,30 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.function"
             ],
             "settings": {
-                  "foreground": "#047857"
+                  "foreground": "#be185d"
             }
       },
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
-                  "foreground": "#b45309"
+                  "foreground": "#15803d"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#c2410c"
             }
       },
       {
@@ -6172,7 +7464,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.other"
             ],
             "settings": {
-                  "foreground": "#292524"
+                  "foreground": "#3b1004"
             }
       },
       {
@@ -6181,7 +7473,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type"
             ],
             "settings": {
-                  "foreground": "#4338ca"
+                  "foreground": "#6d28d9"
             }
       },
       {
@@ -6189,7 +7481,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#a8a29e",
+                  "foreground": "#ea580c",
                   "fontStyle": "italic"
             }
       },
@@ -6215,157 +7507,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.name.tag"
             ],
             "settings": {
-                  "foreground": "#047857"
-            }
-      }
-],
-  },
-
-  // 🍑 Peach Bellini Light
-  {
-    id: "peach-bellini",
-    name: "\ud83c\udf51 Peach Bellini Light",
-    description: "Sun-ripened orchard peaches, prosecco bubbles, coral nectar, and sparkling apricot.",
-    type: "light",
-    accentColor: "#ea580c",
-    colors: {
-      "foreground": "#431407",
-      "descriptionForeground": "#c2410c",
-      "disabledForeground": "#fb923c",
-      "icon.foreground": "#ea580c",
-      "editor.background": "#fff7ed",
-      "editor.foreground": "#431407",
-      "editorLineNumber.foreground": "#fb923c",
-      "editorLineNumber.activeForeground": "#ea580c",
-      "editorCursor.foreground": "#ea580c",
-      "editor.selectionBackground": "#fed7aa",
-      "editor.lineHighlightBackground": "#fed7aa",
-      "focusBorder": "#ea580c",
-      "activityBar.background": "#fed7aa",
-      "activityBar.foreground": "#ea580c",
-      "activityBar.inactiveForeground": "#fb923c",
-      "activityBarBadge.background": "#ea580c",
-      "activityBarBadge.foreground": "#ffffff",
-      "sideBar.background": "#ffedd5",
-      "sideBar.foreground": "#431407",
-      "sideBarTitle.foreground": "#c2410c",
-      "sideBarSectionHeader.background": "#fed7aa",
-      "sideBarSectionHeader.foreground": "#431407",
-      "titleBar.activeBackground": "#fed7aa",
-      "titleBar.activeForeground": "#431407",
-      "statusBar.background": "#ea580c",
-      "statusBar.foreground": "#ffffff",
-      "statusBar.debuggingBackground": "#e11d48",
-      "editorGroupHeader.tabsBackground": "#ffedd5",
-      "tab.activeBackground": "#fff7ed",
-      "tab.activeForeground": "#c2410c",
-      "tab.activeBorderTop": "#ea580c",
-      "tab.inactiveBackground": "#fed7aa",
-      "tab.inactiveForeground": "#c2410c",
-      "tab.hoverBackground": "#fed7aa",
-      "breadcrumb.foreground": "#c2410c",
-      "terminal.background": "#fff7ed",
-      "terminal.foreground": "#431407",
-      "terminalCursor.foreground": "#ea580c",
-      "terminal.ansiGreen": "#db2777",
-      "terminal.ansiCyan": "#7c3aed",
-      "terminal.ansiYellow": "#15803d",
-      "input.background": "#ffedd5",
-      "input.foreground": "#431407",
-      "input.placeholderForeground": "#c2410c",
-      "panel.background": "#fff7ed",
-      "panel.border": "#ffedd5",
-      "panelTitle.activeForeground": "#ea580c",
-      "panelTitle.inactiveForeground": "#c2410c",
-      "panelTitle.activeBorder": "#ea580c",
-      "chat.requestBackground": "#ffedd5",
-      "chat.requestBorder": "#fed7aa",
-      "interactive.requestBackground": "#ffedd5",
-      "textCodeBlock.background": "#fed7aa",
-      "textLink.foreground": "#ea580c",
-      "badge.background": "#ea580c",
-      "badge.foreground": "#ffffff"
-},
-    tokenColors: [
-      {
-            "scope": [
-                  "keyword",
-                  "keyword.control",
-                  "storage.type"
-            ],
-            "settings": {
-                  "foreground": "#ea580c",
-                  "fontStyle": "bold"
-            }
-      },
-      {
-            "scope": [
-                  "entity.name.function",
-                  "support.function"
-            ],
-            "settings": {
-                  "foreground": "#db2777"
-            }
-      },
-      {
-            "scope": [
-                  "string",
-                  "string.quoted"
-            ],
-            "settings": {
-                  "foreground": "#15803d"
-            }
-      },
-      {
-            "scope": [
-                  "variable",
-                  "variable.other"
-            ],
-            "settings": {
-                  "foreground": "#431407"
-            }
-      },
-      {
-            "scope": [
-                  "entity.name.type",
-                  "support.type"
-            ],
-            "settings": {
-                  "foreground": "#7c3aed"
-            }
-      },
-      {
-            "scope": [
-                  "comment"
-            ],
-            "settings": {
-                  "foreground": "#fb923c",
-                  "fontStyle": "italic"
-            }
-      },
-      {
-            "scope": [
-                  "constant.numeric",
-                  "constant.language.boolean"
-            ],
-            "settings": {
-                  "foreground": "#e11d48"
-            }
-      },
-      {
-            "scope": [
-                  "keyword.operator"
-            ],
-            "settings": {
-                  "foreground": "#ea580c"
-            }
-      },
-      {
-            "scope": [
-                  "entity.name.tag"
-            ],
-            "settings": {
-                  "foreground": "#db2777"
+                  "foreground": "#be185d"
             }
       }
 ],
@@ -6379,30 +7521,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#7c3aed",
     colors: {
-      "foreground": "#2e1065",
-      "descriptionForeground": "#9333ea",
-      "disabledForeground": "#a855f7",
+      "foreground": "#210947",
+      "descriptionForeground": "#6b21a8",
+      "disabledForeground": "#7c3aed",
       "icon.foreground": "#7c3aed",
       "editor.background": "#faf5ff",
-      "editor.foreground": "#2e1065",
-      "editorLineNumber.foreground": "#a855f7",
+      "editor.foreground": "#210947",
+      "editorLineNumber.foreground": "#7c3aed",
       "editorLineNumber.activeForeground": "#7c3aed",
       "editorCursor.foreground": "#7c3aed",
       "editor.selectionBackground": "#e9d5ff",
       "editor.lineHighlightBackground": "#e9d5ff",
+      "editorHoverWidget.background": "#f3e8ff",
+      "editorHoverWidget.foreground": "#210947",
+      "editorHoverWidget.border": "#e9d5ff",
+      "editorHoverWidget.statusBarBackground": "#e9d5ff",
+      "editorSuggestWidget.background": "#f3e8ff",
+      "editorSuggestWidget.foreground": "#210947",
+      "editorSuggestWidget.border": "#e9d5ff",
+      "editorSuggestWidget.selectedBackground": "#e9d5ff",
+      "editorSuggestWidget.selectedForeground": "#7c3aed",
+      "editorSuggestWidget.highlightForeground": "#7c3aed",
+      "editorWidget.background": "#f3e8ff",
+      "editorWidget.foreground": "#210947",
+      "editorWidget.border": "#e9d5ff",
       "focusBorder": "#7c3aed",
       "activityBar.background": "#e9d5ff",
       "activityBar.foreground": "#7c3aed",
-      "activityBar.inactiveForeground": "#a855f7",
+      "activityBar.inactiveForeground": "#7c3aed",
       "activityBarBadge.background": "#7c3aed",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#f3e8ff",
-      "sideBar.foreground": "#2e1065",
+      "sideBar.foreground": "#210947",
       "sideBarTitle.foreground": "#7c3aed",
       "sideBarSectionHeader.background": "#e9d5ff",
-      "sideBarSectionHeader.foreground": "#2e1065",
+      "sideBarSectionHeader.foreground": "#210947",
       "titleBar.activeBackground": "#e9d5ff",
-      "titleBar.activeForeground": "#2e1065",
+      "titleBar.activeForeground": "#210947",
       "statusBar.background": "#7c3aed",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -6411,22 +7566,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#7c3aed",
       "tab.activeBorderTop": "#7c3aed",
       "tab.inactiveBackground": "#e9d5ff",
-      "tab.inactiveForeground": "#9333ea",
+      "tab.inactiveForeground": "#6b21a8",
       "tab.hoverBackground": "#e9d5ff",
-      "breadcrumb.foreground": "#9333ea",
+      "breadcrumb.foreground": "#6b21a8",
       "terminal.background": "#faf5ff",
-      "terminal.foreground": "#2e1065",
+      "terminal.foreground": "#210947",
       "terminalCursor.foreground": "#7c3aed",
-      "terminal.ansiGreen": "#2563eb",
-      "terminal.ansiCyan": "#db2777",
-      "terminal.ansiYellow": "#059669",
+      "terminal.ansiGreen": "#1d4ed8",
+      "terminal.ansiCyan": "#be185d",
+      "terminal.ansiYellow": "#047857",
       "input.background": "#f3e8ff",
-      "input.foreground": "#2e1065",
-      "input.placeholderForeground": "#9333ea",
+      "input.foreground": "#210947",
+      "input.placeholderForeground": "#6b21a8",
       "panel.background": "#faf5ff",
       "panel.border": "#f3e8ff",
       "panelTitle.activeForeground": "#7c3aed",
-      "panelTitle.inactiveForeground": "#9333ea",
+      "panelTitle.inactiveForeground": "#6b21a8",
       "panelTitle.activeBorder": "#7c3aed",
       "chat.requestBackground": "#f3e8ff",
       "chat.requestBorder": "#e9d5ff",
@@ -6444,7 +7599,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "storage.type"
             ],
             "settings": {
-                  "foreground": "#7c3aed",
+                  "foreground": "#6d28d9",
                   "fontStyle": "bold"
             }
       },
@@ -6454,16 +7609,30 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.function"
             ],
             "settings": {
-                  "foreground": "#2563eb"
+                  "foreground": "#1d4ed8"
             }
       },
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
-                  "foreground": "#059669"
+                  "foreground": "#047857"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#6d28d9"
             }
       },
       {
@@ -6472,7 +7641,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.other"
             ],
             "settings": {
-                  "foreground": "#2e1065"
+                  "foreground": "#210947"
             }
       },
       {
@@ -6481,7 +7650,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type"
             ],
             "settings": {
-                  "foreground": "#db2777"
+                  "foreground": "#be185d"
             }
       },
       {
@@ -6489,7 +7658,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#a855f7",
+                  "foreground": "#7c3aed",
                   "fontStyle": "italic"
             }
       },
@@ -6499,7 +7668,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "constant.language.boolean"
             ],
             "settings": {
-                  "foreground": "#ea580c"
+                  "foreground": "#c2410c"
             }
       },
       {
@@ -6507,7 +7676,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "keyword.operator"
             ],
             "settings": {
-                  "foreground": "#7c3aed"
+                  "foreground": "#6d28d9"
             }
       },
       {
@@ -6515,7 +7684,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.name.tag"
             ],
             "settings": {
-                  "foreground": "#2563eb"
+                  "foreground": "#1d4ed8"
             }
       }
 ],
@@ -6529,30 +7698,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#059669",
     colors: {
-      "foreground": "#052e16",
-      "descriptionForeground": "#16a34a",
-      "disabledForeground": "#4ade80",
+      "foreground": "#03200f",
+      "descriptionForeground": "#15803d",
+      "disabledForeground": "#16a34a",
       "icon.foreground": "#059669",
       "editor.background": "#f0fdf4",
-      "editor.foreground": "#052e16",
-      "editorLineNumber.foreground": "#4ade80",
+      "editor.foreground": "#03200f",
+      "editorLineNumber.foreground": "#16a34a",
       "editorLineNumber.activeForeground": "#059669",
       "editorCursor.foreground": "#059669",
       "editor.selectionBackground": "#bbf7d0",
       "editor.lineHighlightBackground": "#bbf7d0",
+      "editorHoverWidget.background": "#dcfce7",
+      "editorHoverWidget.foreground": "#03200f",
+      "editorHoverWidget.border": "#bbf7d0",
+      "editorHoverWidget.statusBarBackground": "#bbf7d0",
+      "editorSuggestWidget.background": "#dcfce7",
+      "editorSuggestWidget.foreground": "#03200f",
+      "editorSuggestWidget.border": "#bbf7d0",
+      "editorSuggestWidget.selectedBackground": "#bbf7d0",
+      "editorSuggestWidget.selectedForeground": "#166534",
+      "editorSuggestWidget.highlightForeground": "#059669",
+      "editorWidget.background": "#dcfce7",
+      "editorWidget.foreground": "#03200f",
+      "editorWidget.border": "#bbf7d0",
       "focusBorder": "#059669",
       "activityBar.background": "#bbf7d0",
       "activityBar.foreground": "#059669",
-      "activityBar.inactiveForeground": "#4ade80",
+      "activityBar.inactiveForeground": "#16a34a",
       "activityBarBadge.background": "#059669",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#dcfce7",
-      "sideBar.foreground": "#052e16",
+      "sideBar.foreground": "#03200f",
       "sideBarTitle.foreground": "#166534",
       "sideBarSectionHeader.background": "#bbf7d0",
-      "sideBarSectionHeader.foreground": "#052e16",
+      "sideBarSectionHeader.foreground": "#03200f",
       "titleBar.activeBackground": "#bbf7d0",
-      "titleBar.activeForeground": "#052e16",
+      "titleBar.activeForeground": "#03200f",
       "statusBar.background": "#059669",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -6561,22 +7743,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#166534",
       "tab.activeBorderTop": "#059669",
       "tab.inactiveBackground": "#bbf7d0",
-      "tab.inactiveForeground": "#16a34a",
+      "tab.inactiveForeground": "#15803d",
       "tab.hoverBackground": "#bbf7d0",
-      "breadcrumb.foreground": "#16a34a",
+      "breadcrumb.foreground": "#15803d",
       "terminal.background": "#f0fdf4",
-      "terminal.foreground": "#052e16",
+      "terminal.foreground": "#03200f",
       "terminalCursor.foreground": "#059669",
       "terminal.ansiGreen": "#0284c7",
-      "terminal.ansiCyan": "#7c3aed",
-      "terminal.ansiYellow": "#d97706",
+      "terminal.ansiCyan": "#6d28d9",
+      "terminal.ansiYellow": "#b45309",
       "input.background": "#dcfce7",
-      "input.foreground": "#052e16",
-      "input.placeholderForeground": "#16a34a",
+      "input.foreground": "#03200f",
+      "input.placeholderForeground": "#15803d",
       "panel.background": "#f0fdf4",
       "panel.border": "#dcfce7",
       "panelTitle.activeForeground": "#059669",
-      "panelTitle.inactiveForeground": "#16a34a",
+      "panelTitle.inactiveForeground": "#15803d",
       "panelTitle.activeBorder": "#059669",
       "chat.requestBackground": "#dcfce7",
       "chat.requestBorder": "#bbf7d0",
@@ -6594,7 +7776,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "storage.type"
             ],
             "settings": {
-                  "foreground": "#059669",
+                  "foreground": "#047857",
                   "fontStyle": "bold"
             }
       },
@@ -6610,10 +7792,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
-                  "foreground": "#d97706"
+                  "foreground": "#b45309"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#047857"
             }
       },
       {
@@ -6622,7 +7818,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.other"
             ],
             "settings": {
-                  "foreground": "#052e16"
+                  "foreground": "#03200f"
             }
       },
       {
@@ -6631,7 +7827,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type"
             ],
             "settings": {
-                  "foreground": "#7c3aed"
+                  "foreground": "#6d28d9"
             }
       },
       {
@@ -6639,7 +7835,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#4ade80",
+                  "foreground": "#16a34a",
                   "fontStyle": "italic"
             }
       },
@@ -6649,7 +7845,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "constant.language.boolean"
             ],
             "settings": {
-                  "foreground": "#e11d48"
+                  "foreground": "#b91c1c"
             }
       },
       {
@@ -6657,7 +7853,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "keyword.operator"
             ],
             "settings": {
-                  "foreground": "#059669"
+                  "foreground": "#047857"
             }
       },
       {
@@ -6690,6 +7886,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#306230",
       "editor.selectionBackground": "#8bac0f",
       "editor.lineHighlightBackground": "#8bac0f",
+      "editorHoverWidget.background": "#8bac0f",
+      "editorHoverWidget.foreground": "#0f380f",
+      "editorHoverWidget.border": "#8bac0f",
+      "editorHoverWidget.statusBarBackground": "#8bac0f",
+      "editorSuggestWidget.background": "#8bac0f",
+      "editorSuggestWidget.foreground": "#0f380f",
+      "editorSuggestWidget.border": "#8bac0f",
+      "editorSuggestWidget.selectedBackground": "#8bac0f",
+      "editorSuggestWidget.selectedForeground": "#306230",
+      "editorSuggestWidget.highlightForeground": "#306230",
+      "editorWidget.background": "#8bac0f",
+      "editorWidget.foreground": "#0f380f",
+      "editorWidget.border": "#8bac0f",
       "focusBorder": "#306230",
       "activityBar.background": "#8bac0f",
       "activityBar.foreground": "#306230",
@@ -6760,7 +7969,21 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
+            ],
+            "settings": {
+                  "foreground": "#0f380f"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
             ],
             "settings": {
                   "foreground": "#0f380f"
@@ -6829,30 +8052,43 @@ export const THEME_PRESETS: ThemePreset[] = [
     type: "light",
     accentColor: "#dc2626",
     colors: {
-      "foreground": "#1e293b",
-      "descriptionForeground": "#ca8a04",
-      "disabledForeground": "#94a3b8",
+      "foreground": "#0f172a",
+      "descriptionForeground": "#854d0e",
+      "disabledForeground": "#64748b",
       "icon.foreground": "#dc2626",
       "editor.background": "#ffffff",
-      "editor.foreground": "#1e293b",
-      "editorLineNumber.foreground": "#94a3b8",
+      "editor.foreground": "#0f172a",
+      "editorLineNumber.foreground": "#64748b",
       "editorLineNumber.activeForeground": "#dc2626",
       "editorCursor.foreground": "#dc2626",
       "editor.selectionBackground": "#fee2e2",
       "editor.lineHighlightBackground": "#fee2e2",
+      "editorHoverWidget.background": "#fef08a",
+      "editorHoverWidget.foreground": "#0f172a",
+      "editorHoverWidget.border": "#fee2e2",
+      "editorHoverWidget.statusBarBackground": "#fee2e2",
+      "editorSuggestWidget.background": "#fef08a",
+      "editorSuggestWidget.foreground": "#0f172a",
+      "editorSuggestWidget.border": "#fee2e2",
+      "editorSuggestWidget.selectedBackground": "#fee2e2",
+      "editorSuggestWidget.selectedForeground": "#dc2626",
+      "editorSuggestWidget.highlightForeground": "#dc2626",
+      "editorWidget.background": "#fef08a",
+      "editorWidget.foreground": "#0f172a",
+      "editorWidget.border": "#fee2e2",
       "focusBorder": "#dc2626",
       "activityBar.background": "#fde047",
       "activityBar.foreground": "#dc2626",
-      "activityBar.inactiveForeground": "#94a3b8",
+      "activityBar.inactiveForeground": "#64748b",
       "activityBarBadge.background": "#dc2626",
       "activityBarBadge.foreground": "#ffffff",
       "sideBar.background": "#fef08a",
-      "sideBar.foreground": "#1e293b",
+      "sideBar.foreground": "#0f172a",
       "sideBarTitle.foreground": "#dc2626",
       "sideBarSectionHeader.background": "#fee2e2",
-      "sideBarSectionHeader.foreground": "#1e293b",
+      "sideBarSectionHeader.foreground": "#0f172a",
       "titleBar.activeBackground": "#fde047",
-      "titleBar.activeForeground": "#1e293b",
+      "titleBar.activeForeground": "#0f172a",
       "statusBar.background": "#2563eb",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
@@ -6861,22 +8097,22 @@ export const THEME_PRESETS: ThemePreset[] = [
       "tab.activeForeground": "#dc2626",
       "tab.activeBorderTop": "#dc2626",
       "tab.inactiveBackground": "#fee2e2",
-      "tab.inactiveForeground": "#ca8a04",
+      "tab.inactiveForeground": "#854d0e",
       "tab.hoverBackground": "#fee2e2",
-      "breadcrumb.foreground": "#ca8a04",
+      "breadcrumb.foreground": "#854d0e",
       "terminal.background": "#ffffff",
-      "terminal.foreground": "#1e293b",
+      "terminal.foreground": "#0f172a",
       "terminalCursor.foreground": "#dc2626",
-      "terminal.ansiGreen": "#2563eb",
-      "terminal.ansiCyan": "#eab308",
-      "terminal.ansiYellow": "#16a34a",
+      "terminal.ansiGreen": "#1d4ed8",
+      "terminal.ansiCyan": "#b45309",
+      "terminal.ansiYellow": "#15803d",
       "input.background": "#fef9c3",
-      "input.foreground": "#1e293b",
-      "input.placeholderForeground": "#ca8a04",
+      "input.foreground": "#0f172a",
+      "input.placeholderForeground": "#854d0e",
       "panel.background": "#ffffff",
       "panel.border": "#fef08a",
       "panelTitle.activeForeground": "#dc2626",
-      "panelTitle.inactiveForeground": "#ca8a04",
+      "panelTitle.inactiveForeground": "#854d0e",
       "panelTitle.activeBorder": "#dc2626",
       "chat.requestBackground": "#fef9c3",
       "chat.requestBorder": "#fee2e2",
@@ -6904,16 +8140,30 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.function"
             ],
             "settings": {
-                  "foreground": "#2563eb"
+                  "foreground": "#1d4ed8"
             }
       },
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
-                  "foreground": "#16a34a"
+                  "foreground": "#15803d"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#dc2626"
             }
       },
       {
@@ -6922,7 +8172,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.other"
             ],
             "settings": {
-                  "foreground": "#1e293b"
+                  "foreground": "#0f172a"
             }
       },
       {
@@ -6931,7 +8181,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "support.type"
             ],
             "settings": {
-                  "foreground": "#eab308"
+                  "foreground": "#b45309"
             }
       },
       {
@@ -6939,7 +8189,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment"
             ],
             "settings": {
-                  "foreground": "#94a3b8",
+                  "foreground": "#64748b",
                   "fontStyle": "italic"
             }
       },
@@ -6949,7 +8199,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "constant.language.boolean"
             ],
             "settings": {
-                  "foreground": "#ea580c"
+                  "foreground": "#c2410c"
             }
       },
       {
@@ -6965,7 +8215,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.name.tag"
             ],
             "settings": {
-                  "foreground": "#2563eb"
+                  "foreground": "#1d4ed8"
             }
       }
 ],
@@ -6990,6 +8240,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#38bdf8",
       "editor.selectionBackground": "#1e2f4f",
       "editor.lineHighlightBackground": "#1e2f4f",
+      "editorHoverWidget.background": "#131f36",
+      "editorHoverWidget.foreground": "#f8fafc",
+      "editorHoverWidget.border": "#1e2f4f",
+      "editorHoverWidget.statusBarBackground": "#1e2f4f",
+      "editorSuggestWidget.background": "#131f36",
+      "editorSuggestWidget.foreground": "#f8fafc",
+      "editorSuggestWidget.border": "#1e2f4f",
+      "editorSuggestWidget.selectedBackground": "#1e2f4f",
+      "editorSuggestWidget.selectedForeground": "#38bdf8",
+      "editorSuggestWidget.highlightForeground": "#38bdf8",
+      "editorWidget.background": "#131f36",
+      "editorWidget.foreground": "#f8fafc",
+      "editorWidget.border": "#1e2f4f",
       "focusBorder": "#38bdf8",
       "activityBar.background": "#09101c",
       "activityBar.foreground": "#38bdf8",
@@ -7060,10 +8323,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#fed7aa"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#67e8f9"
             }
       },
       {
@@ -7140,6 +8417,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#ff7700",
       "editor.selectionBackground": "#26190c",
       "editor.lineHighlightBackground": "#26190c",
+      "editorHoverWidget.background": "#181008",
+      "editorHoverWidget.foreground": "#fff1e6",
+      "editorHoverWidget.border": "#26190c",
+      "editorHoverWidget.statusBarBackground": "#26190c",
+      "editorSuggestWidget.background": "#181008",
+      "editorSuggestWidget.foreground": "#fff1e6",
+      "editorSuggestWidget.border": "#26190c",
+      "editorSuggestWidget.selectedBackground": "#26190c",
+      "editorSuggestWidget.selectedForeground": "#ff7700",
+      "editorSuggestWidget.highlightForeground": "#ff7700",
+      "editorWidget.background": "#181008",
+      "editorWidget.foreground": "#fff1e6",
+      "editorWidget.border": "#26190c",
       "focusBorder": "#ff7700",
       "activityBar.background": "#080503",
       "activityBar.foreground": "#ff7700",
@@ -7210,10 +8500,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#ffea00"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#ff7700"
             }
       },
       {
@@ -7290,6 +8594,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#ffd43b",
       "editor.selectionBackground": "#132b23",
       "editor.lineHighlightBackground": "#132b23",
+      "editorHoverWidget.background": "#0e1f19",
+      "editorHoverWidget.foreground": "#e8f5e9",
+      "editorHoverWidget.border": "#132b23",
+      "editorHoverWidget.statusBarBackground": "#132b23",
+      "editorSuggestWidget.background": "#0e1f19",
+      "editorSuggestWidget.foreground": "#e8f5e9",
+      "editorSuggestWidget.border": "#132b23",
+      "editorSuggestWidget.selectedBackground": "#132b23",
+      "editorSuggestWidget.selectedForeground": "#ffd43b",
+      "editorSuggestWidget.highlightForeground": "#ffd43b",
+      "editorWidget.background": "#0e1f19",
+      "editorWidget.foreground": "#e8f5e9",
+      "editorWidget.border": "#132b23",
       "focusBorder": "#ffd43b",
       "activityBar.background": "#060d0a",
       "activityBar.foreground": "#ffd43b",
@@ -7360,10 +8677,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#69f0ae"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#ffd43b"
             }
       },
       {
@@ -7440,6 +8771,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#f74c00",
       "editor.selectionBackground": "#261e1a",
       "editor.lineHighlightBackground": "#261e1a",
+      "editorHoverWidget.background": "#1c1613",
+      "editorHoverWidget.foreground": "#f5ece7",
+      "editorHoverWidget.border": "#261e1a",
+      "editorHoverWidget.statusBarBackground": "#261e1a",
+      "editorSuggestWidget.background": "#1c1613",
+      "editorSuggestWidget.foreground": "#f5ece7",
+      "editorSuggestWidget.border": "#261e1a",
+      "editorSuggestWidget.selectedBackground": "#261e1a",
+      "editorSuggestWidget.selectedForeground": "#f74c00",
+      "editorSuggestWidget.highlightForeground": "#f74c00",
+      "editorWidget.background": "#1c1613",
+      "editorWidget.foreground": "#f5ece7",
+      "editorWidget.border": "#261e1a",
       "focusBorder": "#f74c00",
       "activityBar.background": "#0e0a08",
       "activityBar.foreground": "#f74c00",
@@ -7510,10 +8854,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#7fb4ca"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#f74c00"
             }
       },
       {
@@ -7590,6 +8948,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       "editorCursor.foreground": "#facc15",
       "editor.selectionBackground": "#24242a",
       "editor.lineHighlightBackground": "#24242a",
+      "editorHoverWidget.background": "#1a1a1e",
+      "editorHoverWidget.foreground": "#ffffff",
+      "editorHoverWidget.border": "#24242a",
+      "editorHoverWidget.statusBarBackground": "#24242a",
+      "editorSuggestWidget.background": "#1a1a1e",
+      "editorSuggestWidget.foreground": "#ffffff",
+      "editorSuggestWidget.border": "#24242a",
+      "editorSuggestWidget.selectedBackground": "#24242a",
+      "editorSuggestWidget.selectedForeground": "#facc15",
+      "editorSuggestWidget.highlightForeground": "#facc15",
+      "editorWidget.background": "#1a1a1e",
+      "editorWidget.foreground": "#ffffff",
+      "editorWidget.border": "#24242a",
       "focusBorder": "#facc15",
       "activityBar.background": "#0b0b0c",
       "activityBar.foreground": "#facc15",
@@ -7660,10 +9031,24 @@ export const THEME_PRESETS: ThemePreset[] = [
       {
             "scope": [
                   "string",
-                  "string.quoted"
+                  "string.quoted",
+                  "string.quoted.double",
+                  "string.quoted.single",
+                  "string.template"
             ],
             "settings": {
                   "foreground": "#facc15"
+            }
+      },
+      {
+            "scope": [
+                  "support.type.property-name",
+                  "meta.object-literal.key",
+                  "support.type.property-name.json",
+                  "meta.structure.dictionary.json string.quoted.double.json"
+            ],
+            "settings": {
+                  "foreground": "#dc2626"
             }
       },
       {

@@ -1230,6 +1230,13 @@ class ThemeStudioWebview {
                 <div>9  <span class="syn-keyword mock-clickable" id="synKw5" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">export</span> <span class="syn-keyword mock-clickable" id="synKw6" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">function</span> <span class="syn-func mock-clickable" id="synFunc1" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">activateTheme</span>(<span class="syn-var mock-clickable" id="synVar5" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">palette</span>: <span class="syn-type mock-clickable" id="synType5" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">ThemeProfile</span>) {</div>
                 <div>10   <span class="syn-func mock-clickable" id="synFunc2" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">console</span>.<span class="syn-func mock-clickable" id="synFunc3" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">log</span>(<span class="syn-string mock-clickable" id="synStr2" data-inspect-syntax="strings" data-inspect-simple-syntax="simple.strings" title="Click to highlight Strings">\`✨ Applied \${palette.name}!\`</span>);</div>
                 <div>11 }</div>
+                <div style="position: relative; margin-top: 2px;">
+                  <div>12  <span class="syn-prop mock-clickable" id="synProp1" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.properties" title="Click to highlight Object & JSON Keys">"model"</span>: <span class="syn-string mock-clickable" id="synStr3" data-inspect-syntax="strings" data-inspect-simple-syntax="simple.strings" title="Click to highlight Strings & Text Literals">"qwen3.8-27b"</span>,</div>
+                  <!-- Floating Mock Hover Tooltip -->
+                  <div class="mock-hover-widget mock-clickable" id="mockHoverWidget" data-inspect-ui="editorHoverWidget.background" data-inspect-simple-ui="simple.popups" style="position: absolute; left: 16px; top: -18px; background: rgba(0,0,0,0.8); border: 1px solid var(--card-border); border-radius: 4px; padding: 2px 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.4); font-size: calc(8.5px * var(--preview-scale)); z-index: 10; display: flex; align-items: center; gap: 4px;" title="Click to highlight Hover Popup & Tooltips">
+                    <span id="mockHoverText" data-inspect-ui="editorHoverWidget.foreground" data-inspect-simple-ui="simple.popups" style="font-weight: 600;">⚠️ Unknown Configuration Setting</span>
+                  </div>
+                </div>
               </div>
 
               <!-- Mock Chat / Prompt Box Panel -->
@@ -1630,6 +1637,15 @@ class ThemeStudioWebview {
         } else if (key === 'panel.background') {
           const cp = document.getElementById('mockChatPanel');
           if (cp) cp.style.background = val;
+        } else if (key === 'editorHoverWidget.background') {
+          const hw = document.getElementById('mockHoverWidget');
+          if (hw) hw.style.background = val;
+        } else if (key === 'editorHoverWidget.foreground') {
+          const ht = document.getElementById('mockHoverText');
+          if (ht) ht.style.color = val;
+        } else if (key === 'editorHoverWidget.border') {
+          const hw = document.getElementById('mockHoverWidget');
+          if (hw) hw.style.borderColor = val;
         }
 
         vscode.postMessage({ command: 'applyLiveColor', key, value: val });
@@ -1640,6 +1656,8 @@ class ThemeStudioWebview {
           document.querySelectorAll('.syn-keyword').forEach(el => el.style.color = color);
         } else if (syntaxId === 'functions') {
           document.querySelectorAll('.syn-func').forEach(el => el.style.color = color);
+        } else if (syntaxId === 'properties') {
+          document.querySelectorAll('.syn-prop').forEach(el => el.style.color = color);
         } else if (syntaxId === 'strings') {
           document.querySelectorAll('.syn-string').forEach(el => el.style.color = color);
         } else if (syntaxId === 'variables') {
@@ -1889,6 +1907,15 @@ class ThemeStudioWebview {
           } else if (k === 'panel.background') {
             const cp = document.getElementById('mockChatPanel');
             if (cp) cp.style.background = val;
+          } else if (k === 'editorHoverWidget.background') {
+            const hw = document.getElementById('mockHoverWidget');
+            if (hw) hw.style.background = val;
+          } else if (k === 'editorHoverWidget.foreground') {
+            const ht = document.getElementById('mockHoverText');
+            if (ht) ht.style.color = val;
+          } else if (k === 'editorHoverWidget.border') {
+            const hw = document.getElementById('mockHoverWidget');
+            if (hw) hw.style.borderColor = val;
           }
         }
       });
@@ -1902,6 +1929,8 @@ class ThemeStudioWebview {
           document.querySelectorAll('.syn-keyword').forEach(el => el.style.color = fg);
         } else if (scopes.some(s => s.includes('function'))) {
           document.querySelectorAll('.syn-func').forEach(el => el.style.color = fg);
+        } else if (scopes.some(s => s.includes('property') || s.includes('key'))) {
+          document.querySelectorAll('.syn-prop').forEach(el => el.style.color = fg);
         } else if (scopes.some(s => s.includes('string'))) {
           document.querySelectorAll('.syn-string').forEach(el => el.style.color = fg);
         } else if (scopes.some(s => s.includes('variable'))) {

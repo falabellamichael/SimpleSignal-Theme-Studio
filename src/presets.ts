@@ -12265,84 +12265,84 @@ export const THEME_PRESETS: ThemePreset[] = [
       }
 ]
   },
-  // 🏔️ South Park (Colorado Parka & Snow)
+  // 🏔️ South Park (Colorado Snow Light)
   {
     id: "south-park",
-    name: "\ud83c\udfd4\ufe0f South Park (Colorado Parka & Snow)",
-    description: "Mountain town animated palette with Stan's blue pom-pom hat, Kyle's bright green ushanka, Cartman's red jacket, and Kenny's orange parka.",
-    type: "dark",
-    accentColor: "#06b6d4",
+    name: "\ud83c\udfd4\ufe0f South Park (Colorado Snow Light)",
+    description: "Crisp Rocky Mountain daytime snow palette with Colorado powder white, Cartman red jacket, Kyle green ushanka, Stan blue pom-pom hat, and Kenny parka orange.",
+    type: "light",
+    accentColor: "#0284c7",
     colors: {
-      "foreground": "#f1f5f9",
+      "foreground": "#0f172a",
       "descriptionForeground": "#64748b",
-      "disabledForeground": "#475569",
-      "icon.foreground": "#06b6d4",
-      "editor.background": "#0d1117",
-      "editor.foreground": "#f1f5f9",
-      "editorLineNumber.foreground": "#475569",
-      "editorLineNumber.activeForeground": "#06b6d4",
-      "editorCursor.foreground": "#06b6d4",
-      "editor.selectionBackground": "#1c2432",
-      "editor.lineHighlightBackground": "#1c2432",
-      "editorHoverWidget.background": "#141a24",
-      "editorHoverWidget.foreground": "#e2e8f0",
-      "editorHoverWidget.border": "#1c2432",
-      "editorHoverWidget.statusBarBackground": "#1c2432",
-      "editorSuggestWidget.background": "#141a24",
-      "editorSuggestWidget.foreground": "#e2e8f0",
-      "editorSuggestWidget.border": "#1c2432",
-      "editorSuggestWidget.selectedBackground": "#1c2432",
-      "editorSuggestWidget.selectedForeground": "#06b6d4",
-      "editorSuggestWidget.highlightForeground": "#06b6d4",
-      "editorWidget.background": "#141a24",
-      "editorWidget.foreground": "#e2e8f0",
-      "editorWidget.border": "#1c2432",
-      "focusBorder": "#06b6d4",
-      "activityBar.background": "#080b10",
-      "activityBar.foreground": "#06b6d4",
-      "activityBar.inactiveForeground": "#475569",
-      "activityBarBadge.background": "#06b6d4",
+      "disabledForeground": "#64748b",
+      "icon.foreground": "#0284c7",
+      "editor.background": "#f8fafc",
+      "editor.foreground": "#0f172a",
+      "editorLineNumber.foreground": "#64748b",
+      "editorLineNumber.activeForeground": "#0284c7",
+      "editorCursor.foreground": "#0284c7",
+      "editor.selectionBackground": "#e2e8f0",
+      "editor.lineHighlightBackground": "#e2e8f0",
+      "editorHoverWidget.background": "#f1f5f9",
+      "editorHoverWidget.foreground": "#1e293b",
+      "editorHoverWidget.border": "#e2e8f0",
+      "editorHoverWidget.statusBarBackground": "#e2e8f0",
+      "editorSuggestWidget.background": "#f1f5f9",
+      "editorSuggestWidget.foreground": "#1e293b",
+      "editorSuggestWidget.border": "#e2e8f0",
+      "editorSuggestWidget.selectedBackground": "#e2e8f0",
+      "editorSuggestWidget.selectedForeground": "#0284c7",
+      "editorSuggestWidget.highlightForeground": "#0284c7",
+      "editorWidget.background": "#f1f5f9",
+      "editorWidget.foreground": "#1e293b",
+      "editorWidget.border": "#e2e8f0",
+      "focusBorder": "#0284c7",
+      "activityBar.background": "#e2e8f0",
+      "activityBar.foreground": "#0284c7",
+      "activityBar.inactiveForeground": "#64748b",
+      "activityBarBadge.background": "#0284c7",
       "activityBarBadge.foreground": "#ffffff",
-      "sideBar.background": "#141a24",
-      "sideBar.foreground": "#e2e8f0",
-      "sideBarTitle.foreground": "#38bdf8",
-      "sideBarSectionHeader.background": "#1c2432",
-      "sideBarSectionHeader.foreground": "#e2e8f0",
-      "titleBar.activeBackground": "#080b10",
-      "titleBar.activeForeground": "#ffffff",
-      "titleBar.inactiveBackground": "#080b10",
-      "titleBar.inactiveForeground": "#999999",
+      "sideBar.background": "#f1f5f9",
+      "sideBar.foreground": "#1e293b",
+      "sideBarTitle.foreground": "#0284c7",
+      "sideBarSectionHeader.background": "#e2e8f0",
+      "sideBarSectionHeader.foreground": "#1e293b",
+      "titleBar.activeBackground": "#e2e8f0",
+      "titleBar.activeForeground": "#000000",
+      "titleBar.inactiveBackground": "#e2e8f0",
+      "titleBar.inactiveForeground": "#555555",
       "statusBar.background": "#ff5500",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
-      "editorGroupHeader.tabsBackground": "#141a24",
-      "tab.activeBackground": "#0d1117",
-      "tab.activeForeground": "#06b6d4",
-      "tab.activeBorderTop": "#06b6d4",
-      "tab.inactiveBackground": "#1c2432",
+      "editorGroupHeader.tabsBackground": "#f1f5f9",
+      "tab.activeBackground": "#f8fafc",
+      "tab.activeForeground": "#0284c7",
+      "tab.activeBorderTop": "#0284c7",
+      "tab.inactiveBackground": "#e2e8f0",
       "tab.inactiveForeground": "#64748b",
-      "tab.hoverBackground": "#1c2432",
+      "tab.hoverBackground": "#e2e8f0",
       "breadcrumb.foreground": "#64748b",
-      "terminal.background": "#0d1117",
-      "terminal.foreground": "#f1f5f9",
-      "terminalCursor.foreground": "#06b6d4",
-      "terminal.ansiGreen": "#22c55e",
-      "terminal.ansiCyan": "#38bdf8",
-      "terminal.ansiYellow": "#facc15",
-      "input.background": "#1e2738",
-      "input.foreground": "#ffffff",
+      "terminal.background": "#f8fafc",
+      "terminal.foreground": "#0f172a",
+      "terminalCursor.foreground": "#0284c7",
+      "terminal.ansiGreen": "#15803d",
+      "terminal.ansiCyan": "#0284c7",
+      "terminal.ansiYellow": "#b45309",
+      "input.background": "#f1f5f9",
+      "input.foreground": "#0f172a",
       "input.placeholderForeground": "#64748b",
-      "panel.background": "#0d1117",
-      "panel.border": "#141a24",
-      "panelTitle.activeForeground": "#06b6d4",
+      "panel.background": "#f8fafc",
+      "panel.border": "#f1f5f9",
+      "panelTitle.activeForeground": "#0284c7",
       "panelTitle.inactiveForeground": "#64748b",
-      "panelTitle.activeBorder": "#06b6d4",
-      "chat.requestBackground": "#1e2738",
-      "chat.requestBorder": "#1c2432",
-      "interactive.requestBackground": "#1e2738",
-      "textCodeBlock.background": "#1c2432",
-      "textLink.foreground": "#06b6d4",
-      "badge.background": "#06b6d4",
+      "panelTitle.activeBorder": "#0284c7",
+      "chat.requestBackground": "#f1f5f9",
+      "chat.requestBorder": "#e2e8f0",
+      "interactive.requestBackground": "#f1f5f9",
+      "textCodeBlock.background": "#e2e8f0",
+      "textLink.foreground": "#0284c7",
+      "badge.background": "#0284c7",
       "badge.foreground": "#ffffff"
 },
     tokenColors: [
@@ -12354,7 +12354,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "storage.modifier"
             ],
             "settings": {
-                  "foreground": "#ef4444",
+                  "foreground": "#dc2626",
                   "fontStyle": "bold"
             }
       },
@@ -12365,7 +12365,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "meta.function-call"
             ],
             "settings": {
-                  "foreground": "#22c55e"
+                  "foreground": "#15803d"
             }
       },
       {
@@ -12381,7 +12381,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
-                  "foreground": "#facc15"
+                  "foreground": "#b45309"
             }
       },
       {
@@ -12393,7 +12393,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.name.tag.json"
             ],
             "settings": {
-                  "foreground": "#ef4444"
+                  "foreground": "#dc2626"
             }
       },
       {
@@ -12404,7 +12404,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.language"
             ],
             "settings": {
-                  "foreground": "#f1f5f9"
+                  "foreground": "#0f172a"
             }
       },
       {
@@ -12415,7 +12415,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.other.inherited-class"
             ],
             "settings": {
-                  "foreground": "#38bdf8"
+                  "foreground": "#0284c7"
             }
       },
       {
@@ -12425,7 +12425,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment.block"
             ],
             "settings": {
-                  "foreground": "#475569",
+                  "foreground": "#64748b",
                   "fontStyle": "italic"
             }
       },
@@ -12438,7 +12438,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "constant.language"
             ],
             "settings": {
-                  "foreground": "#ff6600"
+                  "foreground": "#ea580c"
             }
       },
       {
@@ -12448,7 +12448,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#f1f5f9"
+                  "foreground": "#0f172a"
             }
       },
       {
@@ -12457,87 +12457,87 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.other.attribute-name"
             ],
             "settings": {
-                  "foreground": "#22c55e"
+                  "foreground": "#15803d"
             }
       }
 ]
   },
-  // 🍺 Family Guy (Quahog & Pawtucket Ale)
+  // 🍺 Family Guy (Quahog Daylight)
   {
     id: "family-guy",
-    name: "\ud83c\udf7a Family Guy (Quahog & Pawtucket Ale)",
-    description: "Classic Quahog Rhode Island palette with Peter's green pants and white shirt, Stewie's red and yellow overalls, Lois teal, and Pawtucket Ale amber.",
-    type: "dark",
+    name: "\ud83c\udf7a Family Guy (Quahog Daylight)",
+    description: "Bright sunny suburban Quahog daytime palette featuring Peter Griffin green trousers, Stewie red overalls and yellow shirt, Lois teal, and Pawtucket Ale amber.",
+    type: "light",
     accentColor: "#16a34a",
     colors: {
-      "foreground": "#f0fdf4",
-      "descriptionForeground": "#52786a",
-      "disabledForeground": "#3e6355",
+      "foreground": "#1c1917",
+      "descriptionForeground": "#78716c",
+      "disabledForeground": "#78716c",
       "icon.foreground": "#16a34a",
-      "editor.background": "#0a0f0d",
-      "editor.foreground": "#f0fdf4",
-      "editorLineNumber.foreground": "#3e6355",
+      "editor.background": "#fefdfa",
+      "editor.foreground": "#1c1917",
+      "editorLineNumber.foreground": "#78716c",
       "editorLineNumber.activeForeground": "#16a34a",
       "editorCursor.foreground": "#16a34a",
-      "editor.selectionBackground": "#182420",
-      "editor.lineHighlightBackground": "#182420",
-      "editorHoverWidget.background": "#101815",
-      "editorHoverWidget.foreground": "#dcfce7",
-      "editorHoverWidget.border": "#182420",
-      "editorHoverWidget.statusBarBackground": "#182420",
-      "editorSuggestWidget.background": "#101815",
-      "editorSuggestWidget.foreground": "#dcfce7",
-      "editorSuggestWidget.border": "#182420",
-      "editorSuggestWidget.selectedBackground": "#182420",
+      "editor.selectionBackground": "#ebe7df",
+      "editor.lineHighlightBackground": "#ebe7df",
+      "editorHoverWidget.background": "#f5f3ef",
+      "editorHoverWidget.foreground": "#1c1917",
+      "editorHoverWidget.border": "#ebe7df",
+      "editorHoverWidget.statusBarBackground": "#ebe7df",
+      "editorSuggestWidget.background": "#f5f3ef",
+      "editorSuggestWidget.foreground": "#1c1917",
+      "editorSuggestWidget.border": "#ebe7df",
+      "editorSuggestWidget.selectedBackground": "#ebe7df",
       "editorSuggestWidget.selectedForeground": "#16a34a",
       "editorSuggestWidget.highlightForeground": "#16a34a",
-      "editorWidget.background": "#101815",
-      "editorWidget.foreground": "#dcfce7",
-      "editorWidget.border": "#182420",
+      "editorWidget.background": "#f5f3ef",
+      "editorWidget.foreground": "#1c1917",
+      "editorWidget.border": "#ebe7df",
       "focusBorder": "#16a34a",
-      "activityBar.background": "#060907",
+      "activityBar.background": "#ebe7df",
       "activityBar.foreground": "#16a34a",
-      "activityBar.inactiveForeground": "#3e6355",
+      "activityBar.inactiveForeground": "#78716c",
       "activityBarBadge.background": "#16a34a",
       "activityBarBadge.foreground": "#ffffff",
-      "sideBar.background": "#101815",
-      "sideBar.foreground": "#dcfce7",
-      "sideBarTitle.foreground": "#22c55e",
-      "sideBarSectionHeader.background": "#182420",
-      "sideBarSectionHeader.foreground": "#dcfce7",
-      "titleBar.activeBackground": "#060907",
-      "titleBar.activeForeground": "#ffffff",
-      "titleBar.inactiveBackground": "#060907",
-      "titleBar.inactiveForeground": "#999999",
+      "sideBar.background": "#f5f3ef",
+      "sideBar.foreground": "#1c1917",
+      "sideBarTitle.foreground": "#15803d",
+      "sideBarSectionHeader.background": "#ebe7df",
+      "sideBarSectionHeader.foreground": "#1c1917",
+      "titleBar.activeBackground": "#ebe7df",
+      "titleBar.activeForeground": "#000000",
+      "titleBar.inactiveBackground": "#ebe7df",
+      "titleBar.inactiveForeground": "#555555",
       "statusBar.background": "#d97706",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
-      "editorGroupHeader.tabsBackground": "#101815",
-      "tab.activeBackground": "#0a0f0d",
+      "editorGroupHeader.tabsBackground": "#f5f3ef",
+      "tab.activeBackground": "#fefdfa",
       "tab.activeForeground": "#16a34a",
       "tab.activeBorderTop": "#16a34a",
-      "tab.inactiveBackground": "#182420",
-      "tab.inactiveForeground": "#52786a",
-      "tab.hoverBackground": "#182420",
-      "breadcrumb.foreground": "#52786a",
-      "terminal.background": "#0a0f0d",
-      "terminal.foreground": "#f0fdf4",
+      "tab.inactiveBackground": "#ebe7df",
+      "tab.inactiveForeground": "#78716c",
+      "tab.hoverBackground": "#ebe7df",
+      "breadcrumb.foreground": "#78716c",
+      "terminal.background": "#fefdfa",
+      "terminal.foreground": "#1c1917",
       "terminalCursor.foreground": "#16a34a",
-      "terminal.ansiGreen": "#22c55e",
-      "terminal.ansiCyan": "#06b6d4",
-      "terminal.ansiYellow": "#facc15",
-      "input.background": "#1b2924",
-      "input.foreground": "#f0fdf4",
-      "input.placeholderForeground": "#52786a",
-      "panel.background": "#0a0f0d",
-      "panel.border": "#101815",
+      "terminal.ansiGreen": "#15803d",
+      "terminal.ansiCyan": "#0284c7",
+      "terminal.ansiYellow": "#b45309",
+      "input.background": "#f5f3ef",
+      "input.foreground": "#1c1917",
+      "input.placeholderForeground": "#78716c",
+      "panel.background": "#fefdfa",
+      "panel.border": "#f5f3ef",
       "panelTitle.activeForeground": "#16a34a",
-      "panelTitle.inactiveForeground": "#52786a",
+      "panelTitle.inactiveForeground": "#78716c",
       "panelTitle.activeBorder": "#16a34a",
-      "chat.requestBackground": "#1b2924",
-      "chat.requestBorder": "#182420",
-      "interactive.requestBackground": "#1b2924",
-      "textCodeBlock.background": "#182420",
+      "chat.requestBackground": "#f5f3ef",
+      "chat.requestBorder": "#ebe7df",
+      "interactive.requestBackground": "#f5f3ef",
+      "textCodeBlock.background": "#ebe7df",
       "textLink.foreground": "#16a34a",
       "badge.background": "#16a34a",
       "badge.foreground": "#ffffff"
@@ -12551,7 +12551,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "storage.modifier"
             ],
             "settings": {
-                  "foreground": "#ef4444",
+                  "foreground": "#dc2626",
                   "fontStyle": "bold"
             }
       },
@@ -12562,7 +12562,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "meta.function-call"
             ],
             "settings": {
-                  "foreground": "#22c55e"
+                  "foreground": "#15803d"
             }
       },
       {
@@ -12578,7 +12578,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
-                  "foreground": "#facc15"
+                  "foreground": "#b45309"
             }
       },
       {
@@ -12590,7 +12590,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.name.tag.json"
             ],
             "settings": {
-                  "foreground": "#ef4444"
+                  "foreground": "#dc2626"
             }
       },
       {
@@ -12601,7 +12601,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.language"
             ],
             "settings": {
-                  "foreground": "#ffffff"
+                  "foreground": "#1c1917"
             }
       },
       {
@@ -12612,7 +12612,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.other.inherited-class"
             ],
             "settings": {
-                  "foreground": "#06b6d4"
+                  "foreground": "#0284c7"
             }
       },
       {
@@ -12622,7 +12622,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment.block"
             ],
             "settings": {
-                  "foreground": "#3e6355",
+                  "foreground": "#78716c",
                   "fontStyle": "italic"
             }
       },
@@ -12635,7 +12635,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "constant.language"
             ],
             "settings": {
-                  "foreground": "#f97316"
+                  "foreground": "#ea580c"
             }
       },
       {
@@ -12645,7 +12645,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#f0fdf4"
+                  "foreground": "#1c1917"
             }
       },
       {
@@ -12654,7 +12654,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.other.attribute-name"
             ],
             "settings": {
-                  "foreground": "#22c55e"
+                  "foreground": "#15803d"
             }
       }
 ]

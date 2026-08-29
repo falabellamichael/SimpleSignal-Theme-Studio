@@ -2,7 +2,7 @@
   "name": "simpletheme",
   "displayName": "SimpleTheme",
   "description": "Visual Theme Designer & Customizer for VS Code. Live color pickers, syntax highlights, curated presets, mock preview & instant live apply.",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "publisher": "falabella",
   "license": "MIT",
   "repository": {
@@ -37,6 +37,28 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "themes": [
+      {
+        "label": "SimpleTheme (Dark Modern)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/simpletheme-dark-color-theme.json"
+      },
+      {
+        "label": "SimpleTheme (Light Modern)",
+        "uiTheme": "vs",
+        "path": "./themes/simpletheme-light-color-theme.json"
+      },
+      {
+        "label": "SimpleTheme (OLED Pure Black)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/simpletheme-oled-color-theme.json"
+      },
+      {
+        "label": "SimpleTheme (Lemonade Dark)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/simpletheme-lemonade-color-theme.json"
+      }
+    ],
     "viewsContainers": {
       "activitybar": [
         {

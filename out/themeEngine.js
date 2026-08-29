@@ -421,6 +421,18 @@ class ThemeEngine {
             // Ignore if document save fails
         }
     }
+    static isLightTheme(colors) {
+        const bg = colors['editor.background'] || colors['sideBar.background'] || '#1e1e1e';
+        const hex = bg.replace('#', '').trim();
+        if (hex.length >= 6) {
+            const r = parseInt(hex.substring(0, 2), 16) / 255;
+            const g = parseInt(hex.substring(2, 4), 16) / 255;
+            const b = parseInt(hex.substring(4, 6), 16) / 255;
+            const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+            return lum > 0.55;
+        }
+        return false;
+    }
     static async applyTheme(colors, tokenColors, profileName) {
         await this.ensureSettingsFileSaved();
         const target = this.getTargetScope();
@@ -432,6 +444,25 @@ class ThemeEngine {
             if (colors[k] && typeof colors[k] === 'string' && colors[k].trim()) {
                 cleanColors[k] = colors[k].trim();
             }
+        }
+        // 0. Ensure base VS Code colorTheme is set to SimpleTheme
+        const isLight = this.isLightTheme(cleanColors);
+        const isOled = (cleanColors['editor.background'] === '#000000' || cleanColors['editor.background'] === '#000');
+        let targetThemeName = 'SimpleTheme (Dark Modern)';
+        if (isLight) {
+            targetThemeName = 'SimpleTheme (Light Modern)';
+        }
+        else if (isOled) {
+            targetThemeName = 'SimpleTheme (OLED Pure Black)';
+        }
+        try {
+            const currentTheme = workbench.get('colorTheme');
+            if (currentTheme !== targetThemeName) {
+                await workbench.update('colorTheme', targetThemeName, target);
+            }
+        }
+        catch (e) {
+            // Ignore if colorTheme switch throws
         }
         try {
             // 1. Update workbench.colorCustomizations
@@ -594,6 +625,10 @@ class ThemeEngine {
         await workbench.update('colorCustomizations', undefined, target);
         await editor.update('tokenColorCustomizations', undefined, target);
         await editor.update('semanticTokenColorCustomizations', undefined, target);
+        try {
+            await workbench.update('colorTheme', 'SimpleTheme (Dark Modern)', target);
+        }
+        catch (e) { }
         await simpletheme.update('activeProfile', 'Default', target);
     }
     static exportAsSettingsJson(colors, tokenColors) {

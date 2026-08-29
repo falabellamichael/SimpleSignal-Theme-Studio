@@ -387,18 +387,47 @@ export class ThemeEngine {
     return Array.isArray(textMateRules) ? textMateRules : [];
   }
 
+  private static async ensureSettingsFileSaved(): Promise<void> {
+    try {
+      for (const doc of vscode.workspace.textDocuments) {
+        if (doc.isDirty && (doc.fileName.toLowerCase().endsWith('settings.json') || doc.uri.path.toLowerCase().endsWith('settings.json'))) {
+          await doc.save();
+        }
+      }
+    } catch (err) {
+      // Ignore if document save fails
+    }
+  }
+
   public static async applyTheme(
     colors: Record<string, string>,
     tokenColors?: TokenRule[],
     profileName?: string
   ): Promise<void> {
+    await this.ensureSettingsFileSaved();
     const target = this.getTargetScope();
     const workbench = vscode.workspace.getConfiguration('workbench');
     const editor = vscode.workspace.getConfiguration('editor');
     const simpletheme = vscode.workspace.getConfiguration('simpletheme');
 
-    // 1. Update workbench.colorCustomizations
-    await workbench.update('colorCustomizations', colors, target);
+    const cleanColors: Record<string, string> = {};
+    for (const k of Object.keys(colors)) {
+      if (colors[k] && typeof colors[k] === 'string' && colors[k].trim()) {
+        cleanColors[k] = colors[k].trim();
+      }
+    }
+
+    try {
+      // 1. Update workbench.colorCustomizations
+      await workbench.update('colorCustomizations', Object.keys(cleanColors).length > 0 ? cleanColors : undefined, target);
+    } catch (err: any) {
+      if (err && err.message && err.message.includes('unsaved changes')) {
+        await this.ensureSettingsFileSaved();
+        await workbench.update('colorCustomizations', Object.keys(cleanColors).length > 0 ? cleanColors : undefined, target);
+      } else {
+        throw err;
+      }
+    }
 
     // 2. Update editor.tokenColorCustomizations & semanticTokenColorCustomizations if provided
     if (tokenColors && tokenColors.length > 0) {
@@ -439,8 +468,18 @@ export class ThemeEngine {
         }
       });
 
-      await editor.update('tokenColorCustomizations', tokenConfig, target);
-      await editor.update('semanticTokenColorCustomizations', { rules: semanticRules, enabled: true }, target);
+      try {
+        await editor.update('tokenColorCustomizations', tokenConfig, target);
+        await editor.update('semanticTokenColorCustomizations', { rules: semanticRules, enabled: true }, target);
+      } catch (err: any) {
+        if (err && err.message && err.message.includes('unsaved changes')) {
+          await this.ensureSettingsFileSaved();
+          await editor.update('tokenColorCustomizations', tokenConfig, target);
+          await editor.update('semanticTokenColorCustomizations', { rules: semanticRules, enabled: true }, target);
+        } else {
+          throw err;
+        }
+      }
     }
 
     // 3. Save active profile name if provided
@@ -450,11 +489,19 @@ export class ThemeEngine {
   }
 
   public static async applySingleColor(key: string, value: string): Promise<void> {
+    await this.ensureSettingsFileSaved();
     const target = this.getTargetScope();
     const workbench = vscode.workspace.getConfiguration('workbench');
     const current = workbench.get<Record<string, string>>('colorCustomizations') || {};
     const updated = { ...current, [key]: value };
-    await workbench.update('colorCustomizations', updated, target);
+    try {
+      await workbench.update('colorCustomizations', updated, target);
+    } catch (err: any) {
+      if (err && err.message && err.message.includes('unsaved changes')) {
+        await this.ensureSettingsFileSaved();
+        await workbench.update('colorCustomizations', updated, target);
+      }
+    }
   }
 
   public static async applySingleTokenColor(syntaxId: string, color: string): Promise<void> {

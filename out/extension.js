@@ -42,8 +42,14 @@ const themeStudioWebview_1 = require("./themeStudioWebview");
 const treeProvider_1 = require("./treeProvider");
 const themeExporter_1 = require("./themeExporter");
 const presets_1 = require("./presets");
-function activate(context) {
+async function activate(context) {
     profileManager_1.ProfileManager.initialize(context);
+    try {
+        await themeEngine_1.ThemeEngine.ensureStatusBarVariants();
+    }
+    catch (error) {
+        console.warn('SimpleTheme could not synchronize status-bar variants during startup.', error);
+    }
     const treeProvider = new treeProvider_1.SimpleSignalThemeTreeProvider();
     vscode.window.registerTreeDataProvider('simpleThemeView', treeProvider);
     // Status Bar Item

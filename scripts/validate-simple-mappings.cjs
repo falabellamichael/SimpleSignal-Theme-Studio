@@ -1,4 +1,5 @@
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
 const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
@@ -784,9 +785,48 @@ assertUniqueIds(presets.SYNTAX_SCOPE_DEFINITIONS, 'Advanced syntax');
 assertUniqueIds(presets.SIMPLE_UI_DEFINITIONS, 'Simple UI');
 assertUniqueIds(presets.SIMPLE_SYNTAX_DEFINITIONS, 'Simple syntax');
 assertUniqueIds(presets.THEME_PRESETS, 'Preset');
-assert.equal(uiIds.size, 80, 'Advanced UI role coverage must remain at 80');
+assert.equal(uiIds.size, 83, 'Advanced UI role coverage must include all normal, empty-window and debugging status-bar roles');
 assert.equal(syntaxIds.size, 10, 'Advanced syntax role coverage must remain at 10');
 assert.equal(presets.THEME_PRESETS.length, 65, 'The bundled Studio preset catalog must remain complete');
+
+const inheritedStatusBar = presets.normalizeStatusBarVariants({
+  'statusBar.background': '#123456',
+  'statusBar.foreground': '#abcdef',
+  'statusBar.debuggingBackground': '#654321',
+});
+assert.equal(inheritedStatusBar['statusBar.noFolderBackground'], '#123456', 'Empty-window status bar must inherit the normal background');
+assert.equal(inheritedStatusBar['statusBar.noFolderForeground'], '#abcdef', 'Empty-window status bar must inherit the normal foreground');
+assert.equal(inheritedStatusBar['statusBar.debuggingForeground'], '#abcdef', 'Debug status bar must inherit the normal foreground');
+
+const explicitStatusBar = presets.normalizeStatusBarVariants({
+  'statusBar.background': '#111111',
+  'statusBar.foreground': '#eeeeee',
+  'statusBar.noFolderBackground': '#222222',
+  'statusBar.noFolderForeground': '#dddddd',
+  'statusBar.debuggingForeground': '#cccccc',
+});
+assert.equal(explicitStatusBar['statusBar.noFolderBackground'], '#222222', 'Explicit empty-window status backgrounds must be preserved');
+assert.equal(explicitStatusBar['statusBar.noFolderForeground'], '#dddddd', 'Explicit empty-window status foregrounds must be preserved');
+assert.equal(explicitStatusBar['statusBar.debuggingForeground'], '#cccccc', 'Explicit debug status foregrounds must be preserved');
+
+for (const themeFile of [
+  'simpletheme-dark-color-theme.json',
+  'simpletheme-light-color-theme.json',
+  'simpletheme-oled-color-theme.json',
+  'simpletheme-lemonade-color-theme.json',
+]) {
+  const theme = JSON.parse(fs.readFileSync(path.join(root, 'themes', themeFile), 'utf8'));
+  assert.equal(
+    theme.colors['statusBar.noFolderBackground'],
+    theme.colors['statusBar.background'],
+    `${themeFile} must not fall back to VS Code's unrelated empty-window status color`
+  );
+  assert.equal(
+    theme.colors['statusBar.noFolderForeground'],
+    theme.colors['statusBar.foreground'],
+    `${themeFile} must keep empty-window status text aligned with normal status text`
+  );
+}
 
 assert.deepEqual(
   Object.keys(presets.SYNTAX_SCOPE_MAP).sort(),

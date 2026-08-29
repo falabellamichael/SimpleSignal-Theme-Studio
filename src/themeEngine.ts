@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { ThemePreset, TokenRule } from './types';
-import { SYNTAX_SCOPE_MAP, THEME_PRESETS } from './presets';
+import { normalizeStatusBarVariants, SYNTAX_SCOPE_MAP, THEME_PRESETS } from './presets';
 
 function stripJsonComments(str: string): string {
   let insideString = false;
@@ -117,6 +117,22 @@ export class ThemeEngine {
     const config = vscode.workspace.getConfiguration('simpletheme');
     const scope = config.get<string>('targetScope', 'global');
     return scope === 'workspace' ? vscode.ConfigurationTarget.Workspace : vscode.ConfigurationTarget.Global;
+  }
+
+  public static async ensureStatusBarVariants(): Promise<void> {
+    const target = this.getTargetScope();
+    const workbench = vscode.workspace.getConfiguration('workbench');
+    const inspection = workbench.inspect<Record<string, string>>('colorCustomizations');
+    const scopedColors = target === vscode.ConfigurationTarget.Global
+      ? inspection?.globalValue
+      : inspection?.workspaceValue;
+
+    if (!scopedColors || Object.keys(scopedColors).length === 0) return;
+
+    const normalized = normalizeStatusBarVariants(scopedColors);
+    if (JSON.stringify(normalized) !== JSON.stringify(scopedColors)) {
+      await workbench.update('colorCustomizations', normalized, target);
+    }
   }
 
   public static getEffectiveThemeState(): {
@@ -327,7 +343,7 @@ export class ThemeEngine {
 
     // 2. Layer active customizations on top
     const userColors = workbench.get<Record<string, string>>('colorCustomizations') || {};
-    const finalColors = { ...baseColors, ...userColors };
+    const finalColors = normalizeStatusBarVariants({ ...baseColors, ...userColors });
 
     const userTokenConfig = editor.get<any>('tokenColorCustomizations') || {};
     const userTextMateRules = userTokenConfig.textMateRules || [];
@@ -378,7 +394,7 @@ export class ThemeEngine {
   public static getCurrentColors(): Record<string, string> {
     const workbench = vscode.workspace.getConfiguration('workbench');
     const colors = workbench.get<Record<string, string>>('colorCustomizations') || {};
-    return { ...colors };
+    return normalizeStatusBarVariants(colors);
   }
 
   public static getCurrentTokenColors(): TokenRule[] {
@@ -424,12 +440,13 @@ export class ThemeEngine {
     const editor = vscode.workspace.getConfiguration('editor');
     const simpletheme = vscode.workspace.getConfiguration('simpletheme');
 
-    const cleanColors: Record<string, string> = {};
+    const sanitizedColors: Record<string, string> = {};
     for (const k of Object.keys(colors)) {
       if (colors[k] && typeof colors[k] === 'string' && colors[k].trim()) {
-        cleanColors[k] = colors[k].trim();
+        sanitizedColors[k] = colors[k].trim();
       }
     }
+    const cleanColors = normalizeStatusBarVariants(sanitizedColors);
 
     // 0. Ensure base VS Code colorTheme is set to SimpleTheme
     const isLight = this.isLightTheme(cleanColors);
@@ -649,7 +666,7 @@ export class ThemeEngine {
 
   public static exportAsSettingsJson(colors: Record<string, string>, tokenColors?: TokenRule[]): string {
     const payload: any = {
-      'workbench.colorCustomizations': colors,
+      'workbench.colorCustomizations': normalizeStatusBarVariants(colors),
     };
     if (tokenColors && tokenColors.length > 0) {
       payload['editor.tokenColorCustomizations'] = {

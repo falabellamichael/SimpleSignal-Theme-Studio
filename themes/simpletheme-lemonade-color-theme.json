@@ -41,6 +41,8 @@
     "titleBar.inactiveForeground": "#999999",
     "statusBar.background": "#080a06",
     "statusBar.foreground": "#fff017",
+    "statusBar.noFolderBackground": "#080a06",
+    "statusBar.noFolderForeground": "#fff017",
     "editorGroupHeader.tabsBackground": "#0f140c",
     "tab.activeBackground": "#0c0f0a",
     "tab.activeForeground": "#fff017",

@@ -1,6 +1,24 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.THEME_PRESETS = exports.SIMPLE_SYNTAX_DEFINITIONS = exports.SIMPLE_UI_DEFINITIONS = exports.SYNTAX_SCOPE_MAP = exports.SYNTAX_SCOPE_DEFINITIONS = exports.UI_COLOR_DEFINITIONS = void 0;
+exports.normalizeStatusBarVariants = normalizeStatusBarVariants;
+function normalizeStatusBarVariants(colors) {
+    const normalized = { ...colors };
+    const background = normalized['statusBar.background'];
+    const foreground = normalized['statusBar.foreground'];
+    if (background && !normalized['statusBar.noFolderBackground']) {
+        normalized['statusBar.noFolderBackground'] = background;
+    }
+    if (foreground) {
+        if (!normalized['statusBar.noFolderForeground']) {
+            normalized['statusBar.noFolderForeground'] = foreground;
+        }
+        if (!normalized['statusBar.debuggingForeground']) {
+            normalized['statusBar.debuggingForeground'] = foreground;
+        }
+    }
+    return normalized;
+}
 exports.UI_COLOR_DEFINITIONS = [
     // 1. Core Window & Global Text
     { id: 'foreground', name: 'Global Base Text', description: 'Main default text across all views, lists and dialogs', category: 'core', defaultValue: '#cccccc' },
@@ -50,7 +68,10 @@ exports.UI_COLOR_DEFINITIONS = [
     { id: 'titleBar.inactiveForeground', name: 'Inactive Title Bar Text', description: 'Title bar text when the window is not focused', category: 'bars', defaultValue: '#cccccc99' },
     { id: 'statusBar.background', name: 'Status Bar Background', description: 'Bottom status bar normal background', category: 'bars', defaultValue: '#007acc' },
     { id: 'statusBar.foreground', name: 'Status Bar Foreground', description: 'Bottom status bar text & icon color', category: 'bars', defaultValue: '#ffffff' },
+    { id: 'statusBar.noFolderBackground', name: 'Empty Window Status Bar BG', description: 'Bottom status bar background when no folder or workspace is open', category: 'bars', defaultValue: '#007acc' },
+    { id: 'statusBar.noFolderForeground', name: 'Empty Window Status Bar Text', description: 'Bottom status bar text and icons when no folder or workspace is open', category: 'bars', defaultValue: '#ffffff' },
     { id: 'statusBar.debuggingBackground', name: 'Status Bar Debugging BG', description: 'Status bar background during debugging session', category: 'bars', defaultValue: '#cc6633' },
+    { id: 'statusBar.debuggingForeground', name: 'Status Bar Debugging Text', description: 'Bottom status bar text and icons during a debugging session', category: 'bars', defaultValue: '#ffffff' },
     // 4. Editor Tabs & Breadcrumbs
     { id: 'editorGroupHeader.tabsBackground', name: 'Tabs Bar Background', description: 'Background of the entire tab header bar', category: 'tabs', defaultValue: '#252526' },
     { id: 'tab.activeBackground', name: 'Active Tab Background', description: 'Background of currently open file tab', category: 'tabs', defaultValue: '#1e1e1e' },
@@ -216,7 +237,7 @@ exports.SIMPLE_UI_DEFINITIONS = [
         description: 'Text shown over badges, avatars, slash commands, selected items and status bars',
         icon: '🔤',
         section: 'Typography',
-        targets: ['activityBarBadge.foreground', 'badge.foreground', 'chat.avatarForeground', 'chat.slashCommandForeground', 'editorSuggestWidget.selectedForeground', 'statusBar.foreground'],
+        targets: ['activityBarBadge.foreground', 'badge.foreground', 'chat.avatarForeground', 'chat.slashCommandForeground', 'editorSuggestWidget.selectedForeground', 'statusBar.foreground', 'statusBar.noFolderForeground', 'statusBar.debuggingForeground'],
         defaultColor: '#ffffff',
     },
     {
@@ -239,11 +260,11 @@ exports.SIMPLE_UI_DEFINITIONS = [
     },
     {
         id: 'simple.statusBarBg',
-        name: 'Status Bar & Debug BG',
-        description: 'Normal and debugging backgrounds for the bottom status bar',
+        name: 'Status Bar Backgrounds',
+        description: 'Normal, empty-window and debugging backgrounds for the bottom status bar',
         icon: '📊',
         section: 'States & Structure',
-        targets: ['statusBar.background', 'statusBar.debuggingBackground'],
+        targets: ['statusBar.background', 'statusBar.noFolderBackground', 'statusBar.debuggingBackground'],
         defaultColor: '#007acc',
     },
     {
@@ -339,7 +360,7 @@ exports.SIMPLE_SYNTAX_DEFINITIONS = [
         defaultColor: '#555566',
     },
 ];
-exports.THEME_PRESETS = [
+const RAW_THEME_PRESETS = [
     // 🍋 Lemonade Dark
     {
         id: "lemonade-dark",
@@ -13731,4 +13752,8 @@ exports.THEME_PRESETS = [
         ]
     }
 ];
+exports.THEME_PRESETS = RAW_THEME_PRESETS.map((preset) => ({
+    ...preset,
+    colors: normalizeStatusBarVariants(preset.colors),
+}));
 //# sourceMappingURL=presets.js.map

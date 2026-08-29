@@ -7,8 +7,14 @@ import { ThemeExporter } from './themeExporter';
 import { THEME_PRESETS } from './presets';
 import { ThemePreset, ThemeProfile } from './types';
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   ProfileManager.initialize(context);
+
+  try {
+    await ThemeEngine.ensureStatusBarVariants();
+  } catch (error) {
+    console.warn('SimpleTheme could not synchronize status-bar variants during startup.', error);
+  }
 
   const treeProvider = new SimpleSignalThemeTreeProvider();
   vscode.window.registerTreeDataProvider('simpleThemeView', treeProvider);

@@ -154,6 +154,20 @@ class ThemeEngine {
         const scope = config.get('targetScope', 'global');
         return scope === 'workspace' ? vscode.ConfigurationTarget.Workspace : vscode.ConfigurationTarget.Global;
     }
+    static async ensureStatusBarVariants() {
+        const target = this.getTargetScope();
+        const workbench = vscode.workspace.getConfiguration('workbench');
+        const inspection = workbench.inspect('colorCustomizations');
+        const scopedColors = target === vscode.ConfigurationTarget.Global
+            ? inspection?.globalValue
+            : inspection?.workspaceValue;
+        if (!scopedColors || Object.keys(scopedColors).length === 0)
+            return;
+        const normalized = (0, presets_1.normalizeStatusBarVariants)(scopedColors);
+        if (JSON.stringify(normalized) !== JSON.stringify(scopedColors)) {
+            await workbench.update('colorCustomizations', normalized, target);
+        }
+    }
     static getEffectiveThemeState() {
         const workbench = vscode.workspace.getConfiguration('workbench');
         const editor = vscode.workspace.getConfiguration('editor');
@@ -356,7 +370,7 @@ class ThemeEngine {
         }
         // 2. Layer active customizations on top
         const userColors = workbench.get('colorCustomizations') || {};
-        const finalColors = { ...baseColors, ...userColors };
+        const finalColors = (0, presets_1.normalizeStatusBarVariants)({ ...baseColors, ...userColors });
         const userTokenConfig = editor.get('tokenColorCustomizations') || {};
         const userTextMateRules = userTokenConfig.textMateRules || [];
         // Merge token rules
@@ -402,7 +416,7 @@ class ThemeEngine {
     static getCurrentColors() {
         const workbench = vscode.workspace.getConfiguration('workbench');
         const colors = workbench.get('colorCustomizations') || {};
-        return { ...colors };
+        return (0, presets_1.normalizeStatusBarVariants)(colors);
     }
     static getCurrentTokenColors() {
         const editor = vscode.workspace.getConfiguration('editor');
@@ -440,12 +454,13 @@ class ThemeEngine {
         const workbench = vscode.workspace.getConfiguration('workbench');
         const editor = vscode.workspace.getConfiguration('editor');
         const simpletheme = vscode.workspace.getConfiguration('simpletheme');
-        const cleanColors = {};
+        const sanitizedColors = {};
         for (const k of Object.keys(colors)) {
             if (colors[k] && typeof colors[k] === 'string' && colors[k].trim()) {
-                cleanColors[k] = colors[k].trim();
+                sanitizedColors[k] = colors[k].trim();
             }
         }
+        const cleanColors = (0, presets_1.normalizeStatusBarVariants)(sanitizedColors);
         // 0. Ensure base VS Code colorTheme is set to SimpleTheme
         const isLight = this.isLightTheme(cleanColors);
         const isOled = (cleanColors['editor.background'] === '#000000' || cleanColors['editor.background'] === '#000');
@@ -652,7 +667,7 @@ class ThemeEngine {
     }
     static exportAsSettingsJson(colors, tokenColors) {
         const payload = {
-            'workbench.colorCustomizations': colors,
+            'workbench.colorCustomizations': (0, presets_1.normalizeStatusBarVariants)(colors),
         };
         if (tokenColors && tokenColors.length > 0) {
             payload['editor.tokenColorCustomizations'] = {

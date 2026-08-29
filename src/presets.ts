@@ -1,5 +1,25 @@
 import { ThemePreset, UISectionColor, SyntaxScopeItem } from './types';
 
+export function normalizeStatusBarVariants(colors: Record<string, string>): Record<string, string> {
+  const normalized = { ...colors };
+  const background = normalized['statusBar.background'];
+  const foreground = normalized['statusBar.foreground'];
+
+  if (background && !normalized['statusBar.noFolderBackground']) {
+    normalized['statusBar.noFolderBackground'] = background;
+  }
+  if (foreground) {
+    if (!normalized['statusBar.noFolderForeground']) {
+      normalized['statusBar.noFolderForeground'] = foreground;
+    }
+    if (!normalized['statusBar.debuggingForeground']) {
+      normalized['statusBar.debuggingForeground'] = foreground;
+    }
+  }
+
+  return normalized;
+}
+
 export const UI_COLOR_DEFINITIONS: UISectionColor[] = [
   // 1. Core Window & Global Text
   { id: 'foreground', name: 'Global Base Text', description: 'Main default text across all views, lists and dialogs', category: 'core', defaultValue: '#cccccc' },
@@ -51,7 +71,10 @@ export const UI_COLOR_DEFINITIONS: UISectionColor[] = [
   { id: 'titleBar.inactiveForeground', name: 'Inactive Title Bar Text', description: 'Title bar text when the window is not focused', category: 'bars', defaultValue: '#cccccc99' },
   { id: 'statusBar.background', name: 'Status Bar Background', description: 'Bottom status bar normal background', category: 'bars', defaultValue: '#007acc' },
   { id: 'statusBar.foreground', name: 'Status Bar Foreground', description: 'Bottom status bar text & icon color', category: 'bars', defaultValue: '#ffffff' },
+  { id: 'statusBar.noFolderBackground', name: 'Empty Window Status Bar BG', description: 'Bottom status bar background when no folder or workspace is open', category: 'bars', defaultValue: '#007acc' },
+  { id: 'statusBar.noFolderForeground', name: 'Empty Window Status Bar Text', description: 'Bottom status bar text and icons when no folder or workspace is open', category: 'bars', defaultValue: '#ffffff' },
   { id: 'statusBar.debuggingBackground', name: 'Status Bar Debugging BG', description: 'Status bar background during debugging session', category: 'bars', defaultValue: '#cc6633' },
+  { id: 'statusBar.debuggingForeground', name: 'Status Bar Debugging Text', description: 'Bottom status bar text and icons during a debugging session', category: 'bars', defaultValue: '#ffffff' },
 
   // 4. Editor Tabs & Breadcrumbs
   { id: 'editorGroupHeader.tabsBackground', name: 'Tabs Bar Background', description: 'Background of the entire tab header bar', category: 'tabs', defaultValue: '#252526' },
@@ -235,7 +258,7 @@ export const SIMPLE_UI_DEFINITIONS: SimpleColorDefinition[] = [
     description: 'Text shown over badges, avatars, slash commands, selected items and status bars',
     icon: '🔤',
     section: 'Typography',
-    targets: ['activityBarBadge.foreground', 'badge.foreground', 'chat.avatarForeground', 'chat.slashCommandForeground', 'editorSuggestWidget.selectedForeground', 'statusBar.foreground'],
+    targets: ['activityBarBadge.foreground', 'badge.foreground', 'chat.avatarForeground', 'chat.slashCommandForeground', 'editorSuggestWidget.selectedForeground', 'statusBar.foreground', 'statusBar.noFolderForeground', 'statusBar.debuggingForeground'],
     defaultColor: '#ffffff',
   },
   {
@@ -258,11 +281,11 @@ export const SIMPLE_UI_DEFINITIONS: SimpleColorDefinition[] = [
   },
   {
     id: 'simple.statusBarBg',
-    name: 'Status Bar & Debug BG',
-    description: 'Normal and debugging backgrounds for the bottom status bar',
+    name: 'Status Bar Backgrounds',
+    description: 'Normal, empty-window and debugging backgrounds for the bottom status bar',
     icon: '📊',
     section: 'States & Structure',
-    targets: ['statusBar.background', 'statusBar.debuggingBackground'],
+    targets: ['statusBar.background', 'statusBar.noFolderBackground', 'statusBar.debuggingBackground'],
     defaultColor: '#007acc',
   },
   {
@@ -361,7 +384,7 @@ export const SIMPLE_SYNTAX_DEFINITIONS: SimpleColorDefinition[] = [
 ];
 
 
-export const THEME_PRESETS: ThemePreset[] = [
+const RAW_THEME_PRESETS: ThemePreset[] = [
   // 🍋 Lemonade Dark
   {
     id: "lemonade-dark",
@@ -13753,3 +13776,8 @@ export const THEME_PRESETS: ThemePreset[] = [
 ]
   }
 ];
+
+export const THEME_PRESETS: ThemePreset[] = RAW_THEME_PRESETS.map((preset) => ({
+  ...preset,
+  colors: normalizeStatusBarVariants(preset.colors),
+}));

@@ -894,6 +894,7 @@ export class ThemeStudioWebview {
       min-height: 200px;
       background: #1e1e1e;
       overflow: hidden;
+      border: 1px solid #000000;
     }
 
     .mock-titlebar {
@@ -904,7 +905,7 @@ export class ThemeStudioWebview {
       align-items: center;
       padding: 0 8px;
       font-size: calc(10px * var(--preview-scale));
-      border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid #000000;
       flex-shrink: 0;
       overflow: hidden;
       white-space: nowrap;
@@ -927,7 +928,7 @@ export class ThemeStudioWebview {
       padding: 8px 0;
       gap: 10px;
       color: #ffffff;
-      border-right: 1px solid rgba(0, 0, 0, 0.1);
+      border-right: 1px solid #000000;
       flex-shrink: 0;
       font-size: 11px;
     }
@@ -941,7 +942,7 @@ export class ThemeStudioWebview {
       display: flex;
       flex-direction: column;
       gap: 4px;
-      border-right: 1px solid rgba(0, 0, 0, 0.1);
+      border-right: 1px solid #000000;
       flex-shrink: 0;
       overflow: hidden;
     }
@@ -963,6 +964,7 @@ export class ThemeStudioWebview {
       gap: 2px;
       flex-shrink: 0;
       overflow: hidden;
+      border-bottom: 1px solid #000000;
     }
 
     .mock-tab {
@@ -975,12 +977,16 @@ export class ThemeStudioWebview {
       align-items: center;
       gap: 4px;
       white-space: nowrap;
+      border: 1px solid #000000;
+      border-bottom: none;
     }
 
     .mock-tab.active {
       background: #1e1e1e;
       color: #ffffff;
       border-top: 2px solid #007acc;
+      border-left: 1px solid #000000;
+      border-right: 1px solid #000000;
     }
 
     .mock-editor-canvas {
@@ -1004,6 +1010,7 @@ export class ThemeStudioWebview {
       padding: 0 8px;
       font-size: calc(9.5px * var(--preview-scale));
       flex-shrink: 0;
+      border-top: 1px solid #000000;
     }
   </style>
 </head>
@@ -1044,10 +1051,10 @@ export class ThemeStudioWebview {
 
   <!-- Studio Layout Container (Right or Bottom Docked) -->
   <div class="studio-layout" id="studioLayout">
-    
+
     <!-- Left Column: Tabs & Control Center -->
     <div class="main-column">
-      
+
       <!-- Nav Tabs -->
       <div class="nav-tabs">
         <button class="nav-tab active" data-tab="tab-ui">🎨 UI Colors</button>
@@ -1058,7 +1065,7 @@ export class ThemeStudioWebview {
 
       <!-- Tab 1: UI Colors -->
       <div id="tab-ui" class="tab-pane">
-        
+
         <!-- Mode Switch Bar -->
         <div class="mode-switch-bar">
           <div style="font-size: 12px; font-weight: 700; color: var(--text);">
@@ -1132,7 +1139,7 @@ export class ThemeStudioWebview {
 
       <!-- Tab 2: Syntax Highlight Tokens -->
       <div id="tab-syntax" class="tab-pane" style="display: none;">
-        
+
         <!-- Mode Switch Bar -->
         <div class="mode-switch-bar">
           <div style="font-size: 12px; font-weight: 700; color: var(--text);">
@@ -1283,7 +1290,7 @@ export class ThemeStudioWebview {
     <!-- Right / Bottom Preview Column -->
     <div class="preview-column" id="previewColumn">
       <div class="preview-sticky">
-        
+
         <!-- Preview Top Controls Bar -->
         <div class="preview-header-bar">
           <div style="display: flex; align-items: center; gap: 6px;">
@@ -1293,7 +1300,7 @@ export class ThemeStudioWebview {
 
           <!-- Compact Size & Scale Controls -->
           <div class="preview-controls-row">
-            
+
             <!-- Height Presets -->
             <div class="size-btn-group">
               <button class="size-btn" onclick="setHeightPreset(280)">Compact</button>
@@ -1312,7 +1319,7 @@ export class ThemeStudioWebview {
         </div>
 
         <div class="mock-window" id="mockWindow">
-          
+
           <!-- Mock Top Title Bar -->
           <div class="mock-titlebar mock-clickable" id="mockTitlebar" data-inspect-ui="titleBar.activeBackground" data-inspect-simple-ui="simple.sidebarBg" title="Click to highlight Title Bar color">
             <span>SimpleTheme — VS Code</span>
@@ -1320,7 +1327,7 @@ export class ThemeStudioWebview {
 
           <!-- Mock Middle (Activity Bar + Sidebar + Editor) -->
           <div class="mock-body">
-            
+
             <!-- Activity Bar -->
             <div class="mock-activitybar mock-clickable" id="mockActivityBar" data-inspect-ui="activityBar.background" data-inspect-simple-ui="simple.sidebarBg" title="Click to highlight Activity Bar color">
               <span>📄</span>
@@ -1342,7 +1349,7 @@ export class ThemeStudioWebview {
 
             <!-- Editor Area -->
             <div class="mock-editor-area">
-              
+
               <!-- Tabs Bar -->
               <div class="mock-tabs-bar mock-clickable" id="mockTabsBar" data-inspect-ui="editorGroupHeader.tabsBackground" data-inspect-simple-ui="simple.tabsBg" title="Click to highlight Tabs Bar color">
                 <div class="mock-tab active mock-clickable" id="mockActiveTab" data-inspect-ui="tab.activeBackground" data-inspect-simple-ui="simple.editorBg" title="Click to highlight Active Tab color">
@@ -1371,14 +1378,14 @@ export class ThemeStudioWebview {
                   <div>13  <span class="syn-prop mock-clickable" id="synProp4" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.properties" title="Click to highlight Object & JSON Keys">"maxTokens"</span>: <span class="syn-num mock-clickable" id="synNum1" data-inspect-syntax="numbers" data-inspect-simple-syntax="simple.numbers" title="Click to highlight Numbers & Booleans">1000000</span>,</div>
                   <div>14  <span class="syn-prop mock-clickable" id="synProp5" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.properties" title="Click to highlight Object & JSON Keys">"agentMode"</span>: <span class="syn-num mock-clickable" id="synNum2" data-inspect-syntax="numbers" data-inspect-simple-syntax="simple.numbers" title="Click to highlight Numbers & Booleans">true</span></div>
                   <!-- Floating Mock Hover Tooltip -->
-                  <div class="mock-hover-widget mock-clickable" id="mockHoverWidget" data-inspect-ui="editorHoverWidget.background" data-inspect-simple-ui="simple.popups" style="position: absolute; right: 12px; top: -14px; background: rgba(0,0,0,0.85); border: 1px solid var(--card-border); border-radius: 4px; padding: 2px 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); font-size: calc(8.5px * var(--preview-scale)); z-index: 10; display: flex; align-items: center; gap: 4px;" title="Click to highlight Hover Popup & Tooltips">
+                  <div class="mock-hover-widget mock-clickable" id="mockHoverWidget" data-inspect-ui="editorHoverWidget.background" data-inspect-simple-ui="simple.popups" style="position: absolute; right: 12px; top: -14px; background: rgba(0,0,0,0.85); border: 1px solid #000000; border-radius: 4px; padding: 2px 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); font-size: calc(8.5px * var(--preview-scale)); z-index: 10; display: flex; align-items: center; gap: 4px;" title="Click to highlight Hover Popup & Tooltips">
                     <span id="mockHoverText" data-inspect-ui="editorHoverWidget.foreground" data-inspect-simple-ui="simple.popups" style="font-weight: 600;">⚠️ Unknown Configuration Setting</span>
                   </div>
                 </div>
               </div>
 
               <!-- Mock Chat / Prompt Box Panel -->
-              <div class="mock-chat-panel mock-clickable" id="mockChatPanel" data-inspect-ui="panel.background" data-inspect-simple-ui="simple.sidebarBg" style="border-top: 1px solid var(--card-border); background: var(--card-bg); padding: 5px 8px; display: flex; flex-direction: column; gap: 4px; font-size: calc(9.5px * var(--preview-scale)); flex-shrink: 0;" title="Click to highlight Panel Container Background">
+              <div class="mock-chat-panel mock-clickable" id="mockChatPanel" data-inspect-ui="panel.background" data-inspect-simple-ui="simple.sidebarBg" style="border-top: 1px solid #000000; background: var(--card-bg); padding: 5px 8px; display: flex; flex-direction: column; gap: 4px; font-size: calc(9.5px * var(--preview-scale)); flex-shrink: 0;" title="Click to highlight Panel Container Background">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                   <div style="display: flex; gap: 6px; align-items: center;">
                     <span class="mock-clickable" id="mockPanelTitleActive" data-inspect-ui="panelTitle.activeForeground" data-inspect-simple-ui="simple.chatText" style="font-weight: 700; color: var(--accent); cursor: pointer;" title="Click to highlight Active Panel Tab (Chat)">Chat</span>
@@ -1386,10 +1393,10 @@ export class ThemeStudioWebview {
                   </div>
                   <span class="mock-clickable" id="mockIcon" data-inspect-ui="icon.foreground" data-inspect-simple-ui="simple.chatText" style="color: var(--text-muted); cursor: pointer; font-size: 10px;" title="Click to highlight UI Icons (+, ⚙️, X)">+ ⚙️ ⛶ ✕</span>
                 </div>
-                <div class="mock-chat-bubble mock-clickable" id="mockChatBubble" data-inspect-ui="chat.requestBackground" data-inspect-simple-ui="simple.chatText" style="background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); border-radius: 4px; padding: 2px 6px; font-weight: 600;" title="Click to highlight Chat User Request Bubble">
+                <div class="mock-chat-bubble mock-clickable" id="mockChatBubble" data-inspect-ui="chat.requestBackground" data-inspect-simple-ui="simple.chatText" style="background: rgba(255,255,255,0.04); border: 1px solid #000000; border-radius: 4px; padding: 2px 6px; font-weight: 600;" title="Click to highlight Chat User Request Bubble">
                   <span>← heyy</span>
                 </div>
-                <div class="mock-input-box mock-clickable" id="mockInputBox" data-inspect-ui="input.background" data-inspect-simple-ui="simple.chatText" style="background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 4px; padding: 3px 6px; display: flex; justify-content: space-between; align-items: center;" title="Click to highlight Input / Chat Box">
+                <div class="mock-input-box mock-clickable" id="mockInputBox" data-inspect-ui="input.background" data-inspect-simple-ui="simple.chatText" style="background: rgba(0,0,0,0.3); border: 1px solid #000000; border-radius: 4px; padding: 3px 6px; display: flex; justify-content: space-between; align-items: center;" title="Click to highlight Input / Chat Box">
                   <span id="mockInputPlaceholder" class="mock-clickable" data-inspect-ui="input.placeholderForeground" data-inspect-simple-ui="simple.chatText" style="color: var(--text-muted);" title="Click to highlight Input Placeholder Text">just checking in, what you're capable of</span>
                   <span id="mockCounter" class="mock-clickable" data-inspect-ui="descriptionForeground" data-inspect-simple-ui="simple.chatText" style="color: var(--text-muted); font-size: 8px; margin-left: 4px;" title="Click to highlight Muted / Counter Text (3/3)">3/3</span>
                 </div>

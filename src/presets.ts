@@ -7,7 +7,7 @@ export const UI_COLOR_DEFINITIONS: UISectionColor[] = [
   { id: 'disabledForeground', name: 'Disabled Text', description: 'Faded text for disabled buttons and menu items', category: 'core', defaultValue: '#666666' },
   { id: 'icon.foreground', name: 'Global UI Icons (+, ⚙️, X)', description: 'Toolbar icons, action buttons and window controls', category: 'core', defaultValue: '#cccccc' },
   { id: 'focusBorder', name: 'Focus Border', description: 'Global focus outline on interactive elements', category: 'core', defaultValue: '#007fd4' },
-  
+
   // 2. Editor Canvas & Hover Widgets
   { id: 'editor.background', name: 'Editor Background', description: 'Main coding canvas background color', category: 'core', defaultValue: '#1e1e1e' },
   { id: 'editor.foreground', name: 'Editor Code Text', description: 'Default code text / punctuation color', category: 'core', defaultValue: '#d4d4d4' },
@@ -1844,7 +1844,7 @@ export const THEME_PRESETS: ThemePreset[] = [
   {
     id: "chessboard-grandmaster-split",
     name: "\u265f\ufe0f Grandmaster Chessboard (Split B&W)",
-    description: "Alternating pitch-black editor canvas with stark snow-white sidebar, black-and-white interleaved tabs, and crisp high-contrast pawn ivory tokens.",
+    description: "Alternating pitch-black editor canvas with stark snow-white sidebar, black-and-white interleaved tabs, crisp high-contrast pawn ivory tokens, and bold solid black borderstrokes.",
     type: "dark",
     accentColor: "#ffffff",
     colors: {
@@ -1852,73 +1852,73 @@ export const THEME_PRESETS: ThemePreset[] = [
       "descriptionForeground": "#888888",
       "disabledForeground": "#71717a",
       "icon.foreground": "#ffffff",
-      "editor.background": "#080808",
+      "editor.background": "#000000",
       "editor.foreground": "#ffffff",
       "editorLineNumber.foreground": "#71717a",
       "editorLineNumber.activeForeground": "#ffffff",
       "editorCursor.foreground": "#ffffff",
-      "editor.selectionBackground": "#1a1a1a",
-      "editor.lineHighlightBackground": "#1a1a1a",
-      "editorHoverWidget.background": "#f8f8f8",
+      "editor.selectionBackground": "#222222",
+      "editor.lineHighlightBackground": "#111111",
+      "editorHoverWidget.background": "#ffffff",
       "editorHoverWidget.foreground": "#000000",
-      "editorHoverWidget.border": "#1a1a1a",
-      "editorHoverWidget.statusBarBackground": "#1a1a1a",
-      "editorSuggestWidget.background": "#f8f8f8",
+      "editorHoverWidget.border": "#000000",
+      "editorHoverWidget.statusBarBackground": "#f0f0f0",
+      "editorSuggestWidget.background": "#ffffff",
       "editorSuggestWidget.foreground": "#000000",
-      "editorSuggestWidget.border": "#1a1a1a",
-      "editorSuggestWidget.selectedBackground": "#1a1a1a",
-      "editorSuggestWidget.selectedForeground": "#000000",
-      "editorSuggestWidget.highlightForeground": "#ffffff",
-      "editorWidget.background": "#f8f8f8",
+      "editorSuggestWidget.border": "#000000",
+      "editorSuggestWidget.selectedBackground": "#000000",
+      "editorSuggestWidget.selectedForeground": "#ffffff",
+      "editorSuggestWidget.highlightForeground": "#000000",
+      "editorWidget.background": "#ffffff",
       "editorWidget.foreground": "#000000",
-      "editorWidget.border": "#1a1a1a",
-      "focusBorder": "#ffffff",
+      "editorWidget.border": "#000000",
+      "focusBorder": "#000000",
       "activityBar.background": "#ffffff",
       "activityBar.foreground": "#000000",
       "activityBar.inactiveForeground": "#666666",
-      "activityBarBadge.background": "#ffffff",
-      "activityBarBadge.foreground": "#000000",
-      "sideBar.background": "#f8f8f8",
+      "activityBarBadge.background": "#000000",
+      "activityBarBadge.foreground": "#ffffff",
+      "sideBar.background": "#ffffff",
       "sideBar.foreground": "#000000",
       "sideBarTitle.foreground": "#000000",
-      "sideBarSectionHeader.background": "#1a1a1a",
-      "sideBarSectionHeader.foreground": "#000000",
+      "sideBarSectionHeader.background": "#000000",
+      "sideBarSectionHeader.foreground": "#ffffff",
       "titleBar.activeBackground": "#ffffff",
       "titleBar.activeForeground": "#000000",
       "titleBar.inactiveBackground": "#ffffff",
       "titleBar.inactiveForeground": "#555555",
-      "statusBar.background": "#080808",
+      "statusBar.background": "#000000",
       "statusBar.foreground": "#ffffff",
       "statusBar.debuggingBackground": "#e11d48",
-      "editorGroupHeader.tabsBackground": "#f8f8f8",
-      "tab.activeBackground": "#080808",
-      "tab.activeForeground": "#000000",
-      "tab.activeBorderTop": "#ffffff",
-      "tab.inactiveBackground": "#1a1a1a",
-      "tab.inactiveForeground": "#888888",
-      "tab.hoverBackground": "#1a1a1a",
+      "editorGroupHeader.tabsBackground": "#ffffff",
+      "tab.activeBackground": "#000000",
+      "tab.activeForeground": "#ffffff",
+      "tab.activeBorderTop": "#000000",
+      "tab.inactiveBackground": "#ffffff",
+      "tab.inactiveForeground": "#000000",
+      "tab.hoverBackground": "#eaeaea",
       "breadcrumb.foreground": "#888888",
-      "terminal.background": "#080808",
+      "terminal.background": "#000000",
       "terminal.foreground": "#ffffff",
       "terminalCursor.foreground": "#ffffff",
-      "terminal.ansiGreen": "#e4e4e7",
-      "terminal.ansiCyan": "#a1a1aa",
-      "terminal.ansiYellow": "#d4d4d8",
+      "terminal.ansiGreen": "#ffffff",
+      "terminal.ansiCyan": "#d4d4d8",
+      "terminal.ansiYellow": "#ffffff",
       "input.background": "#141414",
       "input.foreground": "#ffffff",
       "input.placeholderForeground": "#888888",
-      "panel.background": "#080808",
-      "panel.border": "#f8f8f8",
+      "panel.background": "#000000",
+      "panel.border": "#000000",
       "panelTitle.activeForeground": "#ffffff",
       "panelTitle.inactiveForeground": "#888888",
       "panelTitle.activeBorder": "#ffffff",
       "chat.requestBackground": "#141414",
-      "chat.requestBorder": "#1a1a1a",
+      "chat.requestBorder": "#000000",
       "interactive.requestBackground": "#141414",
-      "textCodeBlock.background": "#1a1a1a",
+      "textCodeBlock.background": "#141414",
       "textLink.foreground": "#ffffff",
-      "badge.background": "#ffffff",
-      "badge.foreground": "#000000"
+      "badge.background": "#000000",
+      "badge.foreground": "#ffffff"
 },
     tokenColors: [
       {
@@ -1940,7 +1940,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "meta.function-call"
             ],
             "settings": {
-                  "foreground": "#e4e4e7"
+                  "foreground": "#ffffff",
+                  "fontStyle": "bold"
             }
       },
       {
@@ -1990,7 +1991,8 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.other.inherited-class"
             ],
             "settings": {
-                  "foreground": "#a1a1aa"
+                  "foreground": "#ffffff",
+                  "fontStyle": "bold"
             }
       },
       {
@@ -2032,7 +2034,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.other.attribute-name"
             ],
             "settings": {
-                  "foreground": "#e4e4e7"
+                  "foreground": "#ffffff"
             }
       }
 ],

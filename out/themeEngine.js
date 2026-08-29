@@ -390,7 +390,8 @@ class ThemeEngine {
                 }
             }
         });
-        const activeProfileName = simpletheme.get('activeProfile', themeName);
+        const configuredProfileName = simpletheme.get('activeProfile', themeName);
+        const activeProfileName = themeName.startsWith('SimpleTheme (') ? configuredProfileName : themeName;
         return {
             themeName: activeProfileName,
             themeKind,
@@ -540,12 +541,16 @@ class ThemeEngine {
             await simpletheme.update('activeProfile', profileName, target);
         }
     }
-    static async applySingleColor(key, value) {
+    static async applyColors(colors) {
         await this.ensureSettingsFileSaved();
         const target = this.getTargetScope();
         const workbench = vscode.workspace.getConfiguration('workbench');
         const current = workbench.get('colorCustomizations') || {};
-        const updated = { ...current, [key]: value };
+        const validColors = Object.fromEntries(Object.entries(colors).filter(([key, value]) => typeof key === 'string' && key.length > 0 && typeof value === 'string' && value.trim().length > 0));
+        if (Object.keys(validColors).length === 0) {
+            return;
+        }
+        const updated = { ...current, ...validColors };
         try {
             await workbench.update('colorCustomizations', updated, target);
         }
@@ -554,9 +559,19 @@ class ThemeEngine {
                 await this.ensureSettingsFileSaved();
                 await workbench.update('colorCustomizations', updated, target);
             }
+            else {
+                throw err;
+            }
+        }
+        const simpletheme = vscode.workspace.getConfiguration('simpletheme');
+        if (simpletheme.get('activeProfile') !== 'Custom') {
+            await simpletheme.update('activeProfile', 'Custom', target);
         }
     }
-    static async applySingleTokenColor(syntaxId, color) {
+    static async applySingleColor(key, value) {
+        await this.applyColors({ [key]: value });
+    }
+    static async applyTokenColors(colors) {
         const target = this.getTargetScope();
         const editor = vscode.workspace.getConfiguration('editor');
         const currentTokens = this.getCurrentTokenColors();
@@ -576,28 +591,7 @@ class ThemeEngine {
             operators: ['keyword.operator', 'punctuation.separator', 'punctuation.terminator'],
             tags: ['entity.name.tag', 'entity.other.attribute-name'],
         };
-        const targetScopes = scopeMap[syntaxId] || [syntaxId];
         const updated = [...currentTokens];
-        const idx = updated.findIndex((r) => {
-            const scopes = Array.isArray(r.scope) ? r.scope : [r.scope];
-            return scopes.some((s) => targetScopes.includes(s));
-        });
-        if (idx >= 0) {
-            updated[idx] = {
-                ...updated[idx],
-                settings: { ...updated[idx].settings, foreground: color },
-            };
-        }
-        else {
-            updated.push({
-                scope: targetScopes,
-                settings: { foreground: color },
-            });
-        }
-        tokenConfig.textMateRules = updated;
-        if (['strings', 'keywords', 'functions', 'variables', 'types', 'comments', 'numbers'].includes(syntaxId)) {
-            tokenConfig[syntaxId] = color;
-        }
         const semKeyMap = {
             strings: 'string',
             keywords: 'keyword',
@@ -608,11 +602,45 @@ class ThemeEngine {
             comments: 'comment',
             numbers: 'number',
         };
-        if (semKeyMap[syntaxId]) {
-            semanticRules[semKeyMap[syntaxId]] = color;
+        for (const [syntaxId, rawColor] of Object.entries(colors)) {
+            const color = typeof rawColor === 'string' ? rawColor.trim() : '';
+            if (!syntaxId || !color) {
+                continue;
+            }
+            const targetScopes = scopeMap[syntaxId] || [syntaxId];
+            const idx = updated.findIndex((r) => {
+                const scopes = Array.isArray(r.scope) ? r.scope : [r.scope];
+                return scopes.some((s) => targetScopes.includes(s));
+            });
+            if (idx >= 0) {
+                updated[idx] = {
+                    ...updated[idx],
+                    settings: { ...updated[idx].settings, foreground: color },
+                };
+            }
+            else {
+                updated.push({
+                    scope: targetScopes,
+                    settings: { foreground: color },
+                });
+            }
+            if (['strings', 'keywords', 'functions', 'variables', 'types', 'comments', 'numbers'].includes(syntaxId)) {
+                tokenConfig[syntaxId] = color;
+            }
+            if (semKeyMap[syntaxId]) {
+                semanticRules[semKeyMap[syntaxId]] = color;
+            }
         }
+        tokenConfig.textMateRules = updated;
         await editor.update('tokenColorCustomizations', tokenConfig, target);
         await editor.update('semanticTokenColorCustomizations', { rules: semanticRules, enabled: true }, target);
+        const simpletheme = vscode.workspace.getConfiguration('simpletheme');
+        if (simpletheme.get('activeProfile') !== 'Custom') {
+            await simpletheme.update('activeProfile', 'Custom', target);
+        }
+    }
+    static async applySingleTokenColor(syntaxId, color) {
+        await this.applyTokenColors({ [syntaxId]: color });
     }
     static async applyPreset(preset) {
         await this.applyTheme(preset.colors, preset.tokenColors, preset.name);

@@ -16,7 +16,10 @@ export class ThemeStudioWebview {
   private readonly _extensionUri: vscode.Uri;
   private _disposables: vscode.Disposable[] = [];
   private _isApplyingInternalChange: boolean = false;
+  private _internalChangeDepth: number = 0;
   private _internalChangeTimer: NodeJS.Timeout | undefined;
+  private _liveColorApplyQueue: Promise<void> = Promise.resolve();
+  private _liveTokenApplyQueue: Promise<void> = Promise.resolve();
 
   public static createOrShow(extensionUri: vscode.Uri) {
     const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
@@ -40,14 +43,25 @@ export class ThemeStudioWebview {
     ThemeStudioWebview.currentPanel = new ThemeStudioWebview(panel, extensionUri);
   }
 
-  private _markInternalChange() {
+  private async _runInternalChange<T>(operation: () => Promise<T>): Promise<T> {
+    this._internalChangeDepth += 1;
     this._isApplyingInternalChange = true;
     if (this._internalChangeTimer) {
       clearTimeout(this._internalChangeTimer);
+      this._internalChangeTimer = undefined;
     }
-    this._internalChangeTimer = setTimeout(() => {
-      this._isApplyingInternalChange = false;
-    }, 600);
+
+    try {
+      return await operation();
+    } finally {
+      this._internalChangeDepth = Math.max(0, this._internalChangeDepth - 1);
+      if (this._internalChangeDepth === 0) {
+        this._internalChangeTimer = setTimeout(() => {
+          this._isApplyingInternalChange = false;
+          this._internalChangeTimer = undefined;
+        }, 400);
+      }
+    }
   }
 
   private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
@@ -61,6 +75,9 @@ export class ThemeStudioWebview {
     // Live VS Code Active Theme Listener: When user changes theme in VS Code (File > Preferences > Theme > Color Theme)
     vscode.window.onDidChangeActiveColorTheme(
       () => {
+        if (this._isApplyingInternalChange) {
+          return;
+        }
         this._syncActiveThemeToWebview();
       },
       null,
@@ -92,8 +109,7 @@ export class ThemeStudioWebview {
       async (message) => {
         switch (message.command) {
           case 'applyAll':
-            this._markInternalChange();
-            await ThemeEngine.applyTheme(message.colors, message.tokenColors, message.profileName);
+            await this._runInternalChange(() => ThemeEngine.applyTheme(message.colors, message.tokenColors, message.profileName));
             vscode.window.showInformationMessage(`✨ Applied "${message.profileName || 'Custom'}" theme to VS Code!`);
             this._panel.webview.postMessage({
               command: 'themeApplied',
@@ -101,21 +117,44 @@ export class ThemeStudioWebview {
             });
             break;
 
-          case 'applyLiveColor':
-            this._markInternalChange();
-            await ThemeEngine.applySingleColor(message.key, message.value);
+          case 'applyLiveColors': {
+            const colors = message.colors && typeof message.colors === 'object' ? message.colors : {};
+            const applyTask = this._liveColorApplyQueue.then(async () => {
+              await this._runInternalChange(() => ThemeEngine.applyColors(colors));
+            });
+            this._liveColorApplyQueue = applyTask.catch(() => undefined);
+            try {
+              await applyTask;
+            } catch (error) {
+              this._panel.webview.postMessage({
+                command: 'liveApplyError',
+                message: error instanceof Error ? error.message : 'Unable to apply the color change.',
+              });
+            }
             break;
+          }
 
-          case 'applyLiveTokenColor':
-            this._markInternalChange();
-            await ThemeEngine.applySingleTokenColor(message.syntaxId, message.color);
+          case 'applyLiveTokenColors': {
+            const colors = message.colors && typeof message.colors === 'object' ? message.colors : {};
+            const applyTask = this._liveTokenApplyQueue.then(async () => {
+              await this._runInternalChange(() => ThemeEngine.applyTokenColors(colors));
+            });
+            this._liveTokenApplyQueue = applyTask.catch(() => undefined);
+            try {
+              await applyTask;
+            } catch (error) {
+              this._panel.webview.postMessage({
+                command: 'liveApplyError',
+                message: error instanceof Error ? error.message : 'Unable to apply the syntax color change.',
+              });
+            }
             break;
+          }
 
           case 'applyPreset':
-            this._markInternalChange();
             const preset = THEME_PRESETS.find((p) => p.id === message.presetId);
             if (preset) {
-              await ThemeEngine.applyPreset(preset);
+              await this._runInternalChange(() => ThemeEngine.applyPreset(preset));
               vscode.window.showInformationMessage(`✨ Applied preset "${preset.name}"!`);
               this._panel.webview.postMessage({
                 command: 'presetApplied',
@@ -133,7 +172,7 @@ export class ThemeStudioWebview {
               ignoreFocusOut: true,
             });
             if (name && name.trim()) {
-              await ProfileManager.saveProfile(name.trim(), message.colors, message.tokenColors);
+              await ProfileManager.saveProfile(name.trim(), message.colors, message.tokenColors, message.type === 'light' ? 'light' : 'dark');
               vscode.window.showInformationMessage(`💾 Saved profile "${name.trim()}"!`);
               const updatedProfiles = ProfileManager.getProfiles();
               this._panel.webview.postMessage({
@@ -147,12 +186,12 @@ export class ThemeStudioWebview {
           case 'loadProfile':
             const profile = ProfileManager.getProfile(message.profileId);
             if (profile) {
-              this._markInternalChange();
-              await ThemeEngine.applyTheme(profile.colors, profile.tokenColors, profile.name);
+              await this._runInternalChange(() => ThemeEngine.applyTheme(profile.colors, profile.tokenColors, profile.name));
               vscode.window.showInformationMessage(`✨ Loaded profile "${profile.name}"!`);
               this._panel.webview.postMessage({
                 command: 'profileLoaded',
                 profileName: profile.name,
+                themeKind: profile.type,
                 colors: profile.colors,
                 tokenColors: profile.tokenColors,
               });
@@ -195,8 +234,7 @@ export class ThemeStudioWebview {
               'Reset Theme'
             );
             if (confirmReset === 'Reset Theme') {
-              this._markInternalChange();
-              await ThemeEngine.resetTheme();
+              await this._runInternalChange(() => ThemeEngine.resetTheme());
               vscode.window.showInformationMessage('🔄 Reset theme customizations to default.');
               this._syncActiveThemeToWebview();
               this._panel.webview.postMessage({
@@ -220,6 +258,7 @@ export class ThemeStudioWebview {
       themeKind: effective.themeKind,
       colors: effective.colors,
       tokenColors: effective.tokenColors,
+      liveApply: vscode.workspace.getConfiguration('simpletheme').get<boolean>('liveApply', true),
     });
   }
 
@@ -233,6 +272,17 @@ export class ThemeStudioWebview {
     const currentTokens = effectiveState.tokenColors;
     const savedProfiles = ProfileManager.getProfiles();
     const activeProfileName = effectiveState.themeName;
+    const liveApplyEnabled = vscode.workspace.getConfiguration('simpletheme').get<boolean>('liveApply', true);
+    const toColorPickerValue = (value: string | undefined, fallback: string): string => {
+      if (!value) return fallback;
+      const normalized = value.trim();
+      if (/^#[0-9a-f]{6}$/i.test(normalized)) return normalized;
+      if (/^#[0-9a-f]{8}$/i.test(normalized)) return normalized.slice(0, 7);
+      if (/^#[0-9a-f]{3}$/i.test(normalized)) {
+        return `#${normalized[1]}${normalized[1]}${normalized[2]}${normalized[2]}${normalized[3]}${normalized[3]}`;
+      }
+      return fallback;
+    };
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -242,14 +292,28 @@ export class ThemeStudioWebview {
   <title>SimpleTheme</title>
   <style>
     :root {
-      --bg: #07070a;
-      --card-bg: #0e0e14;
-      --card-border: rgba(255, 255, 255, 0.08);
-      --accent: #ffe600;
-      --accent-glow: rgba(255, 230, 0, 0.4);
-      --accent-blue: #00f0ff;
-      --text: #f0f0f8;
-      --text-muted: #858599;
+      --bg: var(--vscode-editor-background, #07070a);
+      --card-bg: var(--vscode-sideBar-background, #0e0e14);
+      --card-border: var(--vscode-panel-border, color-mix(in srgb, var(--text) 16%, transparent));
+      --accent: var(--vscode-focusBorder, #ffe600);
+      --accent-blue: var(--vscode-textLink-foreground, var(--accent));
+      --text: var(--vscode-foreground, #f0f0f8);
+      --text-muted: var(--vscode-descriptionForeground, #858599);
+      --on-accent: var(--vscode-activityBarBadge-foreground, #000000);
+      --control-bg: var(--vscode-input-background, color-mix(in srgb, var(--card-bg) 88%, var(--text) 12%));
+      --surface-subtle: color-mix(in srgb, var(--text) 6%, transparent);
+      --surface-hover: color-mix(in srgb, var(--text) 12%, transparent);
+      --surface-strong: color-mix(in srgb, var(--text) 18%, transparent);
+      --accent-soft: color-mix(in srgb, var(--accent) 12%, transparent);
+      --accent-medium: color-mix(in srgb, var(--accent) 28%, transparent);
+      --accent-border: color-mix(in srgb, var(--accent) 44%, transparent);
+      --accent-glow: color-mix(in srgb, var(--accent) 40%, transparent);
+      --secondary-soft: color-mix(in srgb, var(--accent-blue) 12%, transparent);
+      --secondary-medium: color-mix(in srgb, var(--accent-blue) 32%, transparent);
+      --danger: var(--vscode-errorForeground, #f14c4c);
+      --danger-soft: color-mix(in srgb, var(--danger) 12%, transparent);
+      --danger-medium: color-mix(in srgb, var(--danger) 32%, transparent);
+      --shadow: color-mix(in srgb, #000000 52%, transparent);
       --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       --preview-height: 420px;
       --preview-scale: 1;
@@ -264,6 +328,7 @@ export class ThemeStudioWebview {
     body {
       background-color: var(--bg);
       color: var(--text);
+      color-scheme: light dark;
       font-family: var(--font);
       font-size: 13px;
       line-height: 1.4;
@@ -277,11 +342,11 @@ export class ThemeStudioWebview {
       justify-content: space-between;
       align-items: center;
       padding: 14px 18px;
-      background: linear-gradient(135deg, rgba(255, 230, 0, 0.08) 0%, rgba(0, 240, 255, 0.04) 100%);
-      border: 1px solid rgba(255, 230, 0, 0.2);
+      background: linear-gradient(135deg, var(--accent-soft) 0%, var(--secondary-soft) 100%);
+      border: 1px solid var(--accent-medium);
       border-radius: 12px;
       margin-bottom: 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 4px 20px var(--shadow);
       flex-wrap: wrap;
       gap: 12px;
     }
@@ -315,7 +380,7 @@ export class ThemeStudioWebview {
       font-weight: 700;
       padding: 2px 8px;
       background: var(--accent);
-      color: #000;
+      color: var(--on-accent);
       border-radius: 20px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -338,61 +403,62 @@ export class ThemeStudioWebview {
       font-weight: 600;
       cursor: pointer;
       border: 1px solid var(--card-border);
-      background: rgba(255, 255, 255, 0.06);
+      background: var(--surface-subtle);
       color: var(--text);
-      transition: all 0.15s ease;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
       white-space: nowrap;
     }
 
     .btn:hover {
-      background: rgba(255, 255, 255, 0.12);
+      background: var(--surface-hover);
       border-color: var(--accent);
       transform: translateY(-1px);
     }
 
     .btn-primary {
       background: var(--accent);
-      color: #000;
+      color: var(--on-accent);
       border-color: var(--accent);
       font-weight: 800;
       box-shadow: 0 0 12px var(--accent-glow);
     }
 
     .btn-primary:hover {
-      background: #fff;
-      border-color: #fff;
-      color: #000;
-      box-shadow: 0 0 16px rgba(255, 255, 255, 0.6);
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+      filter: brightness(1.08);
+      box-shadow: 0 0 16px var(--accent-glow);
     }
 
     .btn-dock {
-      background: rgba(0, 240, 255, 0.1);
-      border-color: rgba(0, 240, 255, 0.3);
-      color: #00f0ff;
+      background: var(--secondary-soft);
+      border-color: var(--secondary-medium);
+      color: var(--accent-blue);
       font-weight: 700;
     }
 
     .btn-dock:hover {
-      background: rgba(0, 240, 255, 0.2);
-      border-color: #00f0ff;
-      color: #fff;
-      box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+      background: var(--secondary-medium);
+      border-color: var(--accent-blue);
+      color: var(--text);
+      box-shadow: 0 0 10px var(--secondary-medium);
     }
 
     .btn-sync {
-      background: linear-gradient(135deg, rgba(0, 240, 255, 0.16), rgba(255, 230, 0, 0.16));
-      border: 1px solid rgba(0, 240, 255, 0.45);
-      color: #00f0ff;
+      background: linear-gradient(135deg, var(--secondary-soft), var(--accent-soft));
+      border: 1px solid var(--secondary-medium);
+      color: var(--accent-blue);
       font-weight: 700;
-      box-shadow: 0 0 12px rgba(0, 240, 255, 0.15);
+      box-shadow: 0 0 12px var(--secondary-soft);
     }
 
     .btn-sync:hover {
-      background: linear-gradient(135deg, rgba(0, 240, 255, 0.35), rgba(255, 230, 0, 0.3));
-      border-color: #00f0ff;
-      color: #ffffff;
+      background: linear-gradient(135deg, var(--secondary-medium), var(--accent-medium));
+      border-color: var(--accent-blue);
+      color: var(--text);
       transform: translateY(-1px);
-      box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+      box-shadow: 0 0 16px var(--secondary-medium);
     }
 
     .spin-anim {
@@ -411,21 +477,21 @@ export class ThemeStudioWebview {
     @keyframes pulseGlow {
       0% { box-shadow: 0 0 0px var(--accent); }
       50% { box-shadow: 0 0 25px var(--accent-blue), 0 0 12px var(--accent); }
-      100% { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6); }
+      100% { box-shadow: 0 8px 30px var(--shadow); }
     }
 
     .toast-popup {
       position: fixed;
       bottom: 24px;
       right: 24px;
-      background: rgba(14, 14, 20, 0.95);
+      background: color-mix(in srgb, var(--card-bg) 95%, transparent);
       border: 1px solid var(--accent);
       color: var(--text);
       padding: 10px 16px;
       border-radius: 8px;
       font-weight: 700;
       font-size: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      box-shadow: 0 8px 24px var(--shadow);
       display: none;
       align-items: center;
       gap: 8px;
@@ -439,15 +505,15 @@ export class ThemeStudioWebview {
     }
 
     .btn-danger {
-      background: rgba(255, 0, 85, 0.12);
-      border-color: rgba(255, 0, 85, 0.3);
-      color: #ff4d79;
+      background: var(--danger-soft);
+      border-color: var(--danger-medium);
+      color: var(--danger);
     }
 
     .btn-danger:hover {
-      background: rgba(255, 0, 85, 0.25);
-      border-color: #ff0055;
-      color: #fff;
+      background: var(--danger-medium);
+      border-color: var(--danger);
+      color: var(--text);
     }
 
     /* Main Responsive Layout */
@@ -456,7 +522,7 @@ export class ThemeStudioWebview {
       grid-template-columns: minmax(0, 1.4fr) minmax(300px, 1fr);
       gap: 16px;
       align-items: start;
-      transition: all 0.2s ease;
+      transition: grid-template-columns 0.2s ease;
     }
 
     .main-column {
@@ -511,19 +577,19 @@ export class ThemeStudioWebview {
       background: transparent;
       border: 1px solid transparent;
       color: var(--text-muted);
-      transition: all 0.15s;
+      transition: transform 0.15s ease, border-color 0.15s ease;
       white-space: nowrap;
     }
 
     .nav-tab:hover {
       color: var(--text);
-      background: rgba(255, 255, 255, 0.04);
+      background: var(--surface-subtle);
     }
 
     .nav-tab.active {
       color: var(--accent);
-      background: rgba(255, 230, 0, 0.08);
-      border-color: rgba(255, 230, 0, 0.25);
+      background: var(--accent-soft);
+      border-color: var(--accent-medium);
     }
 
     /* Mode Switch Bar (Simple vs Advanced) */
@@ -531,7 +597,7 @@ export class ThemeStudioWebview {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(255, 255, 255, 0.03);
+      background: var(--surface-subtle);
       border: 1px solid var(--card-border);
       border-radius: 8px;
       padding: 6px 12px;
@@ -543,7 +609,7 @@ export class ThemeStudioWebview {
     .mode-toggle-group {
       display: flex;
       gap: 3px;
-      background: rgba(0, 0, 0, 0.4);
+      background: var(--control-bg);
       padding: 3px;
       border-radius: 6px;
       border: 1px solid var(--card-border);
@@ -558,12 +624,12 @@ export class ThemeStudioWebview {
       border: none;
       background: transparent;
       color: var(--text-muted);
-      transition: all 0.12s;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
     }
 
     .mode-btn.active {
       background: var(--accent);
-      color: #000;
+      color: var(--on-accent);
       box-shadow: 0 0 8px var(--accent-glow);
     }
 
@@ -592,6 +658,10 @@ export class ThemeStudioWebview {
       border-color: var(--accent);
     }
 
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
     .pill-filters {
       display: flex;
       gap: 4px;
@@ -603,21 +673,21 @@ export class ThemeStudioWebview {
       font-weight: 600;
       padding: 4px 9px;
       border-radius: 14px;
-      background: rgba(255, 255, 255, 0.04);
+      background: var(--surface-subtle);
       border: 1px solid var(--card-border);
       color: var(--text-muted);
       cursor: pointer;
-      transition: all 0.12s;
+      transition: transform 0.12s ease, border-color 0.12s ease;
     }
 
     .pill:hover {
       color: var(--text);
-      border-color: rgba(255, 255, 255, 0.2);
+      border-color: var(--surface-strong);
     }
 
     .pill.active {
       background: var(--accent);
-      color: #000;
+      color: var(--on-accent);
       font-weight: 800;
       border-color: var(--accent);
     }
@@ -638,30 +708,30 @@ export class ThemeStudioWebview {
       flex-direction: column;
       gap: 6px;
       min-width: 0;
-      transition: all 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }
 
     .color-card:hover {
-      border-color: rgba(255, 230, 0, 0.3);
+      border-color: var(--accent-medium);
       transform: translateY(-1px);
     }
 
     .simple-card {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: linear-gradient(135deg, var(--surface-hover) 0%, var(--surface-subtle) 100%);
+      border: 1px solid var(--card-border);
       border-radius: 10px;
       padding: 12px 14px;
       display: flex;
       flex-direction: column;
       gap: 8px;
       min-width: 0;
-      transition: all 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }
 
     .simple-card:hover {
       border-color: var(--accent);
       transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 4px 16px var(--shadow);
     }
 
     /* Highlight Animation When Element in Preview is Clicked */
@@ -672,8 +742,8 @@ export class ThemeStudioWebview {
         transform: scale(1.02);
       }
       50% {
-        box-shadow: 0 0 0 4px #00f0ff, 0 0 32px rgba(0, 240, 255, 0.6);
-        border-color: #00f0ff;
+        box-shadow: 0 0 0 4px var(--accent-blue), 0 0 32px var(--secondary-medium);
+        border-color: var(--accent-blue);
         transform: scale(1.04);
       }
       100% {
@@ -714,7 +784,7 @@ export class ThemeStudioWebview {
       font-weight: 700;
       padding: 1px 5px;
       border-radius: 3px;
-      background: rgba(255, 255, 255, 0.08);
+      background: var(--surface-hover);
       color: var(--text-muted);
       text-transform: uppercase;
       flex-shrink: 0;
@@ -731,7 +801,7 @@ export class ThemeStudioWebview {
       display: flex;
       align-items: center;
       gap: 6px;
-      background: rgba(0, 0, 0, 0.25);
+      background: var(--control-bg);
       border: 1px solid var(--card-border);
       border-radius: 6px;
       padding: 3px 6px;
@@ -757,7 +827,7 @@ export class ThemeStudioWebview {
     }
 
     .color-picker::-webkit-color-swatch {
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid var(--card-border);
       border-radius: 3px;
     }
 
@@ -766,7 +836,7 @@ export class ThemeStudioWebview {
       min-width: 0;
       padding: 4px 6px;
       border-radius: 4px;
-      background: rgba(0, 0, 0, 0.3);
+      background: var(--bg);
       border: 1px solid var(--card-border);
       color: var(--text);
       font-family: monospace;
@@ -777,6 +847,11 @@ export class ThemeStudioWebview {
     .hex-input:focus {
       border-color: var(--accent);
       outline: none;
+    }
+
+    .hex-input[aria-invalid="true"] {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 1px var(--danger-soft);
     }
 
     /* Preset Cards */
@@ -792,7 +867,7 @@ export class ThemeStudioWebview {
       border-radius: 8px;
       padding: 12px;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -802,7 +877,7 @@ export class ThemeStudioWebview {
     .preset-card:hover {
       border-color: var(--accent);
       transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 4px 14px var(--shadow);
     }
 
     .preset-header {
@@ -826,7 +901,7 @@ export class ThemeStudioWebview {
       height: 18px;
       border-radius: 4px;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--card-border);
     }
 
     .swatch {
@@ -842,13 +917,13 @@ export class ThemeStudioWebview {
       border: 1px solid var(--card-border);
       border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 8px 30px var(--shadow);
       width: 100%;
     }
 
     .preview-header-bar {
       padding: 6px 10px;
-      background: rgba(255, 255, 255, 0.04);
+      background: var(--surface-subtle);
       border-bottom: 1px solid var(--card-border);
       font-size: 10px;
       font-weight: 700;
@@ -870,7 +945,7 @@ export class ThemeStudioWebview {
     .size-btn-group {
       display: flex;
       gap: 2px;
-      background: rgba(0, 0, 0, 0.3);
+      background: var(--control-bg);
       padding: 2px;
       border-radius: 4px;
       border: 1px solid var(--card-border);
@@ -885,17 +960,17 @@ export class ThemeStudioWebview {
       border: none;
       background: transparent;
       color: var(--text-muted);
-      transition: all 0.1s;
+      transition: transform 0.1s ease;
     }
 
     .size-btn:hover {
       color: var(--text);
-      background: rgba(255, 255, 255, 0.08);
+      background: var(--surface-hover);
     }
 
     .size-btn.active {
       background: var(--accent);
-      color: #000;
+      color: var(--on-accent);
     }
 
     /* Interactive Clickable Preview Cues */
@@ -912,6 +987,8 @@ export class ThemeStudioWebview {
     }
 
     .mock-window {
+      --mock-accent: #007acc;
+      --mock-border: #000000;
       font-family: 'Consolas', 'Courier New', monospace;
       font-size: calc(10.5px * var(--preview-scale));
       display: flex;
@@ -920,7 +997,7 @@ export class ThemeStudioWebview {
       min-height: 200px;
       background: #1e1e1e;
       overflow: hidden;
-      border: 1px solid #000000;
+      border: 1px solid var(--mock-border);
     }
 
     .mock-titlebar {
@@ -931,7 +1008,7 @@ export class ThemeStudioWebview {
       align-items: center;
       padding: 0 8px;
       font-size: calc(10px * var(--preview-scale));
-      border-bottom: 1px solid #000000;
+      border-bottom: 1px solid var(--mock-border);
       flex-shrink: 0;
       overflow: hidden;
       white-space: nowrap;
@@ -954,7 +1031,7 @@ export class ThemeStudioWebview {
       padding: 8px 0;
       gap: 10px;
       color: #ffffff;
-      border-right: 1px solid #000000;
+      border-right: 1px solid var(--mock-border);
       flex-shrink: 0;
       font-size: 11px;
     }
@@ -968,7 +1045,7 @@ export class ThemeStudioWebview {
       display: flex;
       flex-direction: column;
       gap: 4px;
-      border-right: 1px solid #000000;
+      border-right: 1px solid var(--mock-border);
       flex-shrink: 0;
       overflow: hidden;
     }
@@ -990,7 +1067,7 @@ export class ThemeStudioWebview {
       gap: 2px;
       flex-shrink: 0;
       overflow: hidden;
-      border-bottom: 1px solid #000000;
+      border-bottom: 1px solid var(--mock-border);
     }
 
     .mock-tab {
@@ -1003,7 +1080,7 @@ export class ThemeStudioWebview {
       align-items: center;
       gap: 4px;
       white-space: nowrap;
-      border: 1px solid #000000;
+      border: 1px solid var(--mock-border);
       border-bottom: none;
     }
 
@@ -1011,8 +1088,8 @@ export class ThemeStudioWebview {
       background: #1e1e1e;
       color: #ffffff;
       border-top: 2px solid #007acc;
-      border-left: 1px solid #000000;
-      border-right: 1px solid #000000;
+      border-left: 1px solid var(--mock-border);
+      border-right: 1px solid var(--mock-border);
     }
 
     .mock-editor-canvas {
@@ -1036,7 +1113,7 @@ export class ThemeStudioWebview {
       padding: 0 8px;
       font-size: calc(9.5px * var(--preview-scale));
       flex-shrink: 0;
-      border-top: 1px solid #000000;
+      border-top: 1px solid var(--mock-border);
     }
   </style>
 </head>
@@ -1120,7 +1197,7 @@ export class ThemeStudioWebview {
                 </div>
                 <div class="color-desc">${def.description}</div>
                 <div class="color-input-row">
-                  <input type="color" class="color-picker simple-ui-picker" data-simple-id="${def.id}" value="${val.length === 7 ? val : def.defaultColor}" />
+                  <input type="color" class="color-picker simple-ui-picker" data-simple-id="${def.id}" value="${toColorPickerValue(val, def.defaultColor)}" />
                   <input type="text" class="hex-input simple-ui-hex" data-simple-id="${def.id}" value="${val}" />
                 </div>
               </div>`;
@@ -1153,7 +1230,7 @@ export class ThemeStudioWebview {
                 </div>
                 <div class="color-desc">${def.description}</div>
                 <div class="color-input-row">
-                  <input type="color" class="color-picker adv-color-picker" data-target="${def.id}" value="${val.length === 7 ? val : '#1e1e1e'}" />
+                  <input type="color" class="color-picker adv-color-picker" data-target="${def.id}" value="${toColorPickerValue(val, def.defaultValue)}" />
                   <input type="text" class="hex-input adv-hex-input" data-target="${def.id}" value="${val}" />
                 </div>
               </div>`;
@@ -1195,7 +1272,7 @@ export class ThemeStudioWebview {
                 </div>
                 <div class="color-desc">${def.description}</div>
                 <div class="color-input-row">
-                  <input type="color" class="color-picker simple-syntax-picker" data-simple-syntax-id="${def.id}" data-target-syntax="${def.targets[0]}" value="${val.length === 7 ? val : def.defaultColor}" />
+                  <input type="color" class="color-picker simple-syntax-picker" data-simple-syntax-id="${def.id}" data-target-syntax="${def.targets[0]}" value="${toColorPickerValue(val, def.defaultColor)}" />
                   <input type="text" class="hex-input simple-syntax-hex" data-simple-syntax-id="${def.id}" data-target-syntax="${def.targets[0]}" value="${val}" />
                 </div>
               </div>`;
@@ -1220,7 +1297,7 @@ export class ThemeStudioWebview {
                 </div>
                 <div class="color-desc">${item.description}</div>
                 <div class="color-input-row">
-                  <input type="color" class="color-picker adv-syntax-picker" data-syntax-id="${item.id}" value="${val.length === 7 ? val : item.defaultColor}" />
+                  <input type="color" class="color-picker adv-syntax-picker" data-syntax-id="${item.id}" value="${toColorPickerValue(val, item.defaultColor)}" />
                   <input type="text" class="hex-input adv-syntax-hex" data-syntax-id="${item.id}" value="${val}" />
                 </div>
               </div>`;
@@ -1368,7 +1445,7 @@ export class ThemeStudioWebview {
               <div class="mock-sidebar-title mock-clickable" id="mockSidebarTitle" data-inspect-ui="sideBarTitle.foreground" data-inspect-simple-ui="simple.sidebarText" title="Click to highlight Sidebar Title (EXPLORER)" style="font-weight: 700; margin-bottom: 2px;">EXPLORER</div>
               <div class="mock-tree-item mock-clickable" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.sidebarText" title="Click to highlight Explorer Text">📁 src</div>
               <div class="mock-tree-item mock-clickable" style="padding-left: 6px;" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.sidebarText" title="Click to highlight Explorer Text">📄 themeEngine.ts</div>
-              <div class="mock-tree-item mock-clickable" style="padding-left: 6px; color: var(--accent);" data-inspect-ui="focusBorder" data-inspect-simple-ui="simple.accent" title="Click to highlight Selected File Accent">📄 presets.ts</div>
+              <div class="mock-tree-item mock-clickable" id="mockTreeSelected" style="padding-left: 6px; color: var(--mock-accent);" data-inspect-ui="focusBorder" data-inspect-simple-ui="simple.accent" title="Click to highlight Selected File Accent">📄 presets.ts</div>
               <div class="mock-tree-item mock-clickable" style="padding-left: 6px;" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.sidebarText" title="Click to highlight Explorer Text">📄 studio.tsx</div>
               <div class="mock-tree-item mock-clickable" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.sidebarText" title="Click to highlight Explorer Text">📁 media</div>
               <div class="mock-tree-item mock-clickable" style="padding-left: 6px;" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.sidebarText" title="Click to highlight Explorer Text">🖼️ logo.svg</div>
@@ -1405,25 +1482,25 @@ export class ThemeStudioWebview {
                   <div>13  <span class="syn-prop mock-clickable" id="synProp4" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.properties" title="Click to highlight Object & JSON Keys">"maxTokens"</span>: <span class="syn-num mock-clickable" id="synNum1" data-inspect-syntax="numbers" data-inspect-simple-syntax="simple.numbers" title="Click to highlight Numbers & Booleans">1000000</span>,</div>
                   <div>14  <span class="syn-prop mock-clickable" id="synProp5" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.properties" title="Click to highlight Object & JSON Keys">"agentMode"</span>: <span class="syn-num mock-clickable" id="synNum2" data-inspect-syntax="numbers" data-inspect-simple-syntax="simple.numbers" title="Click to highlight Numbers & Booleans">true</span></div>
                   <!-- Floating Mock Hover Tooltip -->
-                  <div class="mock-hover-widget mock-clickable" id="mockHoverWidget" data-inspect-ui="editorHoverWidget.background" data-inspect-simple-ui="simple.popups" style="position: absolute; right: 12px; top: -14px; background: rgba(0,0,0,0.85); border: 1px solid #000000; border-radius: 4px; padding: 2px 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); font-size: calc(8.5px * var(--preview-scale)); z-index: 10; display: flex; align-items: center; gap: 4px;" title="Click to highlight Hover Popup & Tooltips">
+                  <div class="mock-hover-widget mock-clickable" id="mockHoverWidget" data-inspect-ui="editorHoverWidget.background" data-inspect-simple-ui="simple.popups" style="position: absolute; right: 12px; top: -14px; background: rgba(0,0,0,0.85); border: 1px solid var(--mock-border); border-radius: 4px; padding: 2px 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); font-size: calc(8.5px * var(--preview-scale)); z-index: 10; display: flex; align-items: center; gap: 4px;" title="Click to highlight Hover Popup & Tooltips">
                     <span id="mockHoverText" data-inspect-ui="editorHoverWidget.foreground" data-inspect-simple-ui="simple.popups" style="font-weight: 600;">⚠️ Unknown Configuration Setting</span>
                   </div>
                 </div>
               </div>
 
               <!-- Mock Chat / Prompt Box Panel -->
-              <div class="mock-chat-panel mock-clickable" id="mockChatPanel" data-inspect-ui="panel.background" data-inspect-simple-ui="simple.sidebarBg" style="border-top: 1px solid #000000; background: var(--card-bg); padding: 5px 8px; display: flex; flex-direction: column; gap: 4px; font-size: calc(9.5px * var(--preview-scale)); flex-shrink: 0;" title="Click to highlight Panel Container Background">
+              <div class="mock-chat-panel mock-clickable" id="mockChatPanel" data-inspect-ui="panel.background" data-inspect-simple-ui="simple.sidebarBg" style="border-top: 1px solid var(--mock-border); background: var(--card-bg); padding: 5px 8px; display: flex; flex-direction: column; gap: 4px; font-size: calc(9.5px * var(--preview-scale)); flex-shrink: 0;" title="Click to highlight Panel Container Background">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                   <div style="display: flex; gap: 6px; align-items: center;">
-                    <span class="mock-clickable" id="mockPanelTitleActive" data-inspect-ui="panelTitle.activeForeground" data-inspect-simple-ui="simple.chatText" style="font-weight: 700; color: var(--accent); cursor: pointer;" title="Click to highlight Active Panel Tab (Chat)">Chat</span>
+                    <span class="mock-clickable" id="mockPanelTitleActive" data-inspect-ui="panelTitle.activeForeground" data-inspect-simple-ui="simple.chatText" style="font-weight: 700; color: var(--mock-accent); cursor: pointer;" title="Click to highlight Active Panel Tab (Chat)">Chat</span>
                     <span class="mock-clickable" id="mockPanelTitleInactive" data-inspect-ui="panelTitle.inactiveForeground" data-inspect-simple-ui="simple.chatText" style="color: var(--text-muted); cursor: pointer;" title="Click to highlight Inactive Panel Tabs (Codex, CodeGPT)">Codex</span>
                   </div>
                   <span class="mock-clickable" id="mockIcon" data-inspect-ui="icon.foreground" data-inspect-simple-ui="simple.chatText" style="color: var(--text-muted); cursor: pointer; font-size: 10px;" title="Click to highlight UI Icons (+, ⚙️, X)">+ ⚙️ ⛶ ✕</span>
                 </div>
-                <div class="mock-chat-bubble mock-clickable" id="mockChatBubble" data-inspect-ui="chat.requestBackground" data-inspect-simple-ui="simple.chatText" style="background: rgba(255,255,255,0.04); border: 1px solid #000000; border-radius: 4px; padding: 2px 6px; font-weight: 600;" title="Click to highlight Chat User Request Bubble">
+                <div class="mock-chat-bubble mock-clickable" id="mockChatBubble" data-inspect-ui="chat.requestBackground" data-inspect-simple-ui="simple.tabsBg" style="background: rgba(255,255,255,0.04); border: 1px solid var(--mock-border); border-radius: 4px; padding: 2px 6px; font-weight: 600;" title="Click to highlight Chat User Request Bubble">
                   <span>← heyy</span>
                 </div>
-                <div class="mock-input-box mock-clickable" id="mockInputBox" data-inspect-ui="input.background" data-inspect-simple-ui="simple.chatText" style="background: rgba(0,0,0,0.3); border: 1px solid #000000; border-radius: 4px; padding: 3px 6px; display: flex; justify-content: space-between; align-items: center;" title="Click to highlight Input / Chat Box">
+                <div class="mock-input-box mock-clickable" id="mockInputBox" data-inspect-ui="input.background" data-inspect-simple-ui="simple.tabsBg" style="background: rgba(0,0,0,0.3); border: 1px solid var(--mock-border); border-radius: 4px; padding: 3px 6px; display: flex; justify-content: space-between; align-items: center;" title="Click to highlight Input / Chat Box">
                   <span id="mockInputPlaceholder" class="mock-clickable" data-inspect-ui="input.placeholderForeground" data-inspect-simple-ui="simple.chatText" style="color: var(--text-muted);" title="Click to highlight Input Placeholder Text">just checking in, what you're capable of</span>
                   <span id="mockCounter" class="mock-clickable" data-inspect-ui="descriptionForeground" data-inspect-simple-ui="simple.chatText" style="color: var(--text-muted); font-size: 8px; margin-left: 4px;" title="Click to highlight Muted / Counter Text (3/3)">3/3</span>
                 </div>
@@ -1451,9 +1528,11 @@ export class ThemeStudioWebview {
 
     (function() {
       const activeState = {
-        profileName: '${activeProfileName}',
+        profileName: ${JSON.stringify(activeProfileName)},
+        themeKind: ${JSON.stringify(effectiveState.themeKind)},
         colors: ${JSON.stringify(currentColors)},
         tokenColors: ${JSON.stringify(currentTokens)},
+        liveApply: ${JSON.stringify(liveApplyEnabled)},
         dockPosition: 'right', // 'right' | 'bottom'
         previewHeight: 420,
         previewScale: 1.0,
@@ -1464,6 +1543,79 @@ export class ThemeStudioWebview {
       const SIMPLE_UI_MAP = ${JSON.stringify(SIMPLE_UI_DEFINITIONS)};
       const SIMPLE_SYNTAX_MAP = ${JSON.stringify(SIMPLE_SYNTAX_DEFINITIONS)};
       const SYNTAX_DEFS = ${JSON.stringify(SYNTAX_SCOPE_DEFINITIONS)};
+      const UI_DEFS = ${JSON.stringify(UI_COLOR_DEFINITIONS)};
+      const HEX_COLOR_PATTERN = /^#(?:[0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+
+      function readThemeColor(colors, keys, fallback) {
+        for (const key of keys) {
+          const value = colors[key];
+          if (typeof value === 'string' && value.trim() && CSS.supports('color', value.trim())) {
+            return value.trim();
+          }
+        }
+        return fallback;
+      }
+
+      function colorPickerValue(value, fallback = '#1e1e1e') {
+        if (typeof value !== 'string') return fallback;
+        const color = value.trim();
+        if (/^#[0-9a-f]{6}$/i.test(color)) return color;
+        if (/^#[0-9a-f]{8}$/i.test(color)) return color.slice(0, 7);
+        if (/^#[0-9a-f]{3}$/i.test(color)) {
+          return '#' + color[1] + color[1] + color[2] + color[2] + color[3] + color[3];
+        }
+        return fallback;
+      }
+
+      function contrastColor(color) {
+        const normalized = colorPickerValue(color, '#1e1e1e').slice(1);
+        const r = parseInt(normalized.slice(0, 2), 16) / 255;
+        const g = parseInt(normalized.slice(2, 4), 16) / 255;
+        const b = parseInt(normalized.slice(4, 6), 16) / 255;
+        return (0.299 * r + 0.587 * g + 0.114 * b) > 0.58 ? '#111111' : '#ffffff';
+      }
+
+      function applyStudioTheme() {
+        const colors = activeState.colors || {};
+        const isLight = (activeState.themeKind || '').includes('light');
+        const bg = readThemeColor(colors, ['editor.background', 'panel.background'], isLight ? '#ffffff' : '#07070a');
+        const card = readThemeColor(colors, ['sideBar.background', 'editorWidget.background', 'panel.background'], bg);
+        const text = readThemeColor(colors, ['foreground', 'editor.foreground', 'sideBar.foreground'], isLight ? '#1f2328' : '#f0f0f8');
+        const muted = readThemeColor(colors, ['descriptionForeground', 'sideBar.foreground', 'input.placeholderForeground'], text);
+        const accent = readThemeColor(colors, ['focusBorder', 'tab.activeBorderTop', 'textLink.foreground', 'activityBarBadge.background'], isLight ? '#0969da' : '#ffe600');
+        const secondary = readThemeColor(colors, ['textLink.foreground', 'terminal.ansiCyan', 'editorCursor.foreground'], accent);
+        const control = readThemeColor(colors, ['input.background', 'editorWidget.background', 'sideBarSectionHeader.background'], card);
+        const border = readThemeColor(colors, ['panel.border', 'editorWidget.border', 'editorHoverWidget.border'], 'color-mix(in srgb, ' + text + ' 16%, transparent)');
+        const onAccent = readThemeColor(colors, ['activityBarBadge.foreground', 'badge.foreground'], contrastColor(accent));
+        const danger = readThemeColor(colors, ['errorForeground', 'statusBar.debuggingBackground'], '#f14c4c');
+        const root = document.documentElement;
+
+        root.style.colorScheme = isLight ? 'light' : 'dark';
+        root.style.setProperty('--bg', bg);
+        root.style.setProperty('--card-bg', card);
+        root.style.setProperty('--text', text);
+        root.style.setProperty('--text-muted', muted);
+        root.style.setProperty('--accent', accent);
+        root.style.setProperty('--accent-blue', secondary);
+        root.style.setProperty('--control-bg', control);
+        root.style.setProperty('--card-border', border);
+        root.style.setProperty('--on-accent', onAccent);
+        root.style.setProperty('--danger', danger);
+      }
+
+      function setProfileName(name) {
+        activeState.profileName = name;
+        const label = document.getElementById('activeProfileLabel');
+        if (label) label.innerText = name;
+      }
+
+      function markThemeModified() {
+        if (activeState.profileName !== 'Custom') {
+          setProfileName('Custom');
+        }
+      }
+
+      applyStudioTheme();
 
       // 1. Tab Switching
       function switchTab(tabId) {
@@ -1731,33 +1883,54 @@ export class ThemeStudioWebview {
         });
       }
 
-      // Debounced IPC messaging so dragging color picker never drops frames or causes lag
-      let liveColorDebounceTimer = null;
+      // Coalesced IPC batches keep drag updates responsive without racing whole-settings writes.
+      let liveColorFlushTimer = null;
       let pendingLiveColors = {};
 
       function queueLiveColor(key, value) {
+        if (!activeState.liveApply) return;
         pendingLiveColors[key] = value;
-        if (liveColorDebounceTimer) clearTimeout(liveColorDebounceTimer);
-        liveColorDebounceTimer = setTimeout(() => {
-          Object.keys(pendingLiveColors).forEach(k => {
-            vscode.postMessage({ command: 'applyLiveColor', key: k, value: pendingLiveColors[k] });
-          });
-          pendingLiveColors = {};
-        }, 100);
+        if (!liveColorFlushTimer) {
+          liveColorFlushTimer = setTimeout(flushLiveColors, 80);
+        }
       }
 
-      let liveTokenDebounceTimer = null;
+      function flushLiveColors() {
+        if (liveColorFlushTimer) clearTimeout(liveColorFlushTimer);
+        liveColorFlushTimer = null;
+        if (!activeState.liveApply || Object.keys(pendingLiveColors).length === 0) return;
+        const colors = pendingLiveColors;
+        pendingLiveColors = {};
+        vscode.postMessage({ command: 'applyLiveColors', colors });
+      }
+
+      let liveTokenFlushTimer = null;
       let pendingLiveTokens = {};
 
       function queueLiveToken(syntaxId, color) {
+        if (!activeState.liveApply) return;
         pendingLiveTokens[syntaxId] = color;
-        if (liveTokenDebounceTimer) clearTimeout(liveTokenDebounceTimer);
-        liveTokenDebounceTimer = setTimeout(() => {
-          Object.keys(pendingLiveTokens).forEach(s => {
-            vscode.postMessage({ command: 'applyLiveTokenColor', syntaxId: s, color: pendingLiveTokens[s] });
-          });
-          pendingLiveTokens = {};
-        }, 100);
+        if (!liveTokenFlushTimer) {
+          liveTokenFlushTimer = setTimeout(flushLiveTokens, 80);
+        }
+      }
+
+      function flushLiveTokens() {
+        if (liveTokenFlushTimer) clearTimeout(liveTokenFlushTimer);
+        liveTokenFlushTimer = null;
+        if (!activeState.liveApply || Object.keys(pendingLiveTokens).length === 0) return;
+        const colors = pendingLiveTokens;
+        pendingLiveTokens = {};
+        vscode.postMessage({ command: 'applyLiveTokenColors', colors });
+      }
+
+      function cancelPendingLiveChanges() {
+        if (liveColorFlushTimer) clearTimeout(liveColorFlushTimer);
+        if (liveTokenFlushTimer) clearTimeout(liveTokenFlushTimer);
+        liveColorFlushTimer = null;
+        liveTokenFlushTimer = null;
+        pendingLiveColors = {};
+        pendingLiveTokens = {};
       }
 
       // 9. Update Live Mock Workbench & Post Live Changes (0ms Synchronous DOM update)
@@ -1767,29 +1940,18 @@ export class ThemeStudioWebview {
         if (key === 'editor.background') {
           const canvas = document.getElementById('mockCanvas');
           if (canvas) canvas.style.background = val;
-          const actTab = document.getElementById('mockActiveTab');
-          if (actTab) actTab.style.background = val;
         } else if (key === 'editor.foreground') {
           const canvas = document.getElementById('mockCanvas');
           if (canvas) canvas.style.color = val;
+        } else if (key === 'foreground') {
+          const panel = document.getElementById('mockChatPanel');
+          if (panel) panel.style.color = val;
         } else if (key === 'sideBar.background') {
           const sb = document.getElementById('mockSidebar');
           if (sb) sb.style.background = val;
-          const ab = document.getElementById('mockActivityBar');
-          if (ab) ab.style.background = val;
-          const tb = document.getElementById('mockTitlebar');
-          if (tb) tb.style.background = val;
-          const cp = document.getElementById('mockChatPanel');
-          if (cp) cp.style.background = val;
         } else if (key === 'sideBar.foreground') {
           const sb = document.getElementById('mockSidebar');
           if (sb) sb.style.color = val;
-          const sbt = document.getElementById('mockSidebarTitle');
-          if (sbt) sbt.style.color = val;
-          const ab = document.getElementById('mockActivityBar');
-          if (ab) ab.style.color = val;
-          const tb = document.getElementById('mockTitlebar');
-          if (tb) tb.style.color = val;
           document.querySelectorAll('.mock-tree-item:not(#mockTreeSelected)').forEach(el => el.style.color = val);
         } else if (key === 'sideBarTitle.foreground') {
           const sbt = document.getElementById('mockSidebarTitle');
@@ -1818,16 +1980,14 @@ export class ThemeStudioWebview {
         } else if (key === 'tab.activeForeground') {
           const tab = document.getElementById('mockActiveTab');
           if (tab) tab.style.color = val;
-        } else if (key === 'tab.activeBorderTop' || key === 'focusBorder' || key === 'activityBarBadge.background' || key === 'textLink.foreground') {
+        } else if (key === 'tab.activeBorderTop') {
           const tab = document.getElementById('mockActiveTab');
           if (tab) tab.style.borderTopColor = val;
+        } else if (key === 'focusBorder') {
           const sel = document.getElementById('mockTreeSelected');
           if (sel) sel.style.color = val;
-          const pta = document.getElementById('mockPanelTitleActive');
-          if (pta) pta.style.color = val;
-          document.documentElement.style.setProperty('--accent', val);
           const mw = document.getElementById('mockWindow');
-          if (mw) mw.style.setProperty('--accent', val);
+          if (mw) mw.style.setProperty('--mock-accent', val);
         } else if (key === 'tab.inactiveBackground') {
           const tab = document.getElementById('mockInactiveTab');
           if (tab) tab.style.background = val;
@@ -1852,6 +2012,9 @@ export class ThemeStudioWebview {
         } else if (key === 'panelTitle.activeForeground') {
           const pta = document.getElementById('mockPanelTitleActive');
           if (pta) pta.style.color = val;
+        } else if (key === 'panelTitle.activeBorder') {
+          const pta = document.getElementById('mockPanelTitleActive');
+          if (pta) pta.style.borderBottom = '1px solid ' + val;
         } else if (key === 'panelTitle.inactiveForeground') {
           const pti = document.getElementById('mockPanelTitleInactive');
           if (pti) pti.style.color = val;
@@ -1861,9 +2024,20 @@ export class ThemeStudioWebview {
         } else if (key === 'chat.requestBackground') {
           const cb = document.getElementById('mockChatBubble');
           if (cb) cb.style.background = val;
+        } else if (key === 'chat.requestBorder') {
+          const cb = document.getElementById('mockChatBubble');
+          if (cb) cb.style.borderColor = val;
+        } else if (key === 'interactive.requestBackground') {
+          const ib = document.getElementById('mockInputBox');
+          if (ib) ib.style.background = val;
         } else if (key === 'panel.background') {
           const cp = document.getElementById('mockChatPanel');
           if (cp) cp.style.background = val;
+        } else if (key === 'panel.border') {
+          const cp = document.getElementById('mockChatPanel');
+          if (cp) cp.style.borderTopColor = val;
+          const mw = document.getElementById('mockWindow');
+          if (mw) mw.style.setProperty('--mock-border', val);
         } else if (key === 'editorHoverWidget.background') {
           const hw = document.getElementById('mockHoverWidget');
           if (hw) hw.style.background = val;
@@ -1875,7 +2049,9 @@ export class ThemeStudioWebview {
           if (hw) hw.style.borderColor = val;
         }
 
+        applyStudioTheme();
         if (shouldQueue) {
+          markThemeModified();
           queueLiveColor(key, val);
         }
       }
@@ -1911,29 +2087,48 @@ export class ThemeStudioWebview {
         }
 
         if (shouldQueue) {
+          markThemeModified();
           queueLiveToken(syntaxId, color);
         }
       }
 
       // 10. Simple Mode UI Handlers
+      function preserveExistingAlpha(rgb, hexInput) {
+        const existing = hexInput && typeof hexInput.value === 'string' ? hexInput.value.trim() : '';
+        return /^#[0-9a-f]{8}$/i.test(existing) ? rgb + existing.slice(7) : rgb;
+      }
+
+      function setPickerValue(picker, value, fallback) {
+        if (picker) picker.value = colorPickerValue(value, fallback);
+      }
+
+      function validateHexInput(input) {
+        const value = input.value.trim();
+        const isValid = HEX_COLOR_PATTERN.test(value);
+        input.setAttribute('aria-invalid', isValid ? 'false' : 'true');
+        return isValid ? value : null;
+      }
+
       document.querySelectorAll('.simple-ui-picker').forEach(picker => {
         picker.addEventListener('input', function() {
           const simpleId = this.getAttribute('data-simple-id');
-          const val = this.value;
           const hexInput = document.querySelector('.simple-ui-hex[data-simple-id="' + simpleId + '"]');
+          const val = preserveExistingAlpha(this.value, hexInput);
           if (hexInput) hexInput.value = val;
           applySimpleUi(simpleId, val);
         });
+        picker.addEventListener('change', flushLiveColors);
       });
 
       document.querySelectorAll('.simple-ui-hex').forEach(input => {
-        input.addEventListener('input', function() {
+        input.addEventListener('change', function() {
           const simpleId = this.getAttribute('data-simple-id');
-          const val = this.value.trim();
-          if (val.startsWith('#') && (val.length === 4 || val.length === 7 || val.length === 9)) {
+          const val = validateHexInput(this);
+          if (val) {
             const picker = document.querySelector('.simple-ui-picker[data-simple-id="' + simpleId + '"]');
-            if (picker && val.length === 7) picker.value = val;
+            setPickerValue(picker, val, '#1e1e1e');
             applySimpleUi(simpleId, val);
+            flushLiveColors();
           }
         });
       });
@@ -1946,7 +2141,7 @@ export class ThemeStudioWebview {
           updateLivePreview(target, val);
 
           const advPicker = document.querySelector('.adv-color-picker[data-target="' + target + '"]');
-          if (advPicker && val.length === 7) advPicker.value = val;
+          setPickerValue(advPicker, val, def.defaultColor);
           const advHex = document.querySelector('.adv-hex-input[data-target="' + target + '"]');
           if (advHex) advHex.value = val;
         });
@@ -1956,38 +2151,39 @@ export class ThemeStudioWebview {
       document.querySelectorAll('.adv-color-picker').forEach(picker => {
         picker.addEventListener('input', function() {
           const target = this.getAttribute('data-target');
-          const val = this.value;
           const hexInput = document.querySelector('.adv-hex-input[data-target="' + target + '"]');
+          const val = preserveExistingAlpha(this.value, hexInput);
           if (hexInput) hexInput.value = val;
           updateLivePreview(target, val);
 
-          // Also sync to matching Simple UI picker
           const parentSimple = SIMPLE_UI_MAP.find(s => s.targets.includes(target));
-          if (parentSimple) {
+          if (parentSimple && parentSimple.targets[0] === target) {
             const sPicker = document.querySelector('.simple-ui-picker[data-simple-id="' + parentSimple.id + '"]');
-            if (sPicker && val.length === 7) sPicker.value = val;
+            setPickerValue(sPicker, val, parentSimple.defaultColor);
             const sHex = document.querySelector('.simple-ui-hex[data-simple-id="' + parentSimple.id + '"]');
             if (sHex) sHex.value = val;
           }
         });
+        picker.addEventListener('change', flushLiveColors);
       });
 
       document.querySelectorAll('.adv-hex-input').forEach(input => {
-        input.addEventListener('input', function() {
+        input.addEventListener('change', function() {
           const target = this.getAttribute('data-target');
-          const val = this.value.trim();
-          if (val.startsWith('#') && (val.length === 4 || val.length === 7 || val.length === 9)) {
+          const val = validateHexInput(this);
+          if (val) {
             const picker = document.querySelector('.adv-color-picker[data-target="' + target + '"]');
-            if (picker && val.length === 7) picker.value = val;
+            setPickerValue(picker, val, '#1e1e1e');
             updateLivePreview(target, val);
 
             const parentSimple = SIMPLE_UI_MAP.find(s => s.targets.includes(target));
-            if (parentSimple) {
+            if (parentSimple && parentSimple.targets[0] === target) {
               const sPicker = document.querySelector('.simple-ui-picker[data-simple-id="' + parentSimple.id + '"]');
-              if (sPicker && val.length === 7) sPicker.value = val;
+              setPickerValue(sPicker, val, parentSimple.defaultColor);
               const sHex = document.querySelector('.simple-ui-hex[data-simple-id="' + parentSimple.id + '"]');
               if (sHex) sHex.value = val;
             }
+            flushLiveColors();
           }
         });
       });
@@ -1995,72 +2191,85 @@ export class ThemeStudioWebview {
       // 12. Simple Mode Syntax Handlers
       document.querySelectorAll('.simple-syntax-picker').forEach(picker => {
         picker.addEventListener('input', function() {
-          const targetSyntax = this.getAttribute('data-target-syntax');
           const simpleSyntaxId = this.getAttribute('data-simple-syntax-id');
-          const val = this.value;
           const hexInput = document.querySelector('.simple-syntax-hex[data-simple-syntax-id="' + simpleSyntaxId + '"]');
+          const val = preserveExistingAlpha(this.value, hexInput);
           if (hexInput) hexInput.value = val;
-
-          if (targetSyntax) {
-            updateLiveSyntax(targetSyntax, val);
-
-            const advPicker = document.querySelector('.adv-syntax-picker[data-syntax-id="' + targetSyntax + '"]');
-            if (advPicker && val.length === 7) advPicker.value = val;
-            const advHex = document.querySelector('.adv-syntax-hex[data-syntax-id="' + targetSyntax + '"]');
-            if (advHex) advHex.value = val;
-          }
+          applySimpleSyntax(simpleSyntaxId, val);
         });
+        picker.addEventListener('change', flushLiveTokens);
       });
 
       document.querySelectorAll('.simple-syntax-hex').forEach(input => {
-        input.addEventListener('input', function() {
-          const targetSyntax = this.getAttribute('data-target-syntax');
+        input.addEventListener('change', function() {
           const simpleSyntaxId = this.getAttribute('data-simple-syntax-id');
-          const val = this.value.trim();
-          if (val.startsWith('#') && (val.length === 4 || val.length === 7 || val.length === 9)) {
+          const val = validateHexInput(this);
+          if (val) {
             const picker = document.querySelector('.simple-syntax-picker[data-simple-syntax-id="' + simpleSyntaxId + '"]');
-            if (picker && val.length === 7) picker.value = val;
-
-            updateLiveSyntax(targetSyntax, val);
-
-            const advPicker = document.querySelector('.adv-syntax-picker[data-syntax-id="' + targetSyntax + '"]');
-            if (advPicker && val.length === 7) advPicker.value = val;
-            const advHex = document.querySelector('.adv-syntax-hex[data-syntax-id="' + targetSyntax + '"]');
-            if (advHex) advHex.value = val;
+            setPickerValue(picker, val, '#1e1e1e');
+            applySimpleSyntax(simpleSyntaxId, val);
+            flushLiveTokens();
           }
         });
       });
+
+      function applySimpleSyntax(simpleSyntaxId, val) {
+        const def = SIMPLE_SYNTAX_MAP.find(item => item.id === simpleSyntaxId);
+        if (!def) return;
+
+        def.targets.forEach(targetSyntax => {
+          updateLiveSyntax(targetSyntax, val);
+          const advPicker = document.querySelector('.adv-syntax-picker[data-syntax-id="' + targetSyntax + '"]');
+          setPickerValue(advPicker, val, def.defaultColor);
+          const advHex = document.querySelector('.adv-syntax-hex[data-syntax-id="' + targetSyntax + '"]');
+          if (advHex) advHex.value = val;
+        });
+      }
 
       // 13. Advanced Syntax Handlers
       document.querySelectorAll('.adv-syntax-picker').forEach(picker => {
         picker.addEventListener('input', function() {
           const syntaxId = this.getAttribute('data-syntax-id');
-          const val = this.value;
           const hexInput = document.querySelector('.adv-syntax-hex[data-syntax-id="' + syntaxId + '"]');
+          const val = preserveExistingAlpha(this.value, hexInput);
           if (hexInput) hexInput.value = val;
           updateLiveSyntax(syntaxId, val);
 
-          const sPicker = document.querySelector('.simple-syntax-picker[data-target-syntax="' + syntaxId + '"]');
-          if (sPicker && val.length === 7) sPicker.value = val;
-          const sHex = document.querySelector('.simple-syntax-hex[data-target-syntax="' + syntaxId + '"]');
-          if (sHex) sHex.value = val;
+          const parentSimple = SIMPLE_SYNTAX_MAP.find(item => item.targets.includes(syntaxId));
+          if (parentSimple && parentSimple.targets[0] === syntaxId) {
+            const sPicker = document.querySelector('.simple-syntax-picker[data-simple-syntax-id="' + parentSimple.id + '"]');
+            setPickerValue(sPicker, val, parentSimple.defaultColor);
+            const sHex = document.querySelector('.simple-syntax-hex[data-simple-syntax-id="' + parentSimple.id + '"]');
+            if (sHex) sHex.value = val;
+          }
         });
+        picker.addEventListener('change', flushLiveTokens);
       });
 
       document.querySelectorAll('.adv-syntax-hex').forEach(input => {
-        input.addEventListener('input', function() {
+        input.addEventListener('change', function() {
           const syntaxId = this.getAttribute('data-syntax-id');
-          const val = this.value.trim();
-          if (val.startsWith('#') && (val.length === 4 || val.length === 7 || val.length === 9)) {
+          const val = validateHexInput(this);
+          if (val) {
             const picker = document.querySelector('.adv-syntax-picker[data-syntax-id="' + syntaxId + '"]');
-            if (picker && val.length === 7) picker.value = val;
+            setPickerValue(picker, val, '#1e1e1e');
             updateLiveSyntax(syntaxId, val);
 
-            const sPicker = document.querySelector('.simple-syntax-picker[data-target-syntax="' + syntaxId + '"]');
-            if (sPicker && val.length === 7) sPicker.value = val;
-            const sHex = document.querySelector('.simple-syntax-hex[data-target-syntax="' + syntaxId + '"]');
-            if (sHex) sHex.value = val;
+            const parentSimple = SIMPLE_SYNTAX_MAP.find(item => item.targets.includes(syntaxId));
+            if (parentSimple && parentSimple.targets[0] === syntaxId) {
+              const sPicker = document.querySelector('.simple-syntax-picker[data-simple-syntax-id="' + parentSimple.id + '"]');
+              setPickerValue(sPicker, val, parentSimple.defaultColor);
+              const sHex = document.querySelector('.simple-syntax-hex[data-simple-syntax-id="' + parentSimple.id + '"]');
+              if (sHex) sHex.value = val;
+            }
+            flushLiveTokens();
           }
+        });
+      });
+
+      document.querySelectorAll('.hex-input').forEach(input => {
+        input.addEventListener('keydown', function(event) {
+          if (event.key === 'Enter') this.blur();
         });
       });
 
@@ -2069,9 +2278,15 @@ export class ThemeStudioWebview {
       window.loadPreset = function(presetId) {
         const p = ALL_PRESETS.find(x => x.id === presetId);
         if (p) {
-          activeState.profileName = p.name;
-          const pLabel = document.getElementById('activeProfileLabel');
-          if (pLabel) pLabel.innerText = p.name;
+          cancelPendingLiveChanges();
+          activeState.colors = { ...p.colors };
+          activeState.tokenColors = p.tokenColors.map(rule => ({
+            ...rule,
+            settings: { ...rule.settings },
+          }));
+          activeState.themeKind = p.type;
+          setProfileName(p.name);
+          applyStudioTheme();
 
           // 1. Synchronously update live preview without queuing message storm
           Object.keys(p.colors).forEach(k => {
@@ -2098,7 +2313,7 @@ export class ThemeStudioWebview {
           SIMPLE_UI_MAP.forEach(sDef => {
             const val = p.colors[sDef.targets[0]] || sDef.defaultColor;
             const pkr = document.querySelector('.simple-ui-picker[data-simple-id="' + sDef.id + '"]');
-            if (pkr && val && val.length === 7) pkr.value = val;
+            setPickerValue(pkr, val, sDef.defaultColor);
             const hex = document.querySelector('.simple-ui-hex[data-simple-id="' + sDef.id + '"]');
             if (hex && val) hex.value = val;
           });
@@ -2113,17 +2328,16 @@ export class ThemeStudioWebview {
             });
             const val = rule?.settings?.foreground || sDef.defaultColor;
             const pkr = document.querySelector('.simple-syntax-picker[data-simple-syntax-id="' + sDef.id + '"]');
-            if (pkr && val && val.length === 7) pkr.value = val;
+            setPickerValue(pkr, val, sDef.defaultColor);
             const hex = document.querySelector('.simple-syntax-hex[data-simple-syntax-id="' + sDef.id + '"]');
             if (hex && val) hex.value = val;
           });
 
           // 5. Update Advanced UI pickers and hex inputs
-          const UI_DEFS = ${JSON.stringify(UI_COLOR_DEFINITIONS)};
           UI_DEFS.forEach(uDef => {
             const val = p.colors[uDef.id] || uDef.defaultValue;
             const pkr = document.querySelector('.adv-color-picker[data-target="' + uDef.id + '"]');
-            if (pkr && val && val.length === 7) pkr.value = val;
+            setPickerValue(pkr, val, uDef.defaultValue);
             const hex = document.querySelector('.adv-hex-input[data-target="' + uDef.id + '"]');
             if (hex && val) hex.value = val;
           });
@@ -2136,7 +2350,7 @@ export class ThemeStudioWebview {
             });
             const val = rule?.settings?.foreground || sDef.defaultColor;
             const pkr = document.querySelector('.adv-syntax-picker[data-syntax-id="' + sDef.id + '"]');
-            if (pkr && val && val.length === 7) pkr.value = val;
+            setPickerValue(pkr, val, sDef.defaultColor);
             const hex = document.querySelector('.adv-syntax-hex[data-syntax-id="' + sDef.id + '"]');
             if (hex && val) hex.value = val;
           });
@@ -2149,6 +2363,7 @@ export class ThemeStudioWebview {
 
       // 15. Profile Actions
       window.loadSavedProfile = function(profileId) {
+        cancelPendingLiveChanges();
         vscode.postMessage({ command: 'loadProfile', profileId });
       };
 
@@ -2177,6 +2392,7 @@ export class ThemeStudioWebview {
           colors: activeState.colors,
           tokenColors: activeState.tokenColors,
           profileName: activeState.profileName,
+          type: (activeState.themeKind || '').includes('light') ? 'light' : 'dark',
         });
       });
 
@@ -2189,107 +2405,110 @@ export class ThemeStudioWebview {
       });
 
       document.getElementById('btnResetTheme').addEventListener('click', () => {
+        cancelPendingLiveChanges();
         vscode.postMessage({ command: 'resetTheme' });
       });
 
-      // Initial Live Preview Colors Init
-      Object.keys(activeState.colors).forEach(k => {
-        const val = activeState.colors[k];
-        if (val) {
-          if (k === 'editor.background') {
-            const canvas = document.getElementById('mockCanvas');
-            if (canvas) canvas.style.background = val;
-          } else if (k === 'editor.foreground') {
-            const canvas = document.getElementById('mockCanvas');
-            if (canvas) canvas.style.color = val;
-          } else if (k === 'sideBar.background') {
-            const sb = document.getElementById('mockSidebar');
-            if (sb) sb.style.background = val;
-          } else if (k === 'sideBar.foreground') {
-            const sb = document.getElementById('mockSidebar');
-            if (sb) sb.style.color = val;
-            document.querySelectorAll('.mock-tree-item:not([style*="var(--accent)"])').forEach(el => el.style.color = val);
-          } else if (k === 'sideBarTitle.foreground') {
-            const sbt = document.getElementById('mockSidebarTitle');
-            if (sbt) sbt.style.color = val;
-          } else if (k === 'activityBar.background') {
-            const ab = document.getElementById('mockActivityBar');
-            if (ab) ab.style.background = val;
-          } else if (k === 'statusBar.background') {
-            const st = document.getElementById('mockStatusBar');
-            if (st) st.style.background = val;
-          } else if (k === 'tab.activeBackground') {
-            const tab = document.getElementById('mockActiveTab');
-            if (tab) tab.style.background = val;
-          } else if (k === 'tab.activeBorderTop') {
-            const tab = document.getElementById('mockActiveTab');
-            if (tab) tab.style.borderTopColor = val;
-          } else if (k === 'editorGroupHeader.tabsBackground') {
-            const tb = document.getElementById('mockTabsBar');
-            if (tb) tb.style.background = val;
-          } else if (k === 'input.background') {
-            const ib = document.getElementById('mockInputBox');
-            if (ib) ib.style.background = val;
-          } else if (k === 'input.foreground') {
-            const ib = document.getElementById('mockInputBox');
-            if (ib) ib.style.color = val;
-          } else if (k === 'input.placeholderForeground') {
-            const ip = document.getElementById('mockInputPlaceholder');
-            if (ip) ip.style.color = val;
-          } else if (k === 'descriptionForeground') {
-            const cnt = document.getElementById('mockCounter');
-            if (cnt) cnt.style.color = val;
-          } else if (k === 'panelTitle.activeForeground') {
-            const pta = document.getElementById('mockPanelTitleActive');
-            if (pta) pta.style.color = val;
-          } else if (k === 'panelTitle.inactiveForeground') {
-            const pti = document.getElementById('mockPanelTitleInactive');
-            if (pti) pti.style.color = val;
-          } else if (k === 'icon.foreground') {
-            const ico = document.getElementById('mockIcon');
-            if (ico) ico.style.color = val;
-          } else if (k === 'chat.requestBackground') {
-            const cb = document.getElementById('mockChatBubble');
-            if (cb) cb.style.background = val;
-          } else if (k === 'panel.background') {
-            const cp = document.getElementById('mockChatPanel');
-            if (cp) cp.style.background = val;
-          } else if (k === 'editorHoverWidget.background') {
-            const hw = document.getElementById('mockHoverWidget');
-            if (hw) hw.style.background = val;
-          } else if (k === 'editorHoverWidget.foreground') {
-            const ht = document.getElementById('mockHoverText');
-            if (ht) ht.style.color = val;
-          } else if (k === 'editorHoverWidget.border') {
-            const hw = document.getElementById('mockHoverWidget');
-            if (hw) hw.style.borderColor = val;
-          }
-        }
-      });
+      function renderSyntaxPreview() {
+        activeState.tokenColors.forEach(rule => {
+          const fg = rule.settings?.foreground;
+          if (!fg) return;
+          const scopes = Array.isArray(rule.scope) ? rule.scope : [rule.scope];
+          if (scopes.some(s => s.includes('keyword'))) updateLiveSyntax('keywords', fg, false);
+          else if (scopes.some(s => s.includes('function'))) updateLiveSyntax('functions', fg, false);
+          else if (scopes.some(s => s.includes('property') || s.includes('key'))) updateLiveSyntax('properties', fg, false);
+          else if (scopes.some(s => s.includes('string'))) updateLiveSyntax('strings', fg, false);
+          else if (scopes.some(s => s.includes('variable'))) updateLiveSyntax('variables', fg, false);
+          else if (scopes.some(s => s.includes('type') || s.includes('class'))) updateLiveSyntax('types', fg, false);
+          else if (scopes.some(s => s.includes('comment'))) updateLiveSyntax('comments', fg, false);
+          else if (scopes.some(s => s.includes('numeric') || s.includes('number'))) updateLiveSyntax('numbers', fg, false);
+        });
+      }
 
-      // Initial Syntax Colors Init
-      activeState.tokenColors.forEach(rule => {
-        const fg = rule.settings?.foreground;
-        if (!fg) return;
-        const scopes = Array.isArray(rule.scope) ? rule.scope : [rule.scope];
-        if (scopes.some(s => s.includes('keyword'))) {
-          document.querySelectorAll('.syn-keyword').forEach(el => el.style.color = fg);
-        } else if (scopes.some(s => s.includes('function'))) {
-          document.querySelectorAll('.syn-func').forEach(el => el.style.color = fg);
-        } else if (scopes.some(s => s.includes('property') || s.includes('key'))) {
-          document.querySelectorAll('.syn-prop').forEach(el => el.style.color = fg);
-        } else if (scopes.some(s => s.includes('string'))) {
-          document.querySelectorAll('.syn-string').forEach(el => el.style.color = fg);
-        } else if (scopes.some(s => s.includes('variable'))) {
-          document.querySelectorAll('.syn-var').forEach(el => el.style.color = fg);
-        } else if (scopes.some(s => s.includes('type') || s.includes('class'))) {
-          document.querySelectorAll('.syn-type').forEach(el => el.style.color = fg);
-        } else if (scopes.some(s => s.includes('comment'))) {
-          document.querySelectorAll('.syn-comment').forEach(el => el.style.color = fg);
-        } else if (scopes.some(s => s.includes('numeric') || s.includes('number'))) {
-          document.querySelectorAll('.syn-num').forEach(el => el.style.color = fg);
+      function syncControlValues() {
+        const activeEl = document.activeElement;
+
+        SIMPLE_UI_MAP.forEach(def => {
+          const val = activeState.colors[def.targets[0]] || def.defaultColor;
+          const picker = document.querySelector('.simple-ui-picker[data-simple-id="' + def.id + '"]');
+          if (picker !== activeEl) setPickerValue(picker, val, def.defaultColor);
+          const hex = document.querySelector('.simple-ui-hex[data-simple-id="' + def.id + '"]');
+          if (hex && hex !== activeEl) {
+            hex.value = val;
+            hex.setAttribute('aria-invalid', 'false');
+          }
+        });
+
+        UI_DEFS.forEach(def => {
+          const val = activeState.colors[def.id] || def.defaultValue;
+          const picker = document.querySelector('.adv-color-picker[data-target="' + def.id + '"]');
+          if (picker !== activeEl) setPickerValue(picker, val, def.defaultValue);
+          const hex = document.querySelector('.adv-hex-input[data-target="' + def.id + '"]');
+          if (hex && hex !== activeEl) {
+            hex.value = val;
+            hex.setAttribute('aria-invalid', 'false');
+          }
+        });
+
+        SIMPLE_SYNTAX_MAP.forEach(def => {
+          const syntax = SYNTAX_DEFS.find(item => item.id === def.targets[0]);
+          const rule = activeState.tokenColors.find(item => {
+            const scopes = Array.isArray(item.scope) ? item.scope : [item.scope];
+            return scopes.some(scope => syntax?.scopes.includes(scope));
+          });
+          const val = rule?.settings?.foreground || def.defaultColor;
+          const picker = document.querySelector('.simple-syntax-picker[data-simple-syntax-id="' + def.id + '"]');
+          if (picker !== activeEl) setPickerValue(picker, val, def.defaultColor);
+          const hex = document.querySelector('.simple-syntax-hex[data-simple-syntax-id="' + def.id + '"]');
+          if (hex && hex !== activeEl) {
+            hex.value = val;
+            hex.setAttribute('aria-invalid', 'false');
+          }
+        });
+
+        SYNTAX_DEFS.forEach(def => {
+          const rule = activeState.tokenColors.find(item => {
+            const scopes = Array.isArray(item.scope) ? item.scope : [item.scope];
+            return scopes.some(scope => def.scopes.includes(scope));
+          });
+          const val = rule?.settings?.foreground || def.defaultColor;
+          const picker = document.querySelector('.adv-syntax-picker[data-syntax-id="' + def.id + '"]');
+          if (picker !== activeEl) setPickerValue(picker, val, def.defaultColor);
+          const hex = document.querySelector('.adv-syntax-hex[data-syntax-id="' + def.id + '"]');
+          if (hex && hex !== activeEl) {
+            hex.value = val;
+            hex.setAttribute('aria-invalid', 'false');
+          }
+        });
+      }
+
+      function renderActiveTheme() {
+        Object.entries(activeState.colors).forEach(([key, value]) => {
+          if (value) updateLivePreview(key, value, false);
+        });
+        renderSyntaxPreview();
+        applyStudioTheme();
+        syncControlValues();
+      }
+
+      function replaceThemeSnapshot(message) {
+        cancelPendingLiveChanges();
+        if (message.colors && typeof message.colors === 'object') {
+          activeState.colors = { ...message.colors };
         }
-      });
+        if (Array.isArray(message.tokenColors)) {
+          activeState.tokenColors = message.tokenColors.map(rule => ({
+            ...rule,
+            settings: { ...rule.settings },
+          }));
+        }
+        if (message.themeKind) activeState.themeKind = message.themeKind;
+        if (typeof message.liveApply === 'boolean') activeState.liveApply = message.liveApply;
+        if (message.themeName) setProfileName(message.themeName);
+        renderActiveTheme();
+      }
+
+      renderActiveTheme();
 
       // 17. Live Theme Sync & Event Receiver from VS Code
       window.addEventListener('message', event => {
@@ -2306,43 +2525,27 @@ export class ThemeStudioWebview {
             }, 1800);
           }
           if (msg.profileName) {
-            activeState.profileName = msg.profileName;
-            const pLabel = document.getElementById('activeProfileLabel');
-            if (pLabel) pLabel.innerText = msg.profileName;
+            setProfileName(msg.profileName);
           }
           showToast('✨ Applied to VS Code!', '✨');
         }
 
         if (msg.command === 'presetApplied') {
           if (msg.presetName) {
-            activeState.profileName = msg.presetName;
-            const pLabel = document.getElementById('activeProfileLabel');
-            if (pLabel) pLabel.innerText = msg.presetName;
+            setProfileName(msg.presetName);
           }
           showToast('✨ Applied preset "' + (msg.presetName || 'Preset') + '"!', '⚡');
         }
 
         if (msg.command === 'profileSaved') {
           if (msg.profileName) {
-            activeState.profileName = msg.profileName;
-            const pLabel = document.getElementById('activeProfileLabel');
-            if (pLabel) pLabel.innerText = msg.profileName;
+            setProfileName(msg.profileName);
           }
           showToast('💾 Saved profile "' + msg.profileName + '"!', '💾');
         }
 
         if (msg.command === 'profileLoaded') {
-          if (msg.profileName) {
-            activeState.profileName = msg.profileName;
-            const pLabel = document.getElementById('activeProfileLabel');
-            if (pLabel) pLabel.innerText = msg.profileName;
-          }
-          if (msg.colors) {
-            activeState.colors = { ...activeState.colors, ...msg.colors };
-            Object.keys(msg.colors).forEach(k => {
-              updateLivePreview(k, msg.colors[k], false);
-            });
-          }
+          replaceThemeSnapshot({ ...msg, themeName: msg.profileName });
           showToast('✨ Loaded profile "' + msg.profileName + '"!', '✨');
         }
 
@@ -2351,87 +2554,11 @@ export class ThemeStudioWebview {
         }
 
         if (msg.command === 'syncActiveTheme') {
-          if (msg.colors) {
-            activeState.colors = { ...activeState.colors, ...msg.colors };
-            Object.keys(msg.colors).forEach(k => {
-              updateLivePreview(k, msg.colors[k], false);
-            });
-          }
+          replaceThemeSnapshot(msg);
+        }
 
-          if (msg.tokenColors && Array.isArray(msg.tokenColors)) {
-            activeState.tokenColors = msg.tokenColors;
-            msg.tokenColors.forEach(tc => {
-              const scopes = Array.isArray(tc.scope) ? tc.scope : [tc.scope];
-              const fg = tc.settings?.foreground;
-              if (fg) {
-                if (scopes.some(s => s.includes('keyword'))) updateLiveSyntax('keywords', fg, false);
-                else if (scopes.some(s => s.includes('function'))) updateLiveSyntax('functions', fg, false);
-                else if (scopes.some(s => s.includes('property') || s.includes('key'))) updateLiveSyntax('properties', fg, false);
-                else if (scopes.some(s => s.includes('string'))) updateLiveSyntax('strings', fg, false);
-                else if (scopes.some(s => s.includes('variable'))) updateLiveSyntax('variables', fg, false);
-                else if (scopes.some(s => s.includes('type') || s.includes('class'))) updateLiveSyntax('types', fg, false);
-                else if (scopes.some(s => s.includes('comment'))) updateLiveSyntax('comments', fg, false);
-                else if (scopes.some(s => s.includes('numeric') || s.includes('number'))) updateLiveSyntax('numbers', fg, false);
-              }
-            });
-          }
-
-          if (msg.themeName) {
-            activeState.profileName = msg.themeName;
-            const pDisplay = document.getElementById('activeProfileDisplay');
-            if (pDisplay) pDisplay.innerText = msg.themeName;
-            const pLabel = document.getElementById('activeProfileLabel');
-            if (pLabel) pLabel.innerText = msg.themeName;
-          }
-
-          const activeEl = document.activeElement;
-
-          // Update Simple UI color pickers and hex inputs
-          SIMPLE_UI_MAP.forEach(sDef => {
-            const val = activeState.colors[sDef.targets[0]] || sDef.defaultColor;
-            const pkr = document.querySelector('.simple-ui-picker[data-simple-id="' + sDef.id + '"]');
-            if (pkr && pkr !== activeEl && val && val.length === 7) pkr.value = val;
-            const hex = document.querySelector('.simple-ui-hex[data-simple-id="' + sDef.id + '"]');
-            if (hex && hex !== activeEl && val) hex.value = val;
-          });
-
-          // Update Simple Syntax color pickers and hex inputs
-          SIMPLE_SYNTAX_MAP.forEach(sDef => {
-            const targetSyntax = sDef.targets[0];
-            const item = SYNTAX_DEFS.find(s => s.id === targetSyntax);
-            const rule = activeState.tokenColors.find(r => {
-              const sc = Array.isArray(r.scope) ? r.scope : [r.scope];
-              return sc.some(s => item?.scopes.includes(s));
-            });
-            const val = rule?.settings?.foreground || sDef.defaultColor;
-            const pkr = document.querySelector('.simple-syntax-picker[data-simple-syntax-id="' + sDef.id + '"]');
-            if (pkr && pkr !== activeEl && val && val.length === 7) pkr.value = val;
-            const hex = document.querySelector('.simple-syntax-hex[data-simple-syntax-id="' + sDef.id + '"]');
-            if (hex && hex !== activeEl && val) hex.value = val;
-          });
-
-          // Update Advanced UI pickers and hex inputs
-          const UI_DEFS = ${JSON.stringify(UI_COLOR_DEFINITIONS)};
-          UI_DEFS.forEach(uDef => {
-            const val = activeState.colors[uDef.id] || uDef.defaultValue;
-            const pkr = document.querySelector('.adv-color-picker[data-target="' + uDef.id + '"]');
-            if (pkr && pkr !== activeEl && val && val.length === 7) pkr.value = val;
-            const hex = document.querySelector('.adv-hex-input[data-target="' + uDef.id + '"]');
-            if (hex && hex !== activeEl && val) hex.value = val;
-          });
-
-          // Update Advanced Syntax pickers and hex inputs
-          SYNTAX_DEFS.forEach(sDef => {
-            const rule = activeState.tokenColors.find(r => {
-              const sc = Array.isArray(r.scope) ? r.scope : [r.scope];
-              return sc.some(s => sDef.scopes.includes(s));
-            });
-            const val = rule?.settings?.foreground || sDef.defaultColor;
-            const pkr = document.querySelector('.adv-syntax-picker[data-syntax-id="' + sDef.id + '"]');
-            if (pkr && pkr !== activeEl && val && val.length === 7) pkr.value = val;
-            const hex = document.querySelector('.adv-syntax-hex[data-syntax-id="' + sDef.id + '"]');
-            if (hex && hex !== activeEl && val) hex.value = val;
-          });
+        if (msg.command === 'liveApplyError') {
+          showToast(msg.message || 'Unable to apply that color.', '⚠️');
         }
       });
 
@@ -2483,6 +2610,10 @@ export class ThemeStudioWebview {
 
   public dispose() {
     ThemeStudioWebview.currentPanel = undefined;
+    if (this._internalChangeTimer) {
+      clearTimeout(this._internalChangeTimer);
+      this._internalChangeTimer = undefined;
+    }
     this._panel.dispose();
 
     while (this._disposables.length) {

@@ -18,8 +18,8 @@ export class ThemeStudioWebview {
   private _isApplyingInternalChange: boolean = false;
   private _internalChangeDepth: number = 0;
   private _internalChangeTimer: NodeJS.Timeout | undefined;
-  private _liveColorApplyQueue: Promise<void> = Promise.resolve();
-  private _liveTokenApplyQueue: Promise<void> = Promise.resolve();
+  private _syncRequestedDuringInternalChange: boolean = false;
+  private _mutationQueue: Promise<void> = Promise.resolve();
 
   public static createOrShow(extensionUri: vscode.Uri) {
     const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
@@ -59,9 +59,27 @@ export class ThemeStudioWebview {
         this._internalChangeTimer = setTimeout(() => {
           this._isApplyingInternalChange = false;
           this._internalChangeTimer = undefined;
+          if (this._syncRequestedDuringInternalChange) {
+            this._syncRequestedDuringInternalChange = false;
+            this._syncActiveThemeToWebview();
+          }
         }, 400);
       }
     }
+  }
+
+  private _enqueueMutation<T>(operation: () => Promise<T>): Promise<T> {
+    const task = this._mutationQueue.then(operation);
+    this._mutationQueue = task.then(() => undefined, () => undefined);
+    return task;
+  }
+
+  private _requestThemeSync() {
+    if (this._isApplyingInternalChange) {
+      this._syncRequestedDuringInternalChange = true;
+      return;
+    }
+    this._syncActiveThemeToWebview();
   }
 
   private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
@@ -75,10 +93,7 @@ export class ThemeStudioWebview {
     // Live VS Code Active Theme Listener: When user changes theme in VS Code (File > Preferences > Theme > Color Theme)
     vscode.window.onDidChangeActiveColorTheme(
       () => {
-        if (this._isApplyingInternalChange) {
-          return;
-        }
-        this._syncActiveThemeToWebview();
+        this._requestThemeSync();
       },
       null,
       this._disposables
@@ -87,10 +102,6 @@ export class ThemeStudioWebview {
     // Live Setting Listener: Only sync when change was made externally (not by the Studio's active sliders)
     vscode.workspace.onDidChangeConfiguration(
       (e) => {
-        if (this._isApplyingInternalChange) {
-          return; // Skip echo feedback loop while user is picking colors in the studio
-        }
-
         if (
           e.affectsConfiguration('workbench.colorTheme') ||
           e.affectsConfiguration('workbench.colorCustomizations') ||
@@ -98,7 +109,7 @@ export class ThemeStudioWebview {
           e.affectsConfiguration('editor.semanticTokenColorCustomizations') ||
           e.affectsConfiguration('simpletheme')
         ) {
-          this._syncActiveThemeToWebview();
+          this._requestThemeSync();
         }
       },
       null,
@@ -107,28 +118,40 @@ export class ThemeStudioWebview {
 
     this._panel.webview.onDidReceiveMessage(
       async (message) => {
-        switch (message.command) {
+        try {
+          switch (message.command) {
           case 'applyAll':
-            await this._runInternalChange(() => ThemeEngine.applyTheme(message.colors, message.tokenColors, message.profileName));
+            const appliedState = await this._enqueueMutation(async () => {
+              await this._runInternalChange(() => ThemeEngine.applyTheme(message.colors, message.tokenColors, message.profileName));
+              return ThemeEngine.getEffectiveThemeState();
+            });
             vscode.window.showInformationMessage(`✨ Applied "${message.profileName || 'Custom'}" theme to VS Code!`);
             this._panel.webview.postMessage({
               command: 'themeApplied',
               profileName: message.profileName || 'Custom Theme',
+              themeKind: appliedState.themeKind,
+              colors: appliedState.colors,
+              tokenColors: appliedState.tokenColors,
+              requestRevision: message.requestRevision,
             });
             break;
 
           case 'applyLiveColors': {
             const colors = message.colors && typeof message.colors === 'object' ? message.colors : {};
-            const applyTask = this._liveColorApplyQueue.then(async () => {
+            const applyTask = this._enqueueMutation(async () => {
               await this._runInternalChange(() => ThemeEngine.applyColors(colors));
             });
-            this._liveColorApplyQueue = applyTask.catch(() => undefined);
+            let errorMessage: string | undefined;
             try {
               await applyTask;
             } catch (error) {
+              errorMessage = error instanceof Error ? error.message : 'Unable to apply the color change.';
+            } finally {
               this._panel.webview.postMessage({
-                command: 'liveApplyError',
-                message: error instanceof Error ? error.message : 'Unable to apply the color change.',
+                command: 'liveColorsApplied',
+                batchId: message.batchId,
+                ok: !errorMessage,
+                message: errorMessage,
               });
             }
             break;
@@ -136,16 +159,20 @@ export class ThemeStudioWebview {
 
           case 'applyLiveTokenColors': {
             const colors = message.colors && typeof message.colors === 'object' ? message.colors : {};
-            const applyTask = this._liveTokenApplyQueue.then(async () => {
+            const applyTask = this._enqueueMutation(async () => {
               await this._runInternalChange(() => ThemeEngine.applyTokenColors(colors));
             });
-            this._liveTokenApplyQueue = applyTask.catch(() => undefined);
+            let errorMessage: string | undefined;
             try {
               await applyTask;
             } catch (error) {
+              errorMessage = error instanceof Error ? error.message : 'Unable to apply the syntax color change.';
+            } finally {
               this._panel.webview.postMessage({
-                command: 'liveApplyError',
-                message: error instanceof Error ? error.message : 'Unable to apply the syntax color change.',
+                command: 'liveTokenColorsApplied',
+                batchId: message.batchId,
+                ok: !errorMessage,
+                message: errorMessage,
               });
             }
             break;
@@ -154,12 +181,26 @@ export class ThemeStudioWebview {
           case 'applyPreset':
             const preset = THEME_PRESETS.find((p) => p.id === message.presetId);
             if (preset) {
-              await this._runInternalChange(() => ThemeEngine.applyPreset(preset));
+              const presetState = await this._enqueueMutation(async () => {
+                await this._runInternalChange(() => ThemeEngine.applyPreset(preset));
+                return ThemeEngine.getEffectiveThemeState();
+              });
               vscode.window.showInformationMessage(`✨ Applied preset "${preset.name}"!`);
               this._panel.webview.postMessage({
                 command: 'presetApplied',
                 presetId: preset.id,
                 presetName: preset.name,
+                themeKind: presetState.themeKind,
+                colors: presetState.colors,
+                tokenColors: presetState.tokenColors,
+                requestRevision: message.requestRevision,
+              });
+            } else {
+              this._panel.webview.postMessage({
+                command: 'authoritativeActionError',
+                requestCommand: message.command,
+                requestRevision: message.requestRevision,
+                message: 'That theme preset is no longer available.',
               });
             }
             break;
@@ -186,14 +227,25 @@ export class ThemeStudioWebview {
           case 'loadProfile':
             const profile = ProfileManager.getProfile(message.profileId);
             if (profile) {
-              await this._runInternalChange(() => ThemeEngine.applyTheme(profile.colors, profile.tokenColors, profile.name));
+              const profileState = await this._enqueueMutation(async () => {
+                await this._runInternalChange(() => ThemeEngine.applyTheme(profile.colors, profile.tokenColors, profile.name));
+                return ThemeEngine.getEffectiveThemeState();
+              });
               vscode.window.showInformationMessage(`✨ Loaded profile "${profile.name}"!`);
               this._panel.webview.postMessage({
                 command: 'profileLoaded',
                 profileName: profile.name,
-                themeKind: profile.type,
-                colors: profile.colors,
-                tokenColors: profile.tokenColors,
+                themeKind: profileState.themeKind,
+                colors: profileState.colors,
+                tokenColors: profileState.tokenColors,
+                requestRevision: message.requestRevision,
+              });
+            } else {
+              this._panel.webview.postMessage({
+                command: 'authoritativeActionError',
+                requestCommand: message.command,
+                requestRevision: message.requestRevision,
+                message: 'That saved theme profile is no longer available.',
               });
             }
             break;
@@ -221,27 +273,56 @@ export class ThemeStudioWebview {
             vscode.window.showInformationMessage('📋 Copied theme settings JSON to clipboard!');
             break;
 
-          case 'refreshThemeFromVsCode':
-            this._syncActiveThemeToWebview();
-            const activeStateObj = ThemeEngine.getEffectiveThemeState();
-            vscode.window.showInformationMessage(`🔄 Synced live colors from "${activeStateObj.themeName}"!`);
-            break;
-
-          case 'resetTheme':
-            const confirmReset = await vscode.window.showWarningMessage(
-              'Reset all theme customizations and restore default colors?',
-              { modal: true },
-              'Reset Theme'
-            );
-            if (confirmReset === 'Reset Theme') {
-              await this._runInternalChange(() => ThemeEngine.resetTheme());
-              vscode.window.showInformationMessage('🔄 Reset theme customizations to default.');
-              this._syncActiveThemeToWebview();
-              this._panel.webview.postMessage({
-                command: 'themeReset',
-              });
+          case 'refreshThemeFromVsCode': {
+            const activeStateObj = await this._enqueueMutation(async () => ThemeEngine.getEffectiveThemeState());
+            this._syncActiveThemeToWebview(message.requestRevision, activeStateObj);
+            if (!message.silent) {
+              vscode.window.showInformationMessage(`🔄 Synced live colors from "${activeStateObj.themeName}"!`);
             }
             break;
+          }
+
+          case 'resetTheme': {
+            // Reserve reset's place in the shared FIFO before opening the modal. Any
+            // edits made while it is open are then applied after a confirmed reset.
+            const resetResult = await this._enqueueMutation(async () => {
+              const confirmReset = await vscode.window.showWarningMessage(
+                'Reset all theme customizations and restore default colors?',
+                { modal: true },
+                'Reset Theme'
+              );
+              const confirmed = confirmReset === 'Reset Theme';
+              if (confirmed) {
+                await this._runInternalChange(() => ThemeEngine.resetTheme());
+              }
+              return {
+                confirmed,
+                state: ThemeEngine.getEffectiveThemeState(),
+              };
+            });
+            if (resetResult.confirmed) {
+              vscode.window.showInformationMessage('🔄 Reset theme customizations to default.');
+            }
+            this._panel.webview.postMessage({
+              command: 'themeResetResolved',
+              confirmed: resetResult.confirmed,
+              themeName: resetResult.state.themeName,
+              themeKind: resetResult.state.themeKind,
+              colors: resetResult.state.colors,
+              tokenColors: resetResult.state.tokenColors,
+              liveApply: vscode.workspace.getConfiguration('simpletheme').get<boolean>('liveApply', true),
+              requestRevision: message.requestRevision,
+            });
+            break;
+          }
+          }
+        } catch (error) {
+          this._panel.webview.postMessage({
+            command: 'authoritativeActionError',
+            requestCommand: message.command,
+            requestRevision: message.requestRevision,
+            message: error instanceof Error ? error.message : 'Unable to complete that theme action.',
+          });
         }
       },
       null,
@@ -249,9 +330,8 @@ export class ThemeStudioWebview {
     );
   }
 
-  private _syncActiveThemeToWebview() {
+  private _syncActiveThemeToWebview(requestRevision?: number, effective = ThemeEngine.getEffectiveThemeState()) {
     if (!this._panel || !this._panel.webview) return;
-    const effective = ThemeEngine.getEffectiveThemeState();
     this._panel.webview.postMessage({
       command: 'syncActiveTheme',
       themeName: effective.themeName,
@@ -259,6 +339,7 @@ export class ThemeStudioWebview {
       colors: effective.colors,
       tokenColors: effective.tokenColors,
       liveApply: vscode.workspace.getConfiguration('simpletheme').get<boolean>('liveApply', true),
+      requestRevision,
     });
   }
 
@@ -282,6 +363,144 @@ export class ThemeStudioWebview {
         return `#${normalized[1]}${normalized[1]}${normalized[2]}${normalized[2]}${normalized[3]}${normalized[3]}`;
       }
       return fallback;
+    };
+    const uiDefaults = Object.fromEntries(UI_COLOR_DEFINITIONS.map((definition) => [definition.id, definition.defaultValue]));
+    const normalizeComparableColor = (value: string): string => value.trim().toLowerCase();
+    const getSimpleUiGroupState = (definition: typeof SIMPLE_UI_DEFINITIONS[number]) => {
+      const values = definition.targets.map((target) => currentColors[target] || uiDefaults[target] || definition.defaultColor);
+      return {
+        displayValue: values[0] || definition.defaultColor,
+        mixed: new Set(values.map(normalizeComparableColor)).size > 1,
+      };
+    };
+    const getSyntaxColor = (syntaxId: string): string | undefined => {
+      const syntax = SYNTAX_SCOPE_DEFINITIONS.find((definition) => definition.id === syntaxId);
+      if (!syntax) return undefined;
+      const rule = currentTokens.find((candidate) => {
+        const scopes = Array.isArray(candidate.scope) ? candidate.scope : [candidate.scope];
+        return scopes.some((scope) => syntax.scopes.includes(scope));
+      });
+      return rule?.settings?.foreground;
+    };
+    const getSimpleSyntaxGroupState = (definition: typeof SIMPLE_SYNTAX_DEFINITIONS[number]) => {
+      const values = definition.targets.map((target) => getSyntaxColor(target) || SYNTAX_SCOPE_DEFINITIONS.find((syntax) => syntax.id === target)?.defaultColor || definition.defaultColor);
+      return {
+        displayValue: values[0] || definition.defaultColor,
+        mixed: new Set(values.map(normalizeComparableColor)).size > 1,
+      };
+    };
+    const renderSimpleUiCard = (definition: typeof SIMPLE_UI_DEFINITIONS[number]): string => {
+      const state = getSimpleUiGroupState(definition);
+      const stateLabel = state.mixed ? `Mixed · ${definition.targets.length}` : `Linked ${definition.targets.length}`;
+      const linkedTargets = definition.targets.join(', ');
+      return `
+        <div class="simple-card${state.mixed ? ' is-mixed' : ''}" data-simple-ui-id="${definition.id}" title="Linked roles: ${linkedTargets}">
+          <div class="color-card-header">
+            <span class="color-name">${definition.icon} ${definition.name}</span>
+            <span class="color-category-badge simple-group-state${state.mixed ? ' is-mixed' : ''}" data-simple-ui-state="${definition.id}">${stateLabel}</span>
+          </div>
+          <div class="color-desc">${definition.description}</div>
+          <div class="color-input-row">
+            <input type="color" class="color-picker simple-ui-picker" data-simple-id="${definition.id}" value="${toColorPickerValue(state.displayValue, definition.defaultColor)}" aria-label="${definition.name} color picker" />
+            <input type="text" class="hex-input simple-ui-hex" data-simple-id="${definition.id}" value="${state.displayValue}" aria-label="${definition.name} hex value" title="${state.mixed ? 'Linked roles currently differ. Choose a color to unify them.' : 'All linked roles currently share this color.'}" />
+          </div>
+        </div>`;
+    };
+    const renderSimpleSyntaxCard = (definition: typeof SIMPLE_SYNTAX_DEFINITIONS[number]): string => {
+      const state = getSimpleSyntaxGroupState(definition);
+      const stateLabel = state.mixed ? `Mixed · ${definition.targets.length}` : `Linked ${definition.targets.length}`;
+      return `
+        <div class="simple-card${state.mixed ? ' is-mixed' : ''}" data-simple-syntax-id="${definition.id}" title="Linked syntax roles: ${definition.targets.join(', ')}">
+          <div class="color-card-header">
+            <span class="color-name">${definition.icon} ${definition.name}</span>
+            <span class="color-category-badge simple-group-state${state.mixed ? ' is-mixed' : ''}" data-simple-syntax-state="${definition.id}">${stateLabel}</span>
+          </div>
+          <div class="color-desc">${definition.description}</div>
+          <div class="color-input-row">
+            <input type="color" class="color-picker simple-syntax-picker" data-simple-syntax-id="${definition.id}" data-target-syntax="${definition.targets[0]}" value="${toColorPickerValue(state.displayValue, definition.defaultColor)}" aria-label="${definition.name} color picker" />
+            <input type="text" class="hex-input simple-syntax-hex" data-simple-syntax-id="${definition.id}" data-target-syntax="${definition.targets[0]}" value="${state.displayValue}" aria-label="${definition.name} hex value" title="${state.mixed ? 'Linked syntax roles currently differ. Choose a color to unify them.' : 'All linked syntax roles currently share this color.'}" />
+          </div>
+        </div>`;
+    };
+    const renderSimpleSections = <T extends { section: string }>(definitions: T[], renderCard: (definition: T) => string): string =>
+      Array.from(new Set(definitions.map((definition) => definition.section))).map((section) => {
+        const sectionDefinitions = definitions.filter((definition) => definition.section === section);
+        return `
+          <section class="simple-section" aria-label="${section}">
+            <div class="simple-section-heading">
+              <span>${section}</span>
+              <span class="simple-section-count">${sectionDefinitions.length} controls</span>
+            </div>
+            <div class="color-grid">${sectionDefinitions.map(renderCard).join('')}</div>
+          </section>`;
+      }).join('');
+    const escapeHtml = (value: string): string => value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+    const simpleUiOwnerByTarget = new Map(
+      SIMPLE_UI_DEFINITIONS.flatMap((definition) => definition.targets.map((target) => [target, definition.id] as const))
+    );
+    const simpleSyntaxOwnerByTarget = new Map(
+      SIMPLE_SYNTAX_DEFINITIONS.flatMap((definition) => definition.targets.map((target) => [target, definition.id] as const))
+    );
+    const requireSimpleOwner = (owners: Map<string, string>, target: string, label: string): string => {
+      const owner = owners.get(target);
+      if (!owner) throw new Error(`${label} preview target ${target} has no Simple owner`);
+      return owner;
+    };
+    const previewRoleKind = (id: string): 'background' | 'border' | 'cursor' | 'foreground' => {
+      const normalized = id.toLowerCase();
+      if (normalized.includes('background')) return 'background';
+      if (normalized.includes('border')) return 'border';
+      if (normalized.includes('cursor')) return 'cursor';
+      return 'foreground';
+    };
+    const previewRoleSample = (kind: ReturnType<typeof previewRoleKind>): string => {
+      if (kind === 'background') return 'Surface';
+      if (kind === 'border') return 'Outline';
+      if (kind === 'cursor') return '┃ Cursor';
+      return 'Aa Text';
+    };
+    const renderPreviewUiOption = (definition: typeof UI_COLOR_DEFINITIONS[number]): string => {
+      const owner = requireSimpleOwner(simpleUiOwnerByTarget, definition.id, 'UI');
+      const kind = previewRoleKind(definition.id);
+      const label = `Edit ${definition.name} color (${definition.id})`;
+      return `
+        <button type="button" class="preview-option preview-option-${kind} mock-clickable" data-preview-target="preview-ui-${escapeHtml(definition.id)}" data-preview-ui-role="${escapeHtml(definition.id)}" data-inspect-ui="${escapeHtml(definition.id)}" data-inspect-simple-ui="${escapeHtml(owner)}" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}">
+          <span class="preview-option-sample" aria-hidden="true">${previewRoleSample(kind)}</span>
+          <span class="preview-option-copy">
+            <strong>${escapeHtml(definition.name)}</strong>
+            <small>${escapeHtml(definition.id)}</small>
+          </span>
+        </button>`;
+    };
+    const renderPreviewUiGallery = (): string =>
+      Array.from(new Set(UI_COLOR_DEFINITIONS.map((definition) => definition.category))).map((category) => {
+        const categoryDefinitions = UI_COLOR_DEFINITIONS.filter((definition) => definition.category === category);
+        const categoryLabel = category.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (letter) => letter.toUpperCase());
+        return `
+          <section class="preview-option-section" aria-label="${escapeHtml(categoryLabel)} UI colors">
+            <div class="preview-option-heading">
+              <span>${escapeHtml(categoryLabel)}</span>
+              <span>${categoryDefinitions.length}</span>
+            </div>
+            <div class="preview-option-grid">${categoryDefinitions.map(renderPreviewUiOption).join('')}</div>
+          </section>`;
+      }).join('');
+    const renderPreviewSyntaxOption = (definition: typeof SYNTAX_SCOPE_DEFINITIONS[number]): string => {
+      const owner = requireSimpleOwner(simpleSyntaxOwnerByTarget, definition.id, 'Syntax');
+      const label = `Edit ${definition.name} syntax color`;
+      return `
+        <button type="button" class="preview-option preview-option-foreground mock-clickable" data-preview-target="preview-syntax-${escapeHtml(definition.id)}" data-preview-syntax-role="${escapeHtml(definition.id)}" data-inspect-syntax="${escapeHtml(definition.id)}" data-inspect-simple-syntax="${escapeHtml(owner)}" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}">
+          <span class="preview-option-sample" aria-hidden="true">Aa Code</span>
+          <span class="preview-option-copy">
+            <strong>${escapeHtml(definition.name)}</strong>
+            <small>${escapeHtml(definition.id)}</small>
+          </span>
+        </button>`;
     };
 
     return `<!DOCTYPE html>
@@ -699,6 +918,31 @@ export class ThemeStudioWebview {
       gap: 10px;
     }
 
+    .simple-section + .simple-section {
+      margin-top: 18px;
+    }
+
+    .simple-section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .simple-section-count {
+      color: var(--text-muted);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
     .color-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -732,6 +976,16 @@ export class ThemeStudioWebview {
       border-color: var(--accent);
       transform: translateY(-1px);
       box-shadow: 0 4px 16px var(--shadow);
+    }
+
+    .simple-card.is-mixed {
+      border-style: dashed;
+    }
+
+    .simple-group-state.is-mixed {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid var(--accent-border);
     }
 
     /* Highlight Animation When Element in Preview is Clicked */
@@ -986,6 +1240,155 @@ export class ThemeStudioWebview {
       filter: brightness(1.2);
     }
 
+    .mock-clickable:focus-visible {
+      outline: 2px solid var(--accent) !important;
+      outline-offset: 1px;
+      filter: brightness(1.12);
+    }
+
+    .preview-mode-btn[aria-pressed="true"] {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .preview-panel[hidden] {
+      display: none !important;
+    }
+
+    .preview-role-gallery {
+      height: var(--preview-height);
+      min-height: 200px;
+      overflow: auto;
+      padding: 10px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--vscode-font-family, sans-serif);
+      scrollbar-color: var(--accent) transparent;
+    }
+
+    .preview-gallery-intro {
+      margin: 0 0 10px;
+      color: var(--text-muted);
+      font-size: calc(10px * var(--preview-scale));
+      line-height: 1.4;
+    }
+
+    .preview-option-section + .preview-option-section {
+      margin-top: 10px;
+    }
+
+    .preview-option-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      color: var(--text-muted);
+      font-size: calc(9px * var(--preview-scale));
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .preview-option-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    .preview-option {
+      --preview-role-color: var(--text);
+      appearance: none;
+      width: 100%;
+      min-width: 0;
+      display: grid;
+      grid-template-columns: 52px minmax(0, 1fr);
+      align-items: center;
+      gap: 7px;
+      padding: 5px;
+      border: 1px solid var(--card-border);
+      border-radius: 5px;
+      background: var(--card-bg);
+      color: var(--text);
+      text-align: left;
+      font: inherit;
+    }
+
+    .preview-option:hover {
+      background: var(--surface-hover);
+    }
+
+    .preview-option-sample {
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      background: var(--control-bg);
+      color: var(--preview-role-color);
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: calc(9px * var(--preview-scale));
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .preview-option-background .preview-option-sample {
+      background: var(--preview-role-color);
+      color: var(--text);
+    }
+
+    .preview-option-border .preview-option-sample {
+      border: 3px solid var(--preview-role-color);
+      background: var(--control-bg);
+      color: var(--text);
+    }
+
+    .preview-option-cursor .preview-option-sample {
+      color: var(--preview-role-color);
+      background: var(--control-bg);
+    }
+
+    .preview-option-copy {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .preview-option-copy strong,
+    .preview-option-copy small {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .preview-option-copy strong {
+      color: var(--text);
+      font-size: calc(9.5px * var(--preview-scale));
+    }
+
+    .preview-option-copy small {
+      color: var(--text-muted);
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: calc(7.5px * var(--preview-scale));
+    }
+
+    .mock-line-number {
+      display: inline-block;
+      min-width: 1.2em;
+      text-align: right;
+    }
+
+    .mock-chat-surface {
+      padding: 2px 5px;
+      border-radius: 3px;
+    }
+
+    @media (max-width: 620px) {
+      .preview-option-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
     .mock-window {
       --mock-accent: #007acc;
       --mock-border: #000000;
@@ -1183,26 +1586,9 @@ export class ThemeStudioWebview {
         <!-- Tab 1A: Simple Mode UI (${SIMPLE_UI_DEFINITIONS.length} Master Colors) -->
         <div id="uiSimpleContainer">
           <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
-            Set these ${SIMPLE_UI_DEFINITIONS.length} master colors to style the entire VS Code workbench. *(Tip: Click any element in the Live Preview to jump right to its tile!)*
+            ${SIMPLE_UI_DEFINITIONS.length} linked controls cover all ${UI_COLOR_DEFINITIONS.length} color roles used by every bundled preset. A <strong>Mixed</strong> badge means those linked roles currently differ; choosing a color intentionally unifies them. <em>Tip: click a preview element to jump to its control.</em>
           </div>
-          <div class="color-grid">
-            ${SIMPLE_UI_DEFINITIONS.map((def) => {
-              const primaryTarget = def.targets[0];
-              const val = currentColors[primaryTarget] || def.defaultColor;
-              return `
-              <div class="simple-card" data-simple-ui-id="${def.id}">
-                <div class="color-card-header">
-                  <span class="color-name">${def.icon} ${def.name}</span>
-                  <span class="color-category-badge">Master</span>
-                </div>
-                <div class="color-desc">${def.description}</div>
-                <div class="color-input-row">
-                  <input type="color" class="color-picker simple-ui-picker" data-simple-id="${def.id}" value="${toColorPickerValue(val, def.defaultColor)}" />
-                  <input type="text" class="hex-input simple-ui-hex" data-simple-id="${def.id}" value="${val}" />
-                </div>
-              </div>`;
-            }).join('')}
-          </div>
+          ${renderSimpleSections(SIMPLE_UI_DEFINITIONS, renderSimpleUiCard)}
         </div>
 
         <!-- Tab 1B: Advanced Mode UI (Full Granular List) -->
@@ -1249,35 +1635,17 @@ export class ThemeStudioWebview {
             Syntax Mode:
           </div>
           <div class="mode-toggle-group">
-            <button class="mode-btn active" id="btnSyntaxModeSimple" onclick="setSyntaxMode('simple')">⚡ Simple Mode (6 Tokens)</button>
+            <button class="mode-btn active" id="btnSyntaxModeSimple" onclick="setSyntaxMode('simple')">⚡ Simple Mode (${SIMPLE_SYNTAX_DEFINITIONS.length} Colors)</button>
             <button class="mode-btn" id="btnSyntaxModeAdvanced" onclick="setSyntaxMode('advanced')">⚙️ Advanced Mode (Full Scopes)</button>
           </div>
         </div>
 
-        <!-- Tab 2A: Simple Mode Syntax (6 Master Tokens) -->
+        <!-- Tab 2A: Simple Mode Syntax (${SIMPLE_SYNTAX_DEFINITIONS.length} Master Colors) -->
         <div id="syntaxSimpleContainer">
           <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
-            Set 6 core syntax colors to instantly colorize code across all programming languages. *(Tip: Click any code word in the Live Preview to highlight its tile!)*
+            ${SIMPLE_SYNTAX_DEFINITIONS.length} linked controls cover all ${SYNTAX_SCOPE_DEFINITIONS.length} supported syntax roles. A <strong>Mixed</strong> badge preserves intentional differences until you choose one shared color. <em>Tip: click any code token in the preview to jump to its control.</em>
           </div>
-          <div class="color-grid">
-            ${SIMPLE_SYNTAX_DEFINITIONS.map((def) => {
-              const item = SYNTAX_SCOPE_DEFINITIONS.find((s) => s.id === def.targets[0]);
-              const rule = currentTokens.find((r) => Array.isArray(r.scope) ? r.scope.includes(item?.scopes[0] || '') : r.scope === item?.scopes[0]);
-              const val = rule?.settings?.foreground || def.defaultColor;
-              return `
-              <div class="simple-card" data-simple-syntax-id="${def.id}">
-                <div class="color-card-header">
-                  <span class="color-name">${def.icon} ${def.name}</span>
-                  <span class="color-category-badge">Token</span>
-                </div>
-                <div class="color-desc">${def.description}</div>
-                <div class="color-input-row">
-                  <input type="color" class="color-picker simple-syntax-picker" data-simple-syntax-id="${def.id}" data-target-syntax="${def.targets[0]}" value="${toColorPickerValue(val, def.defaultColor)}" />
-                  <input type="text" class="hex-input simple-syntax-hex" data-simple-syntax-id="${def.id}" data-target-syntax="${def.targets[0]}" value="${val}" />
-                </div>
-              </div>`;
-            }).join('')}
-          </div>
+          ${renderSimpleSections(SIMPLE_SYNTAX_DEFINITIONS, renderSimpleSyntaxCard)}
         </div>
 
         <!-- Tab 2B: Advanced Mode Syntax (Full Scopes) -->
@@ -1399,11 +1767,18 @@ export class ThemeStudioWebview {
         <div class="preview-header-bar">
           <div style="display: flex; align-items: center; gap: 6px;">
             <span>👁️ LIVE PREVIEW</span>
-            <span style="color: var(--accent); font-size: 9px;">● Click element to edit tile</span>
+            <span style="color: var(--accent); font-size: 9px;">● Every displayed role is clickable</span>
           </div>
 
           <!-- Compact Size & Scale Controls -->
           <div class="preview-controls-row">
+
+            <!-- Preview Content -->
+            <div class="size-btn-group" role="group" aria-label="Preview content">
+              <button type="button" class="size-btn preview-mode-btn active" data-preview-mode="workbench" aria-pressed="true">Workbench</button>
+              <button type="button" class="size-btn preview-mode-btn" data-preview-mode="ui" aria-pressed="false">All UI (${UI_COLOR_DEFINITIONS.length})</button>
+              <button type="button" class="size-btn preview-mode-btn" data-preview-mode="syntax" aria-pressed="false">Syntax (${SYNTAX_SCOPE_DEFINITIONS.length})</button>
+            </div>
 
             <!-- Height Presets -->
             <div class="size-btn-group">
@@ -1422,87 +1797,95 @@ export class ThemeStudioWebview {
           </div>
         </div>
 
-        <div class="mock-window" id="mockWindow">
+        <div class="preview-panel" id="previewWorkbenchPanel" data-preview-panel="workbench">
+          <div class="mock-window" id="mockWindow">
 
           <!-- Mock Top Title Bar -->
-          <div class="mock-titlebar mock-clickable" id="mockTitlebar" data-inspect-ui="titleBar.activeBackground" data-inspect-simple-ui="simple.sidebarBg" title="Click to highlight Title Bar color">
-            <span>SimpleTheme — VS Code</span>
+          <div class="mock-titlebar mock-clickable" id="mockTitlebar" data-inspect-ui="titleBar.activeBackground" data-inspect-simple-ui="simple.chromeBg" title="Click to highlight Title Bar Background">
+            <span class="mock-clickable" data-inspect-ui="titleBar.activeForeground" data-inspect-simple-ui="simple.navigationText" title="Click to highlight Title Bar Text">SimpleTheme — VS Code</span>
           </div>
 
           <!-- Mock Middle (Activity Bar + Sidebar + Editor) -->
           <div class="mock-body">
 
             <!-- Activity Bar -->
-            <div class="mock-activitybar mock-clickable" id="mockActivityBar" data-inspect-ui="activityBar.background" data-inspect-simple-ui="simple.sidebarBg" title="Click to highlight Activity Bar color">
-              <span>📄</span>
-              <span>🔍</span>
-              <span>⚡</span>
-              <span>🎨</span>
+            <div class="mock-activitybar mock-clickable" id="mockActivityBar" data-inspect-ui="activityBar.background" data-inspect-simple-ui="simple.chromeBg" title="Click to highlight Activity Bar Background">
+              <span class="mock-clickable" data-inspect-ui="activityBar.foreground" data-inspect-simple-ui="simple.navigationText" title="Click to highlight Navigation Icons">📄</span>
+              <span class="mock-clickable" data-inspect-ui="activityBar.foreground" data-inspect-simple-ui="simple.navigationText" title="Click to highlight Navigation Icons">🔍</span>
+              <span class="mock-clickable" data-inspect-ui="activityBar.foreground" data-inspect-simple-ui="simple.navigationText" title="Click to highlight Navigation Icons">⚡</span>
+              <span class="mock-clickable" data-inspect-ui="activityBar.foreground" data-inspect-simple-ui="simple.navigationText" title="Click to highlight Navigation Icons">🎨</span>
             </div>
 
             <!-- Sidebar -->
-            <div class="mock-sidebar mock-clickable" id="mockSidebar" data-inspect-ui="sideBar.background" data-inspect-simple-ui="simple.sidebarBg" title="Click to highlight Sidebar Background">
-              <div class="mock-sidebar-title mock-clickable" id="mockSidebarTitle" data-inspect-ui="sideBarTitle.foreground" data-inspect-simple-ui="simple.sidebarText" title="Click to highlight Sidebar Title (EXPLORER)" style="font-weight: 700; margin-bottom: 2px;">EXPLORER</div>
-              <div class="mock-tree-item mock-clickable" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.sidebarText" title="Click to highlight Explorer Text">📁 src</div>
-              <div class="mock-tree-item mock-clickable" style="padding-left: 6px;" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.sidebarText" title="Click to highlight Explorer Text">📄 themeEngine.ts</div>
+            <div class="mock-sidebar mock-clickable" id="mockSidebar" data-inspect-ui="sideBar.background" data-inspect-simple-ui="simple.chromeBg" title="Click to highlight Sidebar Background">
+              <div class="mock-sidebar-title mock-clickable" id="mockSidebarTitle" data-inspect-ui="sideBarTitle.foreground" data-inspect-simple-ui="simple.navigationText" title="Click to highlight Sidebar Title (EXPLORER)" style="font-weight: 700; margin-bottom: 2px;">EXPLORER</div>
+              <div class="mock-tree-item mock-clickable" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.navigationText" title="Click to highlight Explorer Text">📁 src</div>
+              <div class="mock-tree-item mock-clickable" style="padding-left: 6px;" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.navigationText" title="Click to highlight Explorer Text">📄 themeEngine.ts</div>
               <div class="mock-tree-item mock-clickable" id="mockTreeSelected" style="padding-left: 6px; color: var(--mock-accent);" data-inspect-ui="focusBorder" data-inspect-simple-ui="simple.accent" title="Click to highlight Selected File Accent">📄 presets.ts</div>
-              <div class="mock-tree-item mock-clickable" style="padding-left: 6px;" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.sidebarText" title="Click to highlight Explorer Text">📄 studio.tsx</div>
-              <div class="mock-tree-item mock-clickable" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.sidebarText" title="Click to highlight Explorer Text">📁 media</div>
-              <div class="mock-tree-item mock-clickable" style="padding-left: 6px;" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.sidebarText" title="Click to highlight Explorer Text">🖼️ logo.svg</div>
+              <div class="mock-tree-item mock-clickable" style="padding-left: 6px;" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.navigationText" title="Click to highlight Explorer Text">📄 studio.tsx</div>
+              <div class="mock-tree-item mock-clickable" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.navigationText" title="Click to highlight Explorer Text">📁 media</div>
+              <div class="mock-tree-item mock-clickable" style="padding-left: 6px;" data-inspect-ui="sideBar.foreground" data-inspect-simple-ui="simple.navigationText" title="Click to highlight Explorer Text">🖼️ logo.svg</div>
             </div>
 
             <!-- Editor Area -->
             <div class="mock-editor-area">
 
               <!-- Tabs Bar -->
-              <div class="mock-tabs-bar mock-clickable" id="mockTabsBar" data-inspect-ui="editorGroupHeader.tabsBackground" data-inspect-simple-ui="simple.tabsBg" title="Click to highlight Tabs Bar color">
-                <div class="mock-tab active mock-clickable" id="mockActiveTab" data-inspect-ui="tab.activeBackground" data-inspect-simple-ui="simple.editorBg" title="Click to highlight Active Tab color">
-                  <span>📄 studio.tsx</span>
+              <div class="mock-tabs-bar mock-clickable" id="mockTabsBar" data-inspect-ui="editorGroupHeader.tabsBackground" data-inspect-simple-ui="simple.chromeBg" title="Click to highlight Tabs Bar color">
+                <div class="mock-tab active mock-clickable" id="mockActiveTab" data-inspect-ui="tab.activeBackground" data-inspect-simple-ui="simple.canvasBg" title="Click to highlight Active Tab Background">
+                  <span class="mock-clickable" data-inspect-ui="tab.activeForeground" data-inspect-simple-ui="simple.primaryText" title="Click to highlight Active Tab Text">📄 studio.tsx</span>
                 </div>
-                <div class="mock-tab mock-clickable" id="mockInactiveTab" data-inspect-ui="tab.inactiveBackground" data-inspect-simple-ui="simple.tabsBg" title="Click to highlight Inactive Tab color">
-                  <span>📄 themeEngine.ts</span>
+                <div class="mock-tab mock-clickable" id="mockInactiveTab" data-inspect-ui="tab.inactiveBackground" data-inspect-simple-ui="simple.secondaryBg" title="Click to highlight Inactive Tab Background">
+                  <span class="mock-clickable" data-inspect-ui="tab.inactiveForeground" data-inspect-simple-ui="simple.mutedText" title="Click to highlight Inactive Tab Text">📄 themeEngine.ts</span>
                 </div>
               </div>
 
               <!-- Editor Code Canvas -->
-              <div class="mock-editor-canvas mock-clickable" id="mockCanvas" data-inspect-ui="editor.background" data-inspect-simple-ui="simple.editorBg" title="Click to highlight Editor Canvas Background">
-                <div style="color: #666; margin-bottom: 3px;">1  <span class="syn-comment mock-clickable" id="synComment" data-inspect-syntax="comments" data-inspect-simple-syntax="simple.comments" title="Click to highlight Comments">// SimpleTheme Realtime Studio</span></div>
-                <div>2  <span class="syn-keyword mock-clickable" id="synKw1" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">import</span> { <span class="syn-var mock-clickable" id="synVar1" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">SimpleTheme</span> } <span class="syn-keyword mock-clickable" id="synKw2" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">from</span> <span class="syn-string mock-clickable" id="synStr1" data-inspect-syntax="strings" data-inspect-simple-syntax="simple.strings" title="Click to highlight Strings">'simpletheme'</span>;</div>
-                <div>3  </div>
-                <div>4  <span class="syn-keyword mock-clickable" id="synKw3" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">export</span> <span class="syn-keyword mock-clickable" id="synKw4" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">interface</span> <span class="syn-type mock-clickable" id="synType1" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types & Classes">ThemeProfile</span> {</div>
-                <div>5    <span class="syn-prop mock-clickable" id="synProp1" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.properties" title="Click to highlight Object & JSON Keys">id</span>: <span class="syn-type mock-clickable" id="synType2" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">string</span>;</div>
-                <div>6    <span class="syn-prop mock-clickable" id="synProp2" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.properties" title="Click to highlight Object & JSON Keys">name</span>: <span class="syn-type mock-clickable" id="synType3" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">string</span>;</div>
-                <div>7  }</div>
-                <div>8  </div>
-                <div>9  <span class="syn-keyword mock-clickable" id="synKw5" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">export</span> <span class="syn-keyword mock-clickable" id="synKw6" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">function</span> <span class="syn-func mock-clickable" id="synFunc1" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">activateTheme</span>(<span class="syn-var mock-clickable" id="synVar2" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">palette</span>: <span class="syn-type mock-clickable" id="synType4" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">ThemeProfile</span>) {</div>
-                <div>10   <span class="syn-func mock-clickable" id="synFunc2" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">console</span>.<span class="syn-func mock-clickable" id="synFunc3" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">log</span>(<span class="syn-string mock-clickable" id="synStr2" data-inspect-syntax="strings" data-inspect-simple-syntax="simple.strings" title="Click to highlight Strings">\`✨ Applied \${palette.name}!\`</span>);</div>
-                <div>11 }</div>
+              <div class="mock-editor-canvas mock-clickable" id="mockCanvas" data-inspect-ui="editor.background" data-inspect-simple-ui="simple.canvasBg" title="Click to highlight Editor Canvas Background">
+                <div style="margin-bottom: 3px;"><span class="mock-line-number mock-clickable" id="mockLineNumber" data-preview-target="editor-line-number-1" data-inspect-ui="editorLineNumber.foreground" data-inspect-simple-ui="simple.mutedText" aria-label="Line number 1 — edit line-number text" title="Click to highlight Line Numbers">1</span>  <span class="syn-comment mock-clickable" id="synComment" data-inspect-syntax="comments" data-inspect-simple-syntax="simple.comments" title="Click to highlight Comments">// SimpleTheme Realtime Studio</span></div>
+                <div><span class="mock-line-number mock-clickable" data-preview-target="editor-line-number-2" data-inspect-ui="editorLineNumber.foreground" data-inspect-simple-ui="simple.mutedText" aria-label="Line number 2 — edit line-number text" title="Click to highlight Line Numbers">2</span>  <span class="syn-keyword mock-clickable" id="synKw1" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">import</span> <span class="syn-op mock-clickable" data-preview-target="code-brace-import-open" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">{</span> <span class="syn-var mock-clickable" id="synVar1" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">SimpleTheme</span> <span class="syn-op mock-clickable" data-preview-target="code-brace-import-close" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">}</span> <span class="syn-keyword mock-clickable" id="synKw2" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">from</span> <span class="syn-string mock-clickable" id="synStr1" data-inspect-syntax="strings" data-inspect-simple-syntax="simple.strings" title="Click to highlight Strings">'simpletheme'</span><span class="syn-op mock-clickable" data-preview-target="code-semicolon-import" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">;</span></div>
+                <div><span class="mock-line-number mock-clickable" data-preview-target="editor-line-number-3" data-inspect-ui="editorLineNumber.foreground" data-inspect-simple-ui="simple.mutedText" aria-label="Line number 3 — edit line-number text" title="Click to highlight Line Numbers">3</span></div>
+                <div><span class="mock-line-number mock-clickable" data-preview-target="editor-line-number-4" data-inspect-ui="editorLineNumber.foreground" data-inspect-simple-ui="simple.mutedText" aria-label="Line number 4 — edit line-number text" title="Click to highlight Line Numbers">4</span>  <span class="syn-keyword mock-clickable" id="synKw3" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">export</span> <span class="syn-keyword mock-clickable" id="synKw4" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">interface</span> <span class="syn-type mock-clickable" id="synType1" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types & Classes">ThemeProfile</span> <span class="syn-op mock-clickable" data-preview-target="code-brace-interface-open" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">{</span></div>
+                <div><span class="mock-line-number mock-clickable" data-preview-target="editor-line-number-5" data-inspect-ui="editorLineNumber.foreground" data-inspect-simple-ui="simple.mutedText" aria-label="Line number 5 — edit line-number text" title="Click to highlight Line Numbers">5</span>    <span class="syn-prop mock-clickable" id="synProp1" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Object & JSON Keys">id</span><span class="syn-op mock-clickable" data-preview-target="code-colon-id" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">:</span> <span class="syn-type mock-clickable" id="synType2" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">string</span><span class="syn-op mock-clickable" data-preview-target="code-semicolon-id" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">;</span></div>
+                <div><span class="mock-line-number mock-clickable" data-preview-target="editor-line-number-6" data-inspect-ui="editorLineNumber.foreground" data-inspect-simple-ui="simple.mutedText" aria-label="Line number 6 — edit line-number text" title="Click to highlight Line Numbers">6</span>    <span class="syn-prop mock-clickable" id="synProp2" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Object & JSON Keys">name</span><span class="syn-op mock-clickable" data-preview-target="code-colon-name" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">:</span> <span class="syn-type mock-clickable" id="synType3" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">string</span><span class="syn-op mock-clickable" data-preview-target="code-semicolon-name" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">;</span></div>
+                <div><span class="mock-line-number mock-clickable" data-preview-target="editor-line-number-7" data-inspect-ui="editorLineNumber.foreground" data-inspect-simple-ui="simple.mutedText" aria-label="Line number 7 — edit line-number text" title="Click to highlight Line Numbers">7</span>  <span class="syn-op mock-clickable" data-preview-target="code-brace-interface-close" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">}</span></div>
+                <div><span class="mock-line-number mock-clickable" data-preview-target="editor-line-number-8" data-inspect-ui="editorLineNumber.foreground" data-inspect-simple-ui="simple.mutedText" aria-label="Line number 8 — edit line-number text" title="Click to highlight Line Numbers">8</span></div>
+                <div><span class="mock-line-number mock-line-number-active mock-clickable" data-preview-target="editor-line-number-9" data-inspect-ui="editorLineNumber.activeForeground" data-inspect-simple-ui="simple.accent" aria-label="Active line number 9 — edit active line-number text" title="Click to highlight Active Line Number">9</span>  <span class="syn-keyword mock-clickable" id="synKw5" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">export</span> <span class="syn-keyword mock-clickable" id="synKw6" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">function</span> <span class="syn-func mock-clickable" id="synFunc1" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">activateTheme</span><span class="syn-op mock-clickable" data-preview-target="code-paren-function-open" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">(</span><span class="syn-var mock-clickable" id="synVar2" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">palette</span><span class="syn-op mock-clickable" data-preview-target="code-colon-parameter" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">:</span> <span class="syn-type mock-clickable" id="synType4" data-inspect-syntax="types" data-inspect-simple-syntax="simple.types" title="Click to highlight Types">ThemeProfile</span><span class="syn-op mock-clickable" data-preview-target="code-paren-function-close" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">)</span> <span class="syn-op mock-clickable" data-preview-target="code-brace-function-open" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">{</span></div>
+                <div><span class="mock-line-number mock-clickable" data-preview-target="editor-line-number-10" data-inspect-ui="editorLineNumber.foreground" data-inspect-simple-ui="simple.mutedText" aria-label="Line number 10 — edit line-number text" title="Click to highlight Line Numbers">10</span>   <span class="syn-func mock-clickable" id="synFunc2" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">console</span><span class="syn-op mock-clickable" data-preview-target="code-dot-console-log" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">.</span><span class="syn-func mock-clickable" id="synFunc3" data-inspect-syntax="functions" data-inspect-simple-syntax="simple.functions" title="Click to highlight Functions">log</span><span class="syn-op mock-clickable" data-preview-target="code-paren-log-open" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">(</span><span class="syn-string mock-clickable" id="synStr2" data-inspect-syntax="strings" data-inspect-simple-syntax="simple.strings" title="Click to highlight Strings">\`✨ Applied \${palette.name}!\`</span><span class="syn-op mock-clickable" data-preview-target="code-paren-log-close" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">)</span><span class="syn-op mock-clickable" data-preview-target="code-semicolon-log" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">;</span></div>
+                <div><span class="mock-line-number mock-clickable" data-preview-target="editor-line-number-11" data-inspect-ui="editorLineNumber.foreground" data-inspect-simple-ui="simple.mutedText" aria-label="Line number 11 — edit line-number text" title="Click to highlight Line Numbers">11</span> <span class="syn-op mock-clickable" data-preview-target="code-brace-function-close" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">}</span></div>
                 <div style="position: relative; margin-top: 3px;">
-                  <div>12  <span class="syn-prop mock-clickable" id="synProp3" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.properties" title="Click to highlight Object & JSON Keys">"model"</span>: <span class="syn-string mock-clickable" id="synStr3" data-inspect-syntax="strings" data-inspect-simple-syntax="simple.strings" title="Click to highlight Strings & Text Literals">"qwen3.8-27b"</span>,</div>
-                  <div>13  <span class="syn-prop mock-clickable" id="synProp4" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.properties" title="Click to highlight Object & JSON Keys">"maxTokens"</span>: <span class="syn-num mock-clickable" id="synNum1" data-inspect-syntax="numbers" data-inspect-simple-syntax="simple.numbers" title="Click to highlight Numbers & Booleans">1000000</span>,</div>
-                  <div>14  <span class="syn-prop mock-clickable" id="synProp5" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.properties" title="Click to highlight Object & JSON Keys">"agentMode"</span>: <span class="syn-num mock-clickable" id="synNum2" data-inspect-syntax="numbers" data-inspect-simple-syntax="simple.numbers" title="Click to highlight Numbers & Booleans">true</span></div>
+                  <div><span class="mock-line-number mock-clickable" data-preview-target="editor-line-number-12" data-inspect-ui="editorLineNumber.foreground" data-inspect-simple-ui="simple.mutedText" aria-label="Line number 12 — edit line-number text" title="Click to highlight Line Numbers">12</span>  <span class="syn-prop mock-clickable" id="synProp3" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Object & JSON Keys">"model"</span><span class="syn-op mock-clickable" data-preview-target="code-colon-model" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">:</span> <span class="syn-string mock-clickable" id="synStr3" data-inspect-syntax="strings" data-inspect-simple-syntax="simple.strings" title="Click to highlight Strings & Text Literals">"qwen3.8-27b"</span><span class="syn-op mock-clickable" data-preview-target="code-comma-model" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">,</span></div>
+                  <div><span class="mock-line-number mock-clickable" data-preview-target="editor-line-number-13" data-inspect-ui="editorLineNumber.foreground" data-inspect-simple-ui="simple.mutedText" aria-label="Line number 13 — edit line-number text" title="Click to highlight Line Numbers">13</span>  <span class="syn-prop mock-clickable" id="synProp4" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Object & JSON Keys">"maxTokens"</span><span class="syn-op mock-clickable" data-preview-target="code-colon-max-tokens" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">:</span> <span class="syn-num mock-clickable" id="synNum1" data-inspect-syntax="numbers" data-inspect-simple-syntax="simple.numbers" title="Click to highlight Numbers & Booleans">1000000</span><span class="syn-op mock-clickable" data-preview-target="code-comma-max-tokens" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">,</span></div>
+                  <div><span class="mock-line-number mock-clickable" data-preview-target="editor-line-number-14" data-inspect-ui="editorLineNumber.foreground" data-inspect-simple-ui="simple.mutedText" aria-label="Line number 14 — edit line-number text" title="Click to highlight Line Numbers">14</span>  <span class="syn-prop mock-clickable" id="synProp5" data-inspect-syntax="properties" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Object & JSON Keys">"agentMode"</span><span class="syn-op mock-clickable" data-preview-target="code-colon-agent-mode" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">:</span> <span class="syn-num mock-clickable" id="synNum2" data-inspect-syntax="numbers" data-inspect-simple-syntax="simple.numbers" title="Click to highlight Numbers & Booleans">true</span></div>
+                  <div><span class="mock-line-number mock-clickable" data-preview-target="editor-line-number-15" data-inspect-ui="editorLineNumber.foreground" data-inspect-simple-ui="simple.mutedText" aria-label="Line number 15 — edit line-number text" title="Click to highlight Line Numbers">15</span>  <span class="syn-tag mock-clickable" data-inspect-syntax="tags" data-inspect-simple-syntax="simple.functions" title="Click to highlight HTML / JSX Tags">&lt;ThemePreview</span> <span class="syn-tag mock-clickable" data-inspect-syntax="tags" data-inspect-simple-syntax="simple.functions" title="Click to highlight HTML / JSX Attributes">accent</span><span class="syn-op mock-clickable" data-preview-target="code-equals-jsx" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">=</span><span class="syn-string mock-clickable" data-inspect-syntax="strings" data-inspect-simple-syntax="simple.strings" title="Click to highlight Strings & Text Literals">"lemon"</span> <span class="syn-tag mock-clickable" data-inspect-syntax="tags" data-inspect-simple-syntax="simple.functions" title="Click to highlight HTML / JSX Tags">/&gt;</span></div>
+                  <div style="display:flex; gap:7px; margin-top:2px;">
+                    <span class="mock-clickable" id="mockTerminalSuccess" data-inspect-ui="terminal.ansiGreen" data-inspect-simple-ui="simple.success" title="Click to highlight Terminal Success">✓ success</span>
+                    <span class="mock-clickable" id="mockTerminalInfo" data-inspect-ui="terminal.ansiCyan" data-inspect-simple-ui="simple.info" title="Click to highlight Terminal Info">i info</span>
+                    <span class="mock-clickable" id="mockTerminalWarning" data-inspect-ui="terminal.ansiYellow" data-inspect-simple-ui="simple.warning" title="Click to highlight Terminal Warning">! warning</span>
+                    <span class="mock-clickable" id="mockSelection" data-preview-target="editor-selection-background" data-inspect-ui="editor.selectionBackground" data-inspect-simple-ui="simple.selectionBg" title="Click the selection padding to highlight Selection Background" style="padding:0 2px;"><span class="mock-clickable" id="mockSelectionText" data-preview-target="editor-selection-text" data-inspect-ui="editor.foreground" data-inspect-simple-ui="simple.primaryText" title="Click the selected text to highlight Editor Text">selected</span></span>
+                  </div>
                   <!-- Floating Mock Hover Tooltip -->
-                  <div class="mock-hover-widget mock-clickable" id="mockHoverWidget" data-inspect-ui="editorHoverWidget.background" data-inspect-simple-ui="simple.popups" style="position: absolute; right: 12px; top: -14px; background: rgba(0,0,0,0.85); border: 1px solid var(--mock-border); border-radius: 4px; padding: 2px 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); font-size: calc(8.5px * var(--preview-scale)); z-index: 10; display: flex; align-items: center; gap: 4px;" title="Click to highlight Hover Popup & Tooltips">
-                    <span id="mockHoverText" data-inspect-ui="editorHoverWidget.foreground" data-inspect-simple-ui="simple.popups" style="font-weight: 600;">⚠️ Unknown Configuration Setting</span>
+                  <div class="mock-hover-widget mock-clickable" id="mockHoverWidget" data-inspect-ui="editorHoverWidget.background" data-inspect-simple-ui="simple.popupBg" style="position: absolute; right: 12px; top: -14px; background: rgba(0,0,0,0.85); border: 1px solid var(--mock-border); border-radius: 4px; padding: 2px 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); font-size: calc(8.5px * var(--preview-scale)); z-index: 10; display: flex; align-items: center; gap: 4px;" title="Click to highlight Hover Popup Background">
+                    <span class="mock-clickable" id="mockHoverText" data-inspect-ui="editorHoverWidget.foreground" data-inspect-simple-ui="simple.primaryText" style="font-weight: 600;" title="Click to highlight Popup Text">⚠️ Unknown Configuration Setting</span>
                   </div>
                 </div>
               </div>
 
               <!-- Mock Chat / Prompt Box Panel -->
-              <div class="mock-chat-panel mock-clickable" id="mockChatPanel" data-inspect-ui="panel.background" data-inspect-simple-ui="simple.sidebarBg" style="border-top: 1px solid var(--mock-border); background: var(--card-bg); padding: 5px 8px; display: flex; flex-direction: column; gap: 4px; font-size: calc(9.5px * var(--preview-scale)); flex-shrink: 0;" title="Click to highlight Panel Container Background">
+              <div class="mock-chat-panel mock-clickable" id="mockChatPanel" data-inspect-ui="panel.background" data-inspect-simple-ui="simple.canvasBg" style="border-top: 1px solid var(--mock-border); background: var(--card-bg); padding: 5px 8px; display: flex; flex-direction: column; gap: 4px; font-size: calc(9.5px * var(--preview-scale)); flex-shrink: 0;" title="Click to highlight Panel Container Background">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                   <div style="display: flex; gap: 6px; align-items: center;">
-                    <span class="mock-clickable" id="mockPanelTitleActive" data-inspect-ui="panelTitle.activeForeground" data-inspect-simple-ui="simple.chatText" style="font-weight: 700; color: var(--mock-accent); cursor: pointer;" title="Click to highlight Active Panel Tab (Chat)">Chat</span>
-                    <span class="mock-clickable" id="mockPanelTitleInactive" data-inspect-ui="panelTitle.inactiveForeground" data-inspect-simple-ui="simple.chatText" style="color: var(--text-muted); cursor: pointer;" title="Click to highlight Inactive Panel Tabs (Codex, CodeGPT)">Codex</span>
+                    <span class="mock-clickable" id="mockPanelTitleActive" data-inspect-ui="panelTitle.activeForeground" data-inspect-simple-ui="simple.primaryText" style="font-weight: 700; color: var(--mock-accent); cursor: pointer;" title="Click to highlight Active Panel Tab (Chat)">Chat</span>
+                    <span class="mock-clickable" id="mockPanelTitleInactive" data-inspect-ui="panelTitle.inactiveForeground" data-inspect-simple-ui="simple.mutedText" style="color: var(--text-muted); cursor: pointer;" title="Click to highlight Inactive Panel Tabs (Codex, CodeGPT)">Codex</span>
                   </div>
-                  <span class="mock-clickable" id="mockIcon" data-inspect-ui="icon.foreground" data-inspect-simple-ui="simple.chatText" style="color: var(--text-muted); cursor: pointer; font-size: 10px;" title="Click to highlight UI Icons (+, ⚙️, X)">+ ⚙️ ⛶ ✕</span>
+                  <span class="mock-clickable" id="mockIcon" data-inspect-ui="icon.foreground" data-inspect-simple-ui="simple.primaryText" style="color: var(--text-muted); cursor: pointer; font-size: 10px;" title="Click to highlight UI Icons (+, ⚙️, X)">+ ⚙️ ⛶ ✕</span>
                 </div>
-                <div class="mock-chat-bubble mock-clickable" id="mockChatBubble" data-inspect-ui="chat.requestBackground" data-inspect-simple-ui="simple.tabsBg" style="background: rgba(255,255,255,0.04); border: 1px solid var(--mock-border); border-radius: 4px; padding: 2px 6px; font-weight: 600;" title="Click to highlight Chat User Request Bubble">
-                  <span>← heyy</span>
+                <div class="mock-chat-bubble mock-clickable" id="mockChatBubble" data-preview-target="chat-request-border" data-inspect-ui="chat.requestBorder" data-inspect-simple-ui="simple.border" style="border: 1px solid var(--mock-border); border-radius: 4px; padding: 1px; font-weight: 600;" title="Click the outline to highlight Chat Borders">
+                  <div class="mock-chat-surface mock-clickable" id="mockChatBubbleSurface" data-preview-target="chat-request-background" data-inspect-ui="chat.requestBackground" data-inspect-simple-ui="simple.inputBg" title="Click the bubble padding to highlight Chat User Request Background"><span class="mock-clickable" id="mockChatText" data-preview-target="chat-request-text" data-inspect-ui="foreground" data-inspect-simple-ui="simple.primaryText" title="Click the request text to highlight Primary Text">← heyy</span></div>
                 </div>
-                <div class="mock-input-box mock-clickable" id="mockInputBox" data-inspect-ui="input.background" data-inspect-simple-ui="simple.tabsBg" style="background: rgba(0,0,0,0.3); border: 1px solid var(--mock-border); border-radius: 4px; padding: 3px 6px; display: flex; justify-content: space-between; align-items: center;" title="Click to highlight Input / Chat Box">
-                  <span id="mockInputPlaceholder" class="mock-clickable" data-inspect-ui="input.placeholderForeground" data-inspect-simple-ui="simple.chatText" style="color: var(--text-muted);" title="Click to highlight Input Placeholder Text">just checking in, what you're capable of</span>
-                  <span id="mockCounter" class="mock-clickable" data-inspect-ui="descriptionForeground" data-inspect-simple-ui="simple.chatText" style="color: var(--text-muted); font-size: 8px; margin-left: 4px;" title="Click to highlight Muted / Counter Text (3/3)">3/3</span>
+                <div class="mock-input-box mock-clickable" id="mockInputBox" data-inspect-ui="input.background" data-inspect-simple-ui="simple.inputBg" style="background: rgba(0,0,0,0.3); border: 1px solid var(--mock-border); border-radius: 4px; padding: 3px 6px; display: flex; justify-content: space-between; align-items: center;" title="Click to highlight Input / Chat Box Background">
+                  <span id="mockInputPlaceholder" class="mock-clickable" data-inspect-ui="input.placeholderForeground" data-inspect-simple-ui="simple.mutedText" style="color: var(--text-muted);" title="Click to highlight Input Placeholder Text">just checking in, what you're capable of</span>
+                  <span id="mockCounter" class="mock-clickable" data-inspect-ui="descriptionForeground" data-inspect-simple-ui="simple.mutedText" style="color: var(--text-muted); font-size: 8px; margin-left: 4px;" title="Click to highlight Muted / Counter Text (3/3)">3/3</span>
                 </div>
               </div>
 
@@ -1511,11 +1894,24 @@ export class ThemeStudioWebview {
           </div>
 
           <!-- Mock Bottom Status Bar -->
-          <div class="mock-statusbar mock-clickable" id="mockStatusBar" data-inspect-ui="statusBar.background" data-inspect-simple-ui="simple.statusBarBg" title="Click to highlight Status Bar color">
-            <span>⚡ SimpleTheme: Active</span>
-            <span>TypeScript • UTF-8</span>
+          <div class="mock-statusbar mock-clickable" id="mockStatusBar" data-inspect-ui="statusBar.background" data-inspect-simple-ui="simple.statusBarBg" title="Click to highlight Status Bar Background">
+            <span class="mock-clickable" data-inspect-ui="statusBar.foreground" data-inspect-simple-ui="simple.onAccentText" title="Click to highlight Text on Accent">⚡ SimpleTheme: Active</span>
+            <span class="mock-clickable" data-inspect-ui="statusBar.foreground" data-inspect-simple-ui="simple.onAccentText" title="Click to highlight Text on Accent">TypeScript • UTF-8</span>
           </div>
 
+          </div>
+        </div>
+
+        <div class="preview-panel preview-role-gallery" id="previewUiPanel" data-preview-panel="ui" hidden>
+          <p class="preview-gallery-intro">All ${UI_COLOR_DEFINITIONS.length} granular UI options are shown here. Click any sample or label to open its exact Advanced control, or its owning Simple control when Simple Mode is active.</p>
+          ${renderPreviewUiGallery()}
+        </div>
+
+        <div class="preview-panel preview-role-gallery" id="previewSyntaxPanel" data-preview-panel="syntax" hidden>
+          <p class="preview-gallery-intro">All ${SYNTAX_SCOPE_DEFINITIONS.length} syntax options are independently clickable. Grouped Simple controls still keep every repeated token reachable from the preview.</p>
+          <section class="preview-option-section" aria-label="Syntax colors">
+            <div class="preview-option-grid">${SYNTAX_SCOPE_DEFINITIONS.map(renderPreviewSyntaxOption).join('')}</div>
+          </section>
         </div>
 
       </div>
@@ -1534,6 +1930,7 @@ export class ThemeStudioWebview {
         tokenColors: ${JSON.stringify(currentTokens)},
         liveApply: ${JSON.stringify(liveApplyEnabled)},
         dockPosition: 'right', // 'right' | 'bottom'
+        previewMode: 'workbench', // 'workbench' | 'ui' | 'syntax'
         previewHeight: 420,
         previewScale: 1.0,
       };
@@ -1544,7 +1941,21 @@ export class ThemeStudioWebview {
       const SIMPLE_SYNTAX_MAP = ${JSON.stringify(SIMPLE_SYNTAX_DEFINITIONS)};
       const SYNTAX_DEFS = ${JSON.stringify(SYNTAX_SCOPE_DEFINITIONS)};
       const UI_DEFS = ${JSON.stringify(UI_COLOR_DEFINITIONS)};
+      const UI_DEFAULTS = Object.fromEntries(UI_DEFS.map(definition => [definition.id, definition.defaultValue]));
       const HEX_COLOR_PATTERN = /^#(?:[0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+      let clientRevision = 0;
+      let latestAuthoritativeRevision = 0;
+      let pendingAuthoritativeRevision = null;
+      let pendingApplyRevision = null;
+      let applyButtonResetTimer = null;
+      let resetBarrierRevision = null;
+      let deferredExternalSync = false;
+      let deferredSyncOverlayFloor = null;
+      let discardLiveEditsThroughRevision = 0;
+      const localColorEdits = new Map();
+      const localSyntaxEdits = new Map();
+      const authoritativeOverlayFloors = new Map();
+      const applyRequestSnapshots = new Map();
 
       function readThemeColor(colors, keys, fallback) {
         for (const key of keys) {
@@ -1609,10 +2020,24 @@ export class ThemeStudioWebview {
         if (label) label.innerText = name;
       }
 
-      function markThemeModified() {
+      function markThemeModified(colorKeys = [], syntaxIds = []) {
+        clientRevision += 1;
+        colorKeys.forEach(key => {
+          localColorEdits.set(key, {
+            revision: clientRevision,
+            value: activeState.colors[key],
+          });
+        });
+        syntaxIds.forEach(syntaxId => {
+          localSyntaxEdits.set(syntaxId, {
+            revision: clientRevision,
+            value: getActiveSyntaxColor(syntaxId),
+          });
+        });
         if (activeState.profileName !== 'Custom') {
           setProfileName('Custom');
         }
+        return clientRevision;
       }
 
       applyStudioTheme();
@@ -1663,14 +2088,29 @@ export class ThemeStudioWebview {
         }, 4500);
       }
 
-      document.querySelectorAll('.mock-clickable').forEach(el => {
-        el.addEventListener('click', function(e) {
-          e.stopPropagation(); // Avoid triggering parent canvas
+      function setPreviewMode(mode) {
+        activeState.previewMode = mode;
+        document.querySelectorAll('[data-preview-panel]').forEach(panel => {
+          panel.hidden = panel.getAttribute('data-preview-panel') !== mode;
+        });
+        document.querySelectorAll('[data-preview-mode]').forEach(button => {
+          const isActive = button.getAttribute('data-preview-mode') === mode;
+          button.classList.toggle('active', isActive);
+          button.setAttribute('aria-pressed', String(isActive));
+        });
+      }
 
-          const inspectUi = this.getAttribute('data-inspect-ui');
-          const inspectSimpleUi = this.getAttribute('data-inspect-simple-ui');
-          const inspectSyntax = this.getAttribute('data-inspect-syntax');
-          const inspectSimpleSyntax = this.getAttribute('data-inspect-simple-syntax');
+      document.querySelectorAll('[data-preview-mode]').forEach(button => {
+        button.addEventListener('click', () => setPreviewMode(button.getAttribute('data-preview-mode')));
+      });
+
+      function activatePreviewTarget(element, event) {
+          event.stopPropagation(); // The leaf text/token wins over its background container.
+
+          const inspectUi = element.getAttribute('data-inspect-ui');
+          const inspectSimpleUi = element.getAttribute('data-inspect-simple-ui');
+          const inspectSyntax = element.getAttribute('data-inspect-syntax');
+          const inspectSimpleSyntax = element.getAttribute('data-inspect-simple-syntax');
 
           if (inspectSyntax || inspectSimpleSyntax) {
             // Switch to Syntax tab
@@ -1706,7 +2146,29 @@ export class ThemeStudioWebview {
 
             if (targetCard) highlightTile(targetCard);
           }
+      }
+
+      document.querySelectorAll('.mock-clickable').forEach(el => {
+        const isNativeButton = el.tagName === 'BUTTON';
+        if (!isNativeButton) {
+          el.setAttribute('role', 'button');
+          el.setAttribute('tabindex', '0');
+        }
+        if (!el.getAttribute('aria-label')) {
+          el.setAttribute('aria-label', el.getAttribute('title') || 'Edit this preview color');
+        }
+
+        el.addEventListener('click', function(e) {
+          activatePreviewTarget(this, e);
         });
+
+        if (!isNativeButton) {
+          el.addEventListener('keydown', function(e) {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            if (e.preventDefault) e.preventDefault();
+            activatePreviewTarget(this, e);
+          });
+        }
       });
 
       // 3. Dock Position Toggle (Right vs Bottom)
@@ -1883,14 +2345,17 @@ export class ThemeStudioWebview {
         });
       }
 
-      // Coalesced IPC batches keep drag updates responsive without racing whole-settings writes.
+      // Keep one acknowledged batch in flight per stream. While VS Code is writing
+      // settings, newer drag values collapse by key instead of building a stale queue.
       let liveColorFlushTimer = null;
       let pendingLiveColors = {};
+      let liveColorInFlight = null;
+      let nextLiveColorBatchId = 1;
 
-      function queueLiveColor(key, value) {
+      function queueLiveColor(key, value, revision) {
         if (!activeState.liveApply) return;
-        pendingLiveColors[key] = value;
-        if (!liveColorFlushTimer) {
+        pendingLiveColors[key] = { value, revision, retryCount: 0 };
+        if (!liveColorFlushTimer && resetBarrierRevision === null) {
           liveColorFlushTimer = setTimeout(flushLiveColors, 80);
         }
       }
@@ -1898,19 +2363,50 @@ export class ThemeStudioWebview {
       function flushLiveColors() {
         if (liveColorFlushTimer) clearTimeout(liveColorFlushTimer);
         liveColorFlushTimer = null;
-        if (!activeState.liveApply || Object.keys(pendingLiveColors).length === 0) return;
-        const colors = pendingLiveColors;
+        if (
+          !activeState.liveApply ||
+          resetBarrierRevision !== null ||
+          liveColorInFlight ||
+          Object.keys(pendingLiveColors).length === 0
+        ) return;
+        const entries = pendingLiveColors;
         pendingLiveColors = {};
-        vscode.postMessage({ command: 'applyLiveColors', colors });
+        const batchId = nextLiveColorBatchId++;
+        liveColorInFlight = { batchId, entries };
+        const colors = Object.fromEntries(Object.entries(entries).map(([key, entry]) => [key, entry.value]));
+        vscode.postMessage({ command: 'applyLiveColors', colors, batchId });
+      }
+
+      function settleLiveColors(message) {
+        if (!liveColorInFlight || message.batchId !== liveColorInFlight.batchId) return;
+        const failedEntries = liveColorInFlight.entries;
+        liveColorInFlight = null;
+        let retryNeeded = false;
+        if (message.ok === false) {
+          Object.entries(failedEntries).forEach(([key, entry]) => {
+            const newer = pendingLiveColors[key];
+            if (!newer && entry.revision > discardLiveEditsThroughRevision && entry.retryCount < 1) {
+              pendingLiveColors[key] = { ...entry, retryCount: entry.retryCount + 1 };
+              retryNeeded = true;
+            }
+          });
+        }
+        if (Object.keys(pendingLiveColors).length > 0 && resetBarrierRevision === null) {
+          if (retryNeeded) liveColorFlushTimer = setTimeout(flushLiveColors, 240);
+          else flushLiveColors();
+        }
+        maybeRefreshDeferredExternalSync();
       }
 
       let liveTokenFlushTimer = null;
       let pendingLiveTokens = {};
+      let liveTokenInFlight = null;
+      let nextLiveTokenBatchId = 1;
 
-      function queueLiveToken(syntaxId, color) {
+      function queueLiveToken(syntaxId, color, revision) {
         if (!activeState.liveApply) return;
-        pendingLiveTokens[syntaxId] = color;
-        if (!liveTokenFlushTimer) {
+        pendingLiveTokens[syntaxId] = { value: color, revision, retryCount: 0 };
+        if (!liveTokenFlushTimer && resetBarrierRevision === null) {
           liveTokenFlushTimer = setTimeout(flushLiveTokens, 80);
         }
       }
@@ -1918,10 +2414,39 @@ export class ThemeStudioWebview {
       function flushLiveTokens() {
         if (liveTokenFlushTimer) clearTimeout(liveTokenFlushTimer);
         liveTokenFlushTimer = null;
-        if (!activeState.liveApply || Object.keys(pendingLiveTokens).length === 0) return;
-        const colors = pendingLiveTokens;
+        if (
+          !activeState.liveApply ||
+          resetBarrierRevision !== null ||
+          liveTokenInFlight ||
+          Object.keys(pendingLiveTokens).length === 0
+        ) return;
+        const entries = pendingLiveTokens;
         pendingLiveTokens = {};
-        vscode.postMessage({ command: 'applyLiveTokenColors', colors });
+        const batchId = nextLiveTokenBatchId++;
+        liveTokenInFlight = { batchId, entries };
+        const colors = Object.fromEntries(Object.entries(entries).map(([key, entry]) => [key, entry.value]));
+        vscode.postMessage({ command: 'applyLiveTokenColors', colors, batchId });
+      }
+
+      function settleLiveTokens(message) {
+        if (!liveTokenInFlight || message.batchId !== liveTokenInFlight.batchId) return;
+        const failedEntries = liveTokenInFlight.entries;
+        liveTokenInFlight = null;
+        let retryNeeded = false;
+        if (message.ok === false) {
+          Object.entries(failedEntries).forEach(([key, entry]) => {
+            const newer = pendingLiveTokens[key];
+            if (!newer && entry.revision > discardLiveEditsThroughRevision && entry.retryCount < 1) {
+              pendingLiveTokens[key] = { ...entry, retryCount: entry.retryCount + 1 };
+              retryNeeded = true;
+            }
+          });
+        }
+        if (Object.keys(pendingLiveTokens).length > 0 && resetBarrierRevision === null) {
+          if (retryNeeded) liveTokenFlushTimer = setTimeout(flushLiveTokens, 240);
+          else flushLiveTokens();
+        }
+        maybeRefreshDeferredExternalSync();
       }
 
       function cancelPendingLiveChanges() {
@@ -1933,9 +2458,88 @@ export class ThemeStudioWebview {
         pendingLiveTokens = {};
       }
 
+      function beginAuthoritativeRequest() {
+        cancelPendingLiveChanges();
+        clientRevision += 1;
+        latestAuthoritativeRevision = clientRevision;
+        pendingAuthoritativeRevision = clientRevision;
+        discardLiveEditsThroughRevision = clientRevision;
+        localColorEdits.clear();
+        localSyntaxEdits.clear();
+        authoritativeOverlayFloors.clear();
+        authoritativeOverlayFloors.set(clientRevision, clientRevision);
+        return clientRevision;
+      }
+
+      function beginReconciliationRequest(overlayFloor) {
+        clientRevision += 1;
+        latestAuthoritativeRevision = clientRevision;
+        pendingAuthoritativeRevision = clientRevision;
+        discardLiveEditsThroughRevision = clientRevision;
+        authoritativeOverlayFloors.clear();
+        authoritativeOverlayFloors.set(clientRevision, overlayFloor);
+        return clientRevision;
+      }
+
+      function beginResetRequest() {
+        if (liveColorFlushTimer) clearTimeout(liveColorFlushTimer);
+        if (liveTokenFlushTimer) clearTimeout(liveTokenFlushTimer);
+        liveColorFlushTimer = null;
+        liveTokenFlushTimer = null;
+        clientRevision += 1;
+        latestAuthoritativeRevision = clientRevision;
+        pendingAuthoritativeRevision = clientRevision;
+        resetBarrierRevision = clientRevision;
+        authoritativeOverlayFloors.clear();
+        authoritativeOverlayFloors.set(clientRevision, clientRevision);
+        return clientRevision;
+      }
+
+      function shouldAcceptAuthoritativeMessage(message) {
+        return typeof message.requestRevision !== 'number' || message.requestRevision === latestAuthoritativeRevision;
+      }
+
+      function hasOutstandingTransportWork() {
+        return (
+          pendingAuthoritativeRevision !== null ||
+          resetBarrierRevision !== null ||
+          !!liveColorInFlight ||
+          !!liveTokenInFlight ||
+          Object.keys(pendingLiveColors).length > 0 ||
+          Object.keys(pendingLiveTokens).length > 0
+        );
+      }
+
+      function hasUnappliedDraft() {
+        return !activeState.liveApply && (localColorEdits.size > 0 || localSyntaxEdits.size > 0);
+      }
+
+      function hasOutstandingLocalWork() {
+        return hasOutstandingTransportWork() || hasUnappliedDraft();
+      }
+
+      function maybeRefreshDeferredExternalSync() {
+        if (!deferredExternalSync) return;
+        const overlayFloor = deferredSyncOverlayFloor;
+        const blocksReconciliation = typeof overlayFloor === 'number'
+          ? hasOutstandingTransportWork()
+          : hasOutstandingLocalWork();
+        if (blocksReconciliation) return;
+        deferredExternalSync = false;
+        deferredSyncOverlayFloor = null;
+        const requestRevision = typeof overlayFloor === 'number'
+          ? beginReconciliationRequest(overlayFloor)
+          : beginAuthoritativeRequest();
+        vscode.postMessage({ command: 'refreshThemeFromVsCode', requestRevision, silent: true });
+      }
+
       // 9. Update Live Mock Workbench & Post Live Changes (0ms Synchronous DOM update)
-      function updateLivePreview(key, val, shouldQueue = true) {
-        activeState.colors[key] = val;
+      function paintLivePreview(key, val) {
+        document.querySelectorAll('[data-preview-ui-role]').forEach(element => {
+          if (element.getAttribute('data-preview-ui-role') === key) {
+            element.style.setProperty('--preview-role-color', val);
+          }
+        });
 
         if (key === 'editor.background') {
           const canvas = document.getElementById('mockCanvas');
@@ -1943,6 +2547,17 @@ export class ThemeStudioWebview {
         } else if (key === 'editor.foreground') {
           const canvas = document.getElementById('mockCanvas');
           if (canvas) canvas.style.color = val;
+        } else if (key === 'editorLineNumber.foreground') {
+          document.querySelectorAll('.mock-line-number:not(.mock-line-number-active)').forEach(lineNumber => {
+            lineNumber.style.color = val;
+          });
+        } else if (key === 'editorLineNumber.activeForeground') {
+          document.querySelectorAll('.mock-line-number-active').forEach(lineNumber => {
+            lineNumber.style.color = val;
+          });
+        } else if (key === 'editor.selectionBackground') {
+          const selection = document.getElementById('mockSelection');
+          if (selection) selection.style.background = val;
         } else if (key === 'foreground') {
           const panel = document.getElementById('mockChatPanel');
           if (panel) panel.style.color = val;
@@ -2022,7 +2637,7 @@ export class ThemeStudioWebview {
           const ico = document.getElementById('mockIcon');
           if (ico) ico.style.color = val;
         } else if (key === 'chat.requestBackground') {
-          const cb = document.getElementById('mockChatBubble');
+          const cb = document.getElementById('mockChatBubbleSurface');
           if (cb) cb.style.background = val;
         } else if (key === 'chat.requestBorder') {
           const cb = document.getElementById('mockChatBubble');
@@ -2047,16 +2662,35 @@ export class ThemeStudioWebview {
         } else if (key === 'editorHoverWidget.border') {
           const hw = document.getElementById('mockHoverWidget');
           if (hw) hw.style.borderColor = val;
-        }
-
-        applyStudioTheme();
-        if (shouldQueue) {
-          markThemeModified();
-          queueLiveColor(key, val);
+        } else if (key === 'terminal.ansiGreen') {
+          const success = document.getElementById('mockTerminalSuccess');
+          if (success) success.style.color = val;
+        } else if (key === 'terminal.ansiCyan') {
+          const info = document.getElementById('mockTerminalInfo');
+          if (info) info.style.color = val;
+        } else if (key === 'terminal.ansiYellow') {
+          const warning = document.getElementById('mockTerminalWarning');
+          if (warning) warning.style.color = val;
         }
       }
 
-      function updateLiveSyntax(syntaxId, color, shouldQueue = true) {
+      function updateLivePreview(key, val, shouldQueue = true, shouldRefreshStudio = true) {
+        activeState.colors[key] = val;
+        paintLivePreview(key, val);
+        if (shouldRefreshStudio) applyStudioTheme();
+        if (shouldQueue) {
+          const editRevision = markThemeModified([key]);
+          queueLiveColor(key, val, editRevision);
+        }
+      }
+
+      function paintSyntaxPreview(syntaxId, color) {
+        document.querySelectorAll('[data-preview-syntax-role]').forEach(element => {
+          if (element.getAttribute('data-preview-syntax-role') === syntaxId) {
+            element.style.setProperty('--preview-role-color', color);
+          }
+        });
+
         if (syntaxId === 'keywords') {
           document.querySelectorAll('.syn-keyword').forEach(el => el.style.color = color);
         } else if (syntaxId === 'functions') {
@@ -2073,22 +2707,56 @@ export class ThemeStudioWebview {
           document.querySelectorAll('.syn-comment').forEach(el => el.style.color = color);
         } else if (syntaxId === 'numbers') {
           document.querySelectorAll('.syn-num').forEach(el => el.style.color = color);
+        } else if (syntaxId === 'operators') {
+          document.querySelectorAll('.syn-op').forEach(el => el.style.color = color);
+        } else if (syntaxId === 'tags') {
+          document.querySelectorAll('.syn-tag').forEach(el => el.style.color = color);
         }
+      }
+
+      function tokenRuleMatchesSyntax(rule, item) {
+        const scopes = Array.isArray(rule.scope) ? rule.scope : [rule.scope];
+        return scopes.some(scope => item.scopes.includes(scope));
+      }
+
+      function getActiveSyntaxColors(syntaxId) {
+        const item = SYNTAX_DEFS.find(definition => definition.id === syntaxId);
+        if (!item) return [];
+        return activeState.tokenColors
+          .filter(candidate => tokenRuleMatchesSyntax(candidate, item))
+          .map(rule => rule?.settings?.foreground)
+          .filter(color => typeof color === 'string');
+      }
+
+      function getActiveSyntaxColor(syntaxId) {
+        return getActiveSyntaxColors(syntaxId)[0] || null;
+      }
+
+      function updateLiveSyntax(syntaxId, color, shouldQueue = true) {
+        paintSyntaxPreview(syntaxId, color);
 
         const item = SYNTAX_DEFS.find(s => s.id === syntaxId);
         if (item) {
           const scope = item.scopes;
-          const idx = activeState.tokenColors.findIndex(r => Array.isArray(r.scope) ? r.scope.includes(scope[0]) : r.scope === scope[0]);
-          if (idx >= 0) {
-            activeState.tokenColors[idx].settings.foreground = color;
+          const matchingIndices = activeState.tokenColors.reduce((indices, rule, index) => {
+            if (tokenRuleMatchesSyntax(rule, item)) indices.push(index);
+            return indices;
+          }, []);
+          if (matchingIndices.length > 0) {
+            matchingIndices.forEach(index => {
+              activeState.tokenColors[index] = {
+                ...activeState.tokenColors[index],
+                settings: { ...activeState.tokenColors[index].settings, foreground: color },
+              };
+            });
           } else {
             activeState.tokenColors.push({ scope, settings: { foreground: color } });
           }
         }
 
         if (shouldQueue) {
-          markThemeModified();
-          queueLiveToken(syntaxId, color);
+          const editRevision = markThemeModified([], [syntaxId]);
+          queueLiveToken(syntaxId, color, editRevision);
         }
       }
 
@@ -2107,6 +2775,74 @@ export class ThemeStudioWebview {
         const isValid = HEX_COLOR_PATTERN.test(value);
         input.setAttribute('aria-invalid', isValid ? 'false' : 'true');
         return isValid ? value : null;
+      }
+
+      function getSimpleUiState(definition) {
+        const values = definition.targets.map(target => activeState.colors[target] || UI_DEFAULTS[target] || definition.defaultColor);
+        return {
+          displayValue: values[0] || definition.defaultColor,
+          mixed: new Set(values.map(value => String(value).trim().toLowerCase())).size > 1,
+        };
+      }
+
+      function syncSimpleUiGroup(definition) {
+        const state = getSimpleUiState(definition);
+        const picker = document.querySelector('.simple-ui-picker[data-simple-id="' + definition.id + '"]');
+        const hex = document.querySelector('.simple-ui-hex[data-simple-id="' + definition.id + '"]');
+        const badge = document.querySelector('[data-simple-ui-state="' + definition.id + '"]');
+        const card = document.querySelector('[data-simple-ui-id="' + definition.id + '"]');
+        const activeElement = document.activeElement;
+        if (picker !== activeElement) setPickerValue(picker, state.displayValue, definition.defaultColor);
+        if (hex) {
+          if (hex !== activeElement) {
+            hex.value = state.displayValue;
+            hex.setAttribute('aria-invalid', 'false');
+          }
+          hex.title = state.mixed
+            ? 'Linked roles currently differ. Choose a color to unify them.'
+            : 'All linked roles currently share this color.';
+        }
+        if (badge) {
+          badge.textContent = state.mixed ? 'Mixed · ' + definition.targets.length : 'Linked ' + definition.targets.length;
+          badge.classList.toggle('is-mixed', state.mixed);
+        }
+        if (card) card.classList.toggle('is-mixed', state.mixed);
+      }
+
+      function getSimpleSyntaxState(definition) {
+        const values = definition.targets.flatMap(target => {
+          const syntax = SYNTAX_DEFS.find(item => item.id === target);
+          const activeColors = getActiveSyntaxColors(target);
+          return activeColors.length > 0 ? activeColors : [syntax?.defaultColor || definition.defaultColor];
+        });
+        return {
+          displayValue: values[0] || definition.defaultColor,
+          mixed: new Set(values.map(value => String(value).trim().toLowerCase())).size > 1,
+        };
+      }
+
+      function syncSimpleSyntaxGroup(definition) {
+        const state = getSimpleSyntaxState(definition);
+        const picker = document.querySelector('.simple-syntax-picker[data-simple-syntax-id="' + definition.id + '"]');
+        const hex = document.querySelector('.simple-syntax-hex[data-simple-syntax-id="' + definition.id + '"]');
+        const badge = document.querySelector('[data-simple-syntax-state="' + definition.id + '"]');
+        const card = document.querySelector('[data-simple-syntax-id="' + definition.id + '"]');
+        const activeElement = document.activeElement;
+        if (picker !== activeElement) setPickerValue(picker, state.displayValue, definition.defaultColor);
+        if (hex) {
+          if (hex !== activeElement) {
+            hex.value = state.displayValue;
+            hex.setAttribute('aria-invalid', 'false');
+          }
+          hex.title = state.mixed
+            ? 'Linked syntax roles currently differ. Choose a color to unify them.'
+            : 'All linked syntax roles currently share this color.';
+        }
+        if (badge) {
+          badge.textContent = state.mixed ? 'Mixed · ' + definition.targets.length : 'Linked ' + definition.targets.length;
+          badge.classList.toggle('is-mixed', state.mixed);
+        }
+        if (card) card.classList.toggle('is-mixed', state.mixed);
       }
 
       document.querySelectorAll('.simple-ui-picker').forEach(picker => {
@@ -2138,13 +2874,18 @@ export class ThemeStudioWebview {
         if (!def) return;
 
         def.targets.forEach(target => {
-          updateLivePreview(target, val);
+          activeState.colors[target] = val;
+          paintLivePreview(target, val);
 
           const advPicker = document.querySelector('.adv-color-picker[data-target="' + target + '"]');
           setPickerValue(advPicker, val, def.defaultColor);
           const advHex = document.querySelector('.adv-hex-input[data-target="' + target + '"]');
           if (advHex) advHex.value = val;
         });
+        const editRevision = markThemeModified(def.targets);
+        def.targets.forEach(target => queueLiveColor(target, val, editRevision));
+        applyStudioTheme();
+        syncSimpleUiGroup(def);
       }
 
       // 11. Advanced UI Handlers
@@ -2157,12 +2898,7 @@ export class ThemeStudioWebview {
           updateLivePreview(target, val);
 
           const parentSimple = SIMPLE_UI_MAP.find(s => s.targets.includes(target));
-          if (parentSimple && parentSimple.targets[0] === target) {
-            const sPicker = document.querySelector('.simple-ui-picker[data-simple-id="' + parentSimple.id + '"]');
-            setPickerValue(sPicker, val, parentSimple.defaultColor);
-            const sHex = document.querySelector('.simple-ui-hex[data-simple-id="' + parentSimple.id + '"]');
-            if (sHex) sHex.value = val;
-          }
+          if (parentSimple) syncSimpleUiGroup(parentSimple);
         });
         picker.addEventListener('change', flushLiveColors);
       });
@@ -2177,12 +2913,7 @@ export class ThemeStudioWebview {
             updateLivePreview(target, val);
 
             const parentSimple = SIMPLE_UI_MAP.find(s => s.targets.includes(target));
-            if (parentSimple && parentSimple.targets[0] === target) {
-              const sPicker = document.querySelector('.simple-ui-picker[data-simple-id="' + parentSimple.id + '"]');
-              setPickerValue(sPicker, val, parentSimple.defaultColor);
-              const sHex = document.querySelector('.simple-ui-hex[data-simple-id="' + parentSimple.id + '"]');
-              if (sHex) sHex.value = val;
-            }
+            if (parentSimple) syncSimpleUiGroup(parentSimple);
             flushLiveColors();
           }
         });
@@ -2218,12 +2949,15 @@ export class ThemeStudioWebview {
         if (!def) return;
 
         def.targets.forEach(targetSyntax => {
-          updateLiveSyntax(targetSyntax, val);
+          updateLiveSyntax(targetSyntax, val, false);
           const advPicker = document.querySelector('.adv-syntax-picker[data-syntax-id="' + targetSyntax + '"]');
           setPickerValue(advPicker, val, def.defaultColor);
           const advHex = document.querySelector('.adv-syntax-hex[data-syntax-id="' + targetSyntax + '"]');
           if (advHex) advHex.value = val;
         });
+        const editRevision = markThemeModified([], def.targets);
+        def.targets.forEach(targetSyntax => queueLiveToken(targetSyntax, val, editRevision));
+        syncSimpleSyntaxGroup(def);
       }
 
       // 13. Advanced Syntax Handlers
@@ -2236,12 +2970,7 @@ export class ThemeStudioWebview {
           updateLiveSyntax(syntaxId, val);
 
           const parentSimple = SIMPLE_SYNTAX_MAP.find(item => item.targets.includes(syntaxId));
-          if (parentSimple && parentSimple.targets[0] === syntaxId) {
-            const sPicker = document.querySelector('.simple-syntax-picker[data-simple-syntax-id="' + parentSimple.id + '"]');
-            setPickerValue(sPicker, val, parentSimple.defaultColor);
-            const sHex = document.querySelector('.simple-syntax-hex[data-simple-syntax-id="' + parentSimple.id + '"]');
-            if (sHex) sHex.value = val;
-          }
+          if (parentSimple) syncSimpleSyntaxGroup(parentSimple);
         });
         picker.addEventListener('change', flushLiveTokens);
       });
@@ -2256,12 +2985,7 @@ export class ThemeStudioWebview {
             updateLiveSyntax(syntaxId, val);
 
             const parentSimple = SIMPLE_SYNTAX_MAP.find(item => item.targets.includes(syntaxId));
-            if (parentSimple && parentSimple.targets[0] === syntaxId) {
-              const sPicker = document.querySelector('.simple-syntax-picker[data-simple-syntax-id="' + parentSimple.id + '"]');
-              setPickerValue(sPicker, val, parentSimple.defaultColor);
-              const sHex = document.querySelector('.simple-syntax-hex[data-simple-syntax-id="' + parentSimple.id + '"]');
-              if (sHex) sHex.value = val;
-            }
+            if (parentSimple) syncSimpleSyntaxGroup(parentSimple);
             flushLiveTokens();
           }
         });
@@ -2278,7 +3002,7 @@ export class ThemeStudioWebview {
       window.loadPreset = function(presetId) {
         const p = ALL_PRESETS.find(x => x.id === presetId);
         if (p) {
-          cancelPendingLiveChanges();
+          const requestRevision = beginAuthoritativeRequest();
           activeState.colors = { ...p.colors };
           activeState.tokenColors = p.tokenColors.map(rule => ({
             ...rule,
@@ -2286,85 +3010,18 @@ export class ThemeStudioWebview {
           }));
           activeState.themeKind = p.type;
           setProfileName(p.name);
-          applyStudioTheme();
+          renderActiveTheme();
 
-          // 1. Synchronously update live preview without queuing message storm
-          Object.keys(p.colors).forEach(k => {
-            updateLivePreview(k, p.colors[k], false);
-          });
-
-          // 2. Synchronously update live syntax without queuing message storm
-          p.tokenColors.forEach(tc => {
-            const scopes = Array.isArray(tc.scope) ? tc.scope : [tc.scope];
-            const fg = tc.settings?.foreground;
-            if (fg) {
-              if (scopes.some(s => s.includes('keyword'))) updateLiveSyntax('keywords', fg, false);
-              else if (scopes.some(s => s.includes('function'))) updateLiveSyntax('functions', fg, false);
-              else if (scopes.some(s => s.includes('property') || s.includes('key'))) updateLiveSyntax('properties', fg, false);
-              else if (scopes.some(s => s.includes('string'))) updateLiveSyntax('strings', fg, false);
-              else if (scopes.some(s => s.includes('variable'))) updateLiveSyntax('variables', fg, false);
-              else if (scopes.some(s => s.includes('type') || s.includes('class'))) updateLiveSyntax('types', fg, false);
-              else if (scopes.some(s => s.includes('comment'))) updateLiveSyntax('comments', fg, false);
-              else if (scopes.some(s => s.includes('numeric') || s.includes('number'))) updateLiveSyntax('numbers', fg, false);
-            }
-          });
-
-          // 3. Update Simple UI color pickers and hex inputs
-          SIMPLE_UI_MAP.forEach(sDef => {
-            const val = p.colors[sDef.targets[0]] || sDef.defaultColor;
-            const pkr = document.querySelector('.simple-ui-picker[data-simple-id="' + sDef.id + '"]');
-            setPickerValue(pkr, val, sDef.defaultColor);
-            const hex = document.querySelector('.simple-ui-hex[data-simple-id="' + sDef.id + '"]');
-            if (hex && val) hex.value = val;
-          });
-
-          // 4. Update Simple Syntax color pickers and hex inputs
-          SIMPLE_SYNTAX_MAP.forEach(sDef => {
-            const targetSyntax = sDef.targets[0];
-            const item = SYNTAX_DEFS.find(s => s.id === targetSyntax);
-            const rule = p.tokenColors.find(r => {
-              const sc = Array.isArray(r.scope) ? r.scope : [r.scope];
-              return sc.some(s => item?.scopes.includes(s));
-            });
-            const val = rule?.settings?.foreground || sDef.defaultColor;
-            const pkr = document.querySelector('.simple-syntax-picker[data-simple-syntax-id="' + sDef.id + '"]');
-            setPickerValue(pkr, val, sDef.defaultColor);
-            const hex = document.querySelector('.simple-syntax-hex[data-simple-syntax-id="' + sDef.id + '"]');
-            if (hex && val) hex.value = val;
-          });
-
-          // 5. Update Advanced UI pickers and hex inputs
-          UI_DEFS.forEach(uDef => {
-            const val = p.colors[uDef.id] || uDef.defaultValue;
-            const pkr = document.querySelector('.adv-color-picker[data-target="' + uDef.id + '"]');
-            setPickerValue(pkr, val, uDef.defaultValue);
-            const hex = document.querySelector('.adv-hex-input[data-target="' + uDef.id + '"]');
-            if (hex && val) hex.value = val;
-          });
-
-          // 6. Update Advanced Syntax pickers and hex inputs
-          SYNTAX_DEFS.forEach(sDef => {
-            const rule = p.tokenColors.find(r => {
-              const sc = Array.isArray(r.scope) ? r.scope : [r.scope];
-              return sc.some(s => sDef.scopes.includes(s));
-            });
-            const val = rule?.settings?.foreground || sDef.defaultColor;
-            const pkr = document.querySelector('.adv-syntax-picker[data-syntax-id="' + sDef.id + '"]');
-            setPickerValue(pkr, val, sDef.defaultColor);
-            const hex = document.querySelector('.adv-syntax-hex[data-syntax-id="' + sDef.id + '"]');
-            if (hex && val) hex.value = val;
-          });
-
-          // 7. Atomic apply to VS Code
-          vscode.postMessage({ command: 'applyPreset', presetId });
+          // Atomic apply to VS Code; the host replies with the effective snapshot.
+          vscode.postMessage({ command: 'applyPreset', presetId, requestRevision });
           showToast('✨ Applied preset "' + p.name + '" to VS Code!', '⚡');
         }
       };
 
       // 15. Profile Actions
       window.loadSavedProfile = function(profileId) {
-        cancelPendingLiveChanges();
-        vscode.postMessage({ command: 'loadProfile', profileId });
+        const requestRevision = beginAuthoritativeRequest();
+        vscode.postMessage({ command: 'loadProfile', profileId, requestRevision });
       };
 
       window.deleteSavedProfile = function(profileId, profileName) {
@@ -2373,6 +3030,22 @@ export class ThemeStudioWebview {
 
       // 16. Top Toolbar Handlers
       document.getElementById('btnApplyAll').addEventListener('click', () => {
+        const submittedColors = { ...activeState.colors };
+        const submittedTokenColors = activeState.tokenColors.map(rule => ({
+          ...rule,
+          settings: { ...rule.settings },
+        }));
+        const submittedColorEdits = [...localColorEdits.entries()].map(([key, edit]) => [key, { ...edit }]);
+        const submittedSyntaxEdits = [...localSyntaxEdits.entries()].map(([syntaxId, edit]) => [syntaxId, { ...edit }]);
+        const requestRevision = beginAuthoritativeRequest();
+        pendingApplyRevision = requestRevision;
+        applyRequestSnapshots.clear();
+        applyRequestSnapshots.set(requestRevision, {
+          colorEdits: submittedColorEdits,
+          syntaxEdits: submittedSyntaxEdits,
+        });
+        if (applyButtonResetTimer) clearTimeout(applyButtonResetTimer);
+        applyButtonResetTimer = null;
         const btn = document.getElementById('btnApplyAll');
         if (btn) {
           btn.innerText = '⚡ Applying...';
@@ -2380,9 +3053,10 @@ export class ThemeStudioWebview {
         }
         vscode.postMessage({
           command: 'applyAll',
-          colors: activeState.colors,
-          tokenColors: activeState.tokenColors,
+          colors: submittedColors,
+          tokenColors: submittedTokenColors,
           profileName: activeState.profileName,
+          requestRevision,
         });
       });
 
@@ -2405,39 +3079,23 @@ export class ThemeStudioWebview {
       });
 
       document.getElementById('btnResetTheme').addEventListener('click', () => {
-        cancelPendingLiveChanges();
-        vscode.postMessage({ command: 'resetTheme' });
+        if (resetBarrierRevision !== null) return;
+        // Hold unsent values until the queued host confirmation resolves. A cancel
+        // releases all held edits; a confirmed reset drops only pre-click edits.
+        const requestRevision = beginResetRequest();
+        vscode.postMessage({ command: 'resetTheme', requestRevision });
       });
 
       function renderSyntaxPreview() {
-        activeState.tokenColors.forEach(rule => {
-          const fg = rule.settings?.foreground;
-          if (!fg) return;
-          const scopes = Array.isArray(rule.scope) ? rule.scope : [rule.scope];
-          if (scopes.some(s => s.includes('keyword'))) updateLiveSyntax('keywords', fg, false);
-          else if (scopes.some(s => s.includes('function'))) updateLiveSyntax('functions', fg, false);
-          else if (scopes.some(s => s.includes('property') || s.includes('key'))) updateLiveSyntax('properties', fg, false);
-          else if (scopes.some(s => s.includes('string'))) updateLiveSyntax('strings', fg, false);
-          else if (scopes.some(s => s.includes('variable'))) updateLiveSyntax('variables', fg, false);
-          else if (scopes.some(s => s.includes('type') || s.includes('class'))) updateLiveSyntax('types', fg, false);
-          else if (scopes.some(s => s.includes('comment'))) updateLiveSyntax('comments', fg, false);
-          else if (scopes.some(s => s.includes('numeric') || s.includes('number'))) updateLiveSyntax('numbers', fg, false);
+        SYNTAX_DEFS.forEach(definition => {
+          paintSyntaxPreview(definition.id, getActiveSyntaxColor(definition.id) || definition.defaultColor);
         });
       }
 
       function syncControlValues() {
         const activeEl = document.activeElement;
 
-        SIMPLE_UI_MAP.forEach(def => {
-          const val = activeState.colors[def.targets[0]] || def.defaultColor;
-          const picker = document.querySelector('.simple-ui-picker[data-simple-id="' + def.id + '"]');
-          if (picker !== activeEl) setPickerValue(picker, val, def.defaultColor);
-          const hex = document.querySelector('.simple-ui-hex[data-simple-id="' + def.id + '"]');
-          if (hex && hex !== activeEl) {
-            hex.value = val;
-            hex.setAttribute('aria-invalid', 'false');
-          }
-        });
+        SIMPLE_UI_MAP.forEach(syncSimpleUiGroup);
 
         UI_DEFS.forEach(def => {
           const val = activeState.colors[def.id] || def.defaultValue;
@@ -2450,28 +3108,10 @@ export class ThemeStudioWebview {
           }
         });
 
-        SIMPLE_SYNTAX_MAP.forEach(def => {
-          const syntax = SYNTAX_DEFS.find(item => item.id === def.targets[0]);
-          const rule = activeState.tokenColors.find(item => {
-            const scopes = Array.isArray(item.scope) ? item.scope : [item.scope];
-            return scopes.some(scope => syntax?.scopes.includes(scope));
-          });
-          const val = rule?.settings?.foreground || def.defaultColor;
-          const picker = document.querySelector('.simple-syntax-picker[data-simple-syntax-id="' + def.id + '"]');
-          if (picker !== activeEl) setPickerValue(picker, val, def.defaultColor);
-          const hex = document.querySelector('.simple-syntax-hex[data-simple-syntax-id="' + def.id + '"]');
-          if (hex && hex !== activeEl) {
-            hex.value = val;
-            hex.setAttribute('aria-invalid', 'false');
-          }
-        });
+        SIMPLE_SYNTAX_MAP.forEach(syncSimpleSyntaxGroup);
 
         SYNTAX_DEFS.forEach(def => {
-          const rule = activeState.tokenColors.find(item => {
-            const scopes = Array.isArray(item.scope) ? item.scope : [item.scope];
-            return scopes.some(scope => def.scopes.includes(scope));
-          });
-          const val = rule?.settings?.foreground || def.defaultColor;
+          const val = getActiveSyntaxColor(def.id) || def.defaultColor;
           const picker = document.querySelector('.adv-syntax-picker[data-syntax-id="' + def.id + '"]');
           if (picker !== activeEl) setPickerValue(picker, val, def.defaultColor);
           const hex = document.querySelector('.adv-syntax-hex[data-syntax-id="' + def.id + '"]');
@@ -2483,16 +3123,21 @@ export class ThemeStudioWebview {
       }
 
       function renderActiveTheme() {
-        Object.entries(activeState.colors).forEach(([key, value]) => {
-          if (value) updateLivePreview(key, value, false);
+        UI_DEFS.forEach(definition => {
+          paintLivePreview(definition.id, activeState.colors[definition.id] || definition.defaultValue);
         });
         renderSyntaxPreview();
         applyStudioTheme();
         syncControlValues();
       }
 
-      function replaceThemeSnapshot(message) {
-        cancelPendingLiveChanges();
+      function replaceThemeSnapshot(message, includeAllLocalEdits = false) {
+        const requestScoped = typeof message.requestRevision === 'number';
+        if (!requestScoped) {
+          cancelPendingLiveChanges();
+          localColorEdits.clear();
+          localSyntaxEdits.clear();
+        }
         if (message.colors && typeof message.colors === 'object') {
           activeState.colors = { ...message.colors };
         }
@@ -2505,7 +3150,71 @@ export class ThemeStudioWebview {
         if (message.themeKind) activeState.themeKind = message.themeKind;
         if (typeof message.liveApply === 'boolean') activeState.liveApply = message.liveApply;
         if (message.themeName) setProfileName(message.themeName);
+
+        let reappliedLocalEdit = false;
+        if (requestScoped) {
+          const editFloor = includeAllLocalEdits
+            ? -Infinity
+            : (authoritativeOverlayFloors.get(message.requestRevision) ?? message.requestRevision);
+          localColorEdits.forEach((edit, key) => {
+            if (edit.revision > editFloor) {
+              activeState.colors[key] = edit.value;
+              reappliedLocalEdit = true;
+            }
+          });
+          localSyntaxEdits.forEach((edit, syntaxId) => {
+            if (edit.revision > editFloor && typeof edit.value === 'string') {
+              updateLiveSyntax(syntaxId, edit.value, false);
+              reappliedLocalEdit = true;
+            }
+          });
+        }
+        if (reappliedLocalEdit) setProfileName('Custom');
         renderActiveTheme();
+      }
+
+      function finishApplyButton(applied) {
+        const btn = document.getElementById('btnApplyAll');
+        if (!btn) return;
+        if (applyButtonResetTimer) clearTimeout(applyButtonResetTimer);
+        applyButtonResetTimer = null;
+        btn.innerText = applied ? '✨ Applied!' : '✨ Apply to VS Code';
+        btn.style.opacity = '1';
+        if (applied) {
+          applyButtonResetTimer = setTimeout(() => {
+            btn.innerText = '✨ Apply to VS Code';
+            applyButtonResetTimer = null;
+          }, 1800);
+        }
+      }
+
+      function hasLocalEditsAfter(revision) {
+        return (
+          [...localColorEdits.values()].some((edit) => edit.revision > revision) ||
+          [...localSyntaxEdits.values()].some((edit) => edit.revision > revision)
+        );
+      }
+
+      function releaseResetBarrier(message) {
+        const revision = message.requestRevision;
+        if (message.confirmed) {
+          discardLiveEditsThroughRevision = Math.max(discardLiveEditsThroughRevision, revision);
+          pendingLiveColors = Object.fromEntries(
+            Object.entries(pendingLiveColors).filter(([, entry]) => entry.revision > revision)
+          );
+          pendingLiveTokens = Object.fromEntries(
+            Object.entries(pendingLiveTokens).filter(([, entry]) => entry.revision > revision)
+          );
+          localColorEdits.forEach((edit, key) => {
+            if (edit.revision <= revision) localColorEdits.delete(key);
+          });
+          localSyntaxEdits.forEach((edit, key) => {
+            if (edit.revision <= revision) localSyntaxEdits.delete(key);
+          });
+        }
+        if (resetBarrierRevision === revision) resetBarrierRevision = null;
+        if (Object.keys(pendingLiveColors).length > 0) flushLiveColors();
+        if (Object.keys(pendingLiveTokens).length > 0) flushLiveTokens();
       }
 
       renderActiveTheme();
@@ -2515,25 +3224,89 @@ export class ThemeStudioWebview {
         const msg = event.data;
         if (!msg) return;
 
+        if (msg.command === 'liveColorsApplied') {
+          settleLiveColors(msg);
+          if (msg.ok === false) showToast(msg.message || 'Unable to apply that color.', '⚠️');
+          return;
+        }
+
+        if (msg.command === 'liveTokenColorsApplied') {
+          settleLiveTokens(msg);
+          if (msg.ok === false) showToast(msg.message || 'Unable to apply that syntax color.', '⚠️');
+          return;
+        }
+
+        if (msg.command === 'authoritativeActionError') {
+          const isCurrentAuthoritativeError = msg.requestRevision === pendingAuthoritativeRevision;
+          if (msg.requestRevision === pendingApplyRevision) {
+            finishApplyButton(false);
+            pendingApplyRevision = null;
+          }
+          if (msg.requestRevision === resetBarrierRevision) {
+            releaseResetBarrier({ requestRevision: msg.requestRevision, confirmed: false });
+          }
+          if (isCurrentAuthoritativeError) {
+            pendingAuthoritativeRevision = null;
+          }
+          authoritativeOverlayFloors.delete(msg.requestRevision);
+          if (isCurrentAuthoritativeError && msg.requestCommand === 'applyAll') {
+            const submitted = applyRequestSnapshots.get(msg.requestRevision);
+            if (submitted) {
+              submitted.colorEdits.forEach(([key, edit]) => {
+                const newer = localColorEdits.get(key);
+                if (!newer || newer.revision <= msg.requestRevision) {
+                  localColorEdits.set(key, edit);
+                }
+              });
+              submitted.syntaxEdits.forEach(([syntaxId, edit]) => {
+                const newer = localSyntaxEdits.get(syntaxId);
+                if (!newer || newer.revision <= msg.requestRevision) {
+                  localSyntaxEdits.set(syntaxId, edit);
+                }
+              });
+            }
+          }
+          applyRequestSnapshots.delete(msg.requestRevision);
+          if (isCurrentAuthoritativeError && msg.requestCommand !== 'refreshThemeFromVsCode') {
+            deferredExternalSync = true;
+            deferredSyncOverlayFloor = ['resetTheme', 'applyAll'].includes(msg.requestCommand)
+              ? -Infinity
+              : msg.requestRevision;
+          }
+          showToast(msg.message || 'Unable to complete that theme action.', '⚠️');
+          maybeRefreshDeferredExternalSync();
+          return;
+        }
+
+        if (msg.command === 'syncActiveTheme' && typeof msg.requestRevision !== 'number' && hasOutstandingLocalWork()) {
+          deferredExternalSync = true;
+          return;
+        }
+
+        const authoritativeCommands = ['themeApplied', 'presetApplied', 'profileLoaded', 'themeResetResolved', 'syncActiveTheme'];
+        const isAuthoritative = authoritativeCommands.includes(msg.command);
+        const acceptsSnapshot = !isAuthoritative || shouldAcceptAuthoritativeMessage(msg);
+
         if (msg.command === 'themeApplied') {
-          const btn = document.getElementById('btnApplyAll');
-          if (btn) {
-            btn.innerText = '✨ Applied!';
-            btn.style.opacity = '1';
-            setTimeout(() => {
-              btn.innerText = '✨ Apply to VS Code';
-            }, 1800);
+          if (msg.requestRevision === pendingApplyRevision) {
+            finishApplyButton(acceptsSnapshot && !hasLocalEditsAfter(msg.requestRevision));
+            pendingApplyRevision = null;
           }
-          if (msg.profileName) {
-            setProfileName(msg.profileName);
-          }
-          showToast('✨ Applied to VS Code!', '✨');
+          applyRequestSnapshots.delete(msg.requestRevision);
+          if (!acceptsSnapshot) return;
+          const hasNewerEdits = hasLocalEditsAfter(msg.requestRevision);
+          if (msg.colors) replaceThemeSnapshot({ ...msg, themeName: msg.profileName });
+          else if (msg.profileName) setProfileName(msg.profileName);
+          showToast(
+            hasNewerEdits ? 'Applied the submitted snapshot; newer edits remain Custom.' : '✨ Applied to VS Code!',
+            '✨'
+          );
         }
 
         if (msg.command === 'presetApplied') {
-          if (msg.presetName) {
-            setProfileName(msg.presetName);
-          }
+          if (!acceptsSnapshot) return;
+          if (msg.colors) replaceThemeSnapshot({ ...msg, themeName: msg.presetName });
+          else if (msg.presetName) setProfileName(msg.presetName);
           showToast('✨ Applied preset "' + (msg.presetName || 'Preset') + '"!', '⚡');
         }
 
@@ -2545,20 +3318,30 @@ export class ThemeStudioWebview {
         }
 
         if (msg.command === 'profileLoaded') {
+          if (!acceptsSnapshot) return;
           replaceThemeSnapshot({ ...msg, themeName: msg.profileName });
           showToast('✨ Loaded profile "' + msg.profileName + '"!', '✨');
         }
 
-        if (msg.command === 'themeReset') {
-          showToast('🔄 Theme reset to defaults.', '🔄');
+        if (msg.command === 'themeResetResolved') {
+          const isMatchingBarrier = msg.requestRevision === resetBarrierRevision;
+          if (acceptsSnapshot) {
+            replaceThemeSnapshot(msg, !msg.confirmed);
+            if (msg.confirmed) showToast('🔄 Theme reset to defaults.', '🔄');
+          }
+          if (isMatchingBarrier) releaseResetBarrier(msg);
+          if (!acceptsSnapshot) return;
         }
 
         if (msg.command === 'syncActiveTheme') {
+          if (!acceptsSnapshot) return;
           replaceThemeSnapshot(msg);
         }
 
-        if (msg.command === 'liveApplyError') {
-          showToast(msg.message || 'Unable to apply that color.', '⚠️');
+        if (isAuthoritative && typeof msg.requestRevision === 'number' && msg.requestRevision === pendingAuthoritativeRevision) {
+          pendingAuthoritativeRevision = null;
+          authoritativeOverlayFloors.delete(msg.requestRevision);
+          maybeRefreshDeferredExternalSync();
         }
       });
 
@@ -2578,6 +3361,7 @@ export class ThemeStudioWebview {
 
       // 19. Universal Live Refresh Function (Syncs everything: preview, tiles, pickers)
       window.refreshFromVsCode = function() {
+        const requestRevision = beginAuthoritativeRequest();
         const icon = document.getElementById('syncIcon');
         if (icon) {
           icon.classList.remove('spin-anim');
@@ -2592,7 +3376,7 @@ export class ThemeStudioWebview {
           preview.classList.add('preview-refreshed');
         }
 
-        vscode.postMessage({ command: 'refreshThemeFromVsCode' });
+        vscode.postMessage({ command: 'refreshThemeFromVsCode', requestRevision });
         showToast('Live Preview & Tiles Synced from VS Code!', '🔄');
       };
 

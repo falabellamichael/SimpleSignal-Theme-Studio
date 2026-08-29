@@ -2,7 +2,7 @@
   "name": "simpletheme",
   "displayName": "SimpleTheme",
   "description": "Visual Theme Designer & Customizer for VS Code. Live color pickers, syntax highlights, curated presets, mock preview & instant live apply.",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "publisher": "falabella",
   "license": "MIT",
   "repository": {
@@ -186,7 +186,9 @@
   "scripts": {
     "vscode:prepublish": "npm run build",
     "build": "tsc -p ./",
-    "watch": "tsc -watch -p ./"
+    "watch": "tsc -watch -p ./",
+    "test": "npm run test:simple-mappings",
+    "test:simple-mappings": "npm run build && node scripts/validate-simple-mappings.cjs"
   },
   "devDependencies": {
     "@types/node": "^20.14.9",

@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { ThemePreset, TokenRule } from './types';
-import { THEME_PRESETS } from './presets';
+import { SYNTAX_SCOPE_MAP, THEME_PRESETS } from './presets';
 
 function stripJsonComments(str: string): string {
   let insideString = false;
@@ -566,20 +566,6 @@ export class ThemeEngine {
     const semanticConfig: Record<string, any> = { ...(editor.get<any>('semanticTokenColorCustomizations') || {}) };
     const semanticRules: Record<string, string> = { ...(semanticConfig.rules || {}) };
     
-    // Map syntaxId to scopes
-    const scopeMap: Record<string, string[]> = {
-      keywords: ['keyword', 'keyword.control', 'storage.type', 'storage.modifier'],
-      functions: ['entity.name.function', 'support.function', 'meta.function-call'],
-      properties: ['support.type.property-name', 'meta.object-literal.key', 'support.type.property-name.json', 'meta.structure.dictionary.json string.quoted.double.json', 'entity.name.tag.json'],
-      strings: ['string', 'string.quoted', 'string.quoted.double', 'string.quoted.single', 'string.template', 'string.unquoted', 'string.json', 'source.json string', 'meta.structure.dictionary.value.json string.quoted.double.json'],
-      variables: ['variable', 'variable.other', 'variable.parameter', 'variable.language'],
-      types: ['entity.name.type', 'support.type', 'entity.name.class', 'entity.other.inherited-class'],
-      comments: ['comment', 'comment.line', 'comment.block'],
-      numbers: ['constant.numeric', 'constant.numeric.json', 'constant.language.boolean', 'constant.language.json', 'constant.language'],
-      operators: ['keyword.operator', 'punctuation.separator', 'punctuation.terminator'],
-      tags: ['entity.name.tag', 'entity.other.attribute-name'],
-    };
-
     const updated = [...currentTokens];
 
     const semKeyMap: Record<string, string> = {
@@ -599,20 +585,23 @@ export class ThemeEngine {
         continue;
       }
 
-      const targetScopes = scopeMap[syntaxId] || [syntaxId];
-      const idx = updated.findIndex((r) => {
-        const scopes = Array.isArray(r.scope) ? r.scope : [r.scope];
-        return scopes.some((s) => targetScopes.includes(s));
-      });
+      const targetScopes = SYNTAX_SCOPE_MAP[syntaxId] || [syntaxId];
+      const matchingIndices = updated.reduce<number[]>((indices, rule, index) => {
+        const scopes = Array.isArray(rule.scope) ? rule.scope : [rule.scope];
+        if (scopes.some((scope) => targetScopes.includes(scope))) indices.push(index);
+        return indices;
+      }, []);
 
-      if (idx >= 0) {
-        updated[idx] = {
-          ...updated[idx],
-          settings: { ...updated[idx].settings, foreground: color },
-        };
+      if (matchingIndices.length > 0) {
+        matchingIndices.forEach((index) => {
+          updated[index] = {
+            ...updated[index],
+            settings: { ...updated[index].settings, foreground: color },
+          };
+        });
       } else {
         updated.push({
-          scope: targetScopes,
+          scope: [...targetScopes],
           settings: { foreground: color },
         });
       }

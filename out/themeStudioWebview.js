@@ -95,7 +95,10 @@ class ThemeStudioWebview {
                     this._markInternalChange();
                     await themeEngine_1.ThemeEngine.applyTheme(message.colors, message.tokenColors, message.profileName);
                     vscode.window.showInformationMessage(`✨ Applied "${message.profileName || 'Custom'}" theme to VS Code!`);
-                    this._update();
+                    this._panel.webview.postMessage({
+                        command: 'themeApplied',
+                        profileName: message.profileName || 'Custom Theme',
+                    });
                     break;
                 case 'applyLiveColor':
                     this._markInternalChange();
@@ -111,7 +114,11 @@ class ThemeStudioWebview {
                     if (preset) {
                         await themeEngine_1.ThemeEngine.applyPreset(preset);
                         vscode.window.showInformationMessage(`✨ Applied preset "${preset.name}"!`);
-                        this._update();
+                        this._panel.webview.postMessage({
+                            command: 'presetApplied',
+                            presetId: preset.id,
+                            presetName: preset.name,
+                        });
                     }
                     break;
                 case 'saveProfile':
@@ -124,15 +131,26 @@ class ThemeStudioWebview {
                     if (name && name.trim()) {
                         await profileManager_1.ProfileManager.saveProfile(name.trim(), message.colors, message.tokenColors);
                         vscode.window.showInformationMessage(`💾 Saved profile "${name.trim()}"!`);
-                        this._update();
+                        const updatedProfiles = profileManager_1.ProfileManager.getProfiles();
+                        this._panel.webview.postMessage({
+                            command: 'profileSaved',
+                            profileName: name.trim(),
+                            savedProfiles: updatedProfiles,
+                        });
                     }
                     break;
                 case 'loadProfile':
                     const profile = profileManager_1.ProfileManager.getProfile(message.profileId);
                     if (profile) {
+                        this._markInternalChange();
                         await themeEngine_1.ThemeEngine.applyTheme(profile.colors, profile.tokenColors, profile.name);
                         vscode.window.showInformationMessage(`✨ Loaded profile "${profile.name}"!`);
-                        this._update();
+                        this._panel.webview.postMessage({
+                            command: 'profileLoaded',
+                            profileName: profile.name,
+                            colors: profile.colors,
+                            tokenColors: profile.tokenColors,
+                        });
                     }
                     break;
                 case 'deleteProfile':
@@ -140,7 +158,11 @@ class ThemeStudioWebview {
                     if (ok === 'Delete') {
                         await profileManager_1.ProfileManager.deleteProfile(message.profileId);
                         vscode.window.showInformationMessage(`Deleted profile.`);
-                        this._update();
+                        const updatedProfiles = profileManager_1.ProfileManager.getProfiles();
+                        this._panel.webview.postMessage({
+                            command: 'profileDeleted',
+                            savedProfiles: updatedProfiles,
+                        });
                     }
                     break;
                 case 'exportJson':
@@ -156,9 +178,13 @@ class ThemeStudioWebview {
                 case 'resetTheme':
                     const confirmReset = await vscode.window.showWarningMessage('Reset all theme customizations and restore default colors?', { modal: true }, 'Reset Theme');
                     if (confirmReset === 'Reset Theme') {
+                        this._markInternalChange();
                         await themeEngine_1.ThemeEngine.resetTheme();
                         vscode.window.showInformationMessage('🔄 Reset theme customizations to default.');
-                        this._update();
+                        this._syncActiveThemeToWebview();
+                        this._panel.webview.postMessage({
+                            command: 'themeReset',
+                        });
                     }
                     break;
             }
@@ -1709,7 +1735,7 @@ class ThemeStudioWebview {
       }
 
       // 9. Update Live Mock Workbench & Post Live Changes (0ms Synchronous DOM update)
-      function updateLivePreview(key, val) {
+      function updateLivePreview(key, val, shouldQueue = true) {
         activeState.colors[key] = val;
 
         if (key === 'editor.background') {
@@ -1823,10 +1849,12 @@ class ThemeStudioWebview {
           if (hw) hw.style.borderColor = val;
         }
 
-        queueLiveColor(key, val);
+        if (shouldQueue) {
+          queueLiveColor(key, val);
+        }
       }
 
-      function updateLiveSyntax(syntaxId, color) {
+      function updateLiveSyntax(syntaxId, color, shouldQueue = true) {
         if (syntaxId === 'keywords') {
           document.querySelectorAll('.syn-keyword').forEach(el => el.style.color = color);
         } else if (syntaxId === 'functions') {
@@ -1856,7 +1884,9 @@ class ThemeStudioWebview {
           }
         }
 
-        queueLiveToken(syntaxId, color);
+        if (shouldQueue) {
+          queueLiveToken(syntaxId, color);
+        }
       }
 
       // 10. Simple Mode UI Handlers
@@ -1939,28 +1969,32 @@ class ThemeStudioWebview {
       // 12. Simple Mode Syntax Handlers
       document.querySelectorAll('.simple-syntax-picker').forEach(picker => {
         picker.addEventListener('input', function() {
-          const simpleId = this.getAttribute('data-simple-syntax-id');
           const targetSyntax = this.getAttribute('data-target-syntax');
+          const simpleSyntaxId = this.getAttribute('data-simple-syntax-id');
           const val = this.value;
-          const hexInput = document.querySelector('.simple-syntax-hex[data-simple-syntax-id="' + simpleId + '"]');
+          const hexInput = document.querySelector('.simple-syntax-hex[data-simple-syntax-id="' + simpleSyntaxId + '"]');
           if (hexInput) hexInput.value = val;
-          updateLiveSyntax(targetSyntax, val);
 
-          const advPicker = document.querySelector('.adv-syntax-picker[data-syntax-id="' + targetSyntax + '"]');
-          if (advPicker && val.length === 7) advPicker.value = val;
-          const advHex = document.querySelector('.adv-syntax-hex[data-syntax-id="' + targetSyntax + '"]');
-          if (advHex) advHex.value = val;
+          if (targetSyntax) {
+            updateLiveSyntax(targetSyntax, val);
+
+            const advPicker = document.querySelector('.adv-syntax-picker[data-syntax-id="' + targetSyntax + '"]');
+            if (advPicker && val.length === 7) advPicker.value = val;
+            const advHex = document.querySelector('.adv-syntax-hex[data-syntax-id="' + targetSyntax + '"]');
+            if (advHex) advHex.value = val;
+          }
         });
       });
 
       document.querySelectorAll('.simple-syntax-hex').forEach(input => {
         input.addEventListener('input', function() {
-          const simpleId = this.getAttribute('data-simple-syntax-id');
           const targetSyntax = this.getAttribute('data-target-syntax');
+          const simpleSyntaxId = this.getAttribute('data-simple-syntax-id');
           const val = this.value.trim();
           if (val.startsWith('#') && (val.length === 4 || val.length === 7 || val.length === 9)) {
-            const picker = document.querySelector('.simple-syntax-picker[data-simple-syntax-id="' + simpleId + '"]');
+            const picker = document.querySelector('.simple-syntax-picker[data-simple-syntax-id="' + simpleSyntaxId + '"]');
             if (picker && val.length === 7) picker.value = val;
+
             updateLiveSyntax(targetSyntax, val);
 
             const advPicker = document.querySelector('.adv-syntax-picker[data-syntax-id="' + targetSyntax + '"]');
@@ -2009,44 +2043,82 @@ class ThemeStudioWebview {
       window.loadPreset = function(presetId) {
         const p = ALL_PRESETS.find(x => x.id === presetId);
         if (p) {
-          // Instant synchronous preview update
+          activeState.profileName = p.name;
+          const pLabel = document.getElementById('activeProfileLabel');
+          if (pLabel) pLabel.innerText = p.name;
+
+          // 1. Synchronously update live preview without queuing message storm
           Object.keys(p.colors).forEach(k => {
-            updateLivePreview(k, p.colors[k]);
+            updateLivePreview(k, p.colors[k], false);
           });
+
+          // 2. Synchronously update live syntax without queuing message storm
           p.tokenColors.forEach(tc => {
             const scopes = Array.isArray(tc.scope) ? tc.scope : [tc.scope];
             const fg = tc.settings?.foreground;
             if (fg) {
-              if (scopes.some(s => s.includes('keyword'))) updateLiveSyntax('keywords', fg);
-              else if (scopes.some(s => s.includes('function'))) updateLiveSyntax('functions', fg);
-              else if (scopes.some(s => s.includes('property') || s.includes('key'))) updateLiveSyntax('properties', fg);
-              else if (scopes.some(s => s.includes('string'))) updateLiveSyntax('strings', fg);
-              else if (scopes.some(s => s.includes('variable'))) updateLiveSyntax('variables', fg);
-              else if (scopes.some(s => s.includes('type') || s.includes('class'))) updateLiveSyntax('types', fg);
-              else if (scopes.some(s => s.includes('comment'))) updateLiveSyntax('comments', fg);
-              else if (scopes.some(s => s.includes('numeric') || s.includes('number'))) updateLiveSyntax('numbers', fg);
+              if (scopes.some(s => s.includes('keyword'))) updateLiveSyntax('keywords', fg, false);
+              else if (scopes.some(s => s.includes('function'))) updateLiveSyntax('functions', fg, false);
+              else if (scopes.some(s => s.includes('property') || s.includes('key'))) updateLiveSyntax('properties', fg, false);
+              else if (scopes.some(s => s.includes('string'))) updateLiveSyntax('strings', fg, false);
+              else if (scopes.some(s => s.includes('variable'))) updateLiveSyntax('variables', fg, false);
+              else if (scopes.some(s => s.includes('type') || s.includes('class'))) updateLiveSyntax('types', fg, false);
+              else if (scopes.some(s => s.includes('comment'))) updateLiveSyntax('comments', fg, false);
+              else if (scopes.some(s => s.includes('numeric') || s.includes('number'))) updateLiveSyntax('numbers', fg, false);
             }
           });
 
-          // Sync all pickers & inputs in UI
+          // 3. Update Simple UI color pickers and hex inputs
           SIMPLE_UI_MAP.forEach(sDef => {
             const val = p.colors[sDef.targets[0]] || sDef.defaultColor;
             const pkr = document.querySelector('.simple-ui-picker[data-simple-id="' + sDef.id + '"]');
-            if (pkr && val.length === 7) pkr.value = val;
+            if (pkr && val && val.length === 7) pkr.value = val;
             const hex = document.querySelector('.simple-ui-hex[data-simple-id="' + sDef.id + '"]');
-            if (hex) hex.value = val;
+            if (hex && val) hex.value = val;
           });
 
+          // 4. Update Simple Syntax color pickers and hex inputs
+          SIMPLE_SYNTAX_MAP.forEach(sDef => {
+            const targetSyntax = sDef.targets[0];
+            const item = SYNTAX_DEFS.find(s => s.id === targetSyntax);
+            const rule = p.tokenColors.find(r => {
+              const sc = Array.isArray(r.scope) ? r.scope : [r.scope];
+              return sc.some(s => item?.scopes.includes(s));
+            });
+            const val = rule?.settings?.foreground || sDef.defaultColor;
+            const pkr = document.querySelector('.simple-syntax-picker[data-simple-syntax-id="' + sDef.id + '"]');
+            if (pkr && val && val.length === 7) pkr.value = val;
+            const hex = document.querySelector('.simple-syntax-hex[data-simple-syntax-id="' + sDef.id + '"]');
+            if (hex && val) hex.value = val;
+          });
+
+          // 5. Update Advanced UI pickers and hex inputs
           const UI_DEFS = ${JSON.stringify(presets_1.UI_COLOR_DEFINITIONS)};
           UI_DEFS.forEach(uDef => {
             const val = p.colors[uDef.id] || uDef.defaultValue;
             const pkr = document.querySelector('.adv-color-picker[data-target="' + uDef.id + '"]');
-            if (pkr && val.length === 7) pkr.value = val;
+            if (pkr && val && val.length === 7) pkr.value = val;
             const hex = document.querySelector('.adv-hex-input[data-target="' + uDef.id + '"]');
-            if (hex) hex.value = val;
+            if (hex && val) hex.value = val;
           });
+
+          // 6. Update Advanced Syntax pickers and hex inputs
+          SYNTAX_DEFS.forEach(sDef => {
+            const rule = p.tokenColors.find(r => {
+              const sc = Array.isArray(r.scope) ? r.scope : [r.scope];
+              return sc.some(s => sDef.scopes.includes(s));
+            });
+            const val = rule?.settings?.foreground || sDef.defaultColor;
+            const pkr = document.querySelector('.adv-syntax-picker[data-syntax-id="' + sDef.id + '"]');
+            if (pkr && val && val.length === 7) pkr.value = val;
+            const hex = document.querySelector('.adv-syntax-hex[data-syntax-id="' + sDef.id + '"]');
+            if (hex && val) hex.value = val;
+          });
+
+          // 7. Atomic apply to VS Code
+          vscode.postMessage({ command: 'applyPreset', presetId });
+          showToast('✨ Applied preset "' + p.name + '" to VS Code!', '⚡');
         }
-        vscode.postMessage({ command: 'applyPreset', presetId });
       };
 
       // 15. Profile Actions
@@ -2060,6 +2132,11 @@ class ThemeStudioWebview {
 
       // 16. Top Toolbar Handlers
       document.getElementById('btnApplyAll').addEventListener('click', () => {
+        const btn = document.getElementById('btnApplyAll');
+        if (btn) {
+          btn.innerText = '⚡ Applying...';
+          btn.style.opacity = '0.75';
+        }
         vscode.postMessage({
           command: 'applyAll',
           colors: activeState.colors,
@@ -2166,7 +2243,7 @@ class ThemeStudioWebview {
 
       // Initial Syntax Colors Init
       activeState.tokenColors.forEach(rule => {
-        const fg = rule.settings.foreground;
+        const fg = rule.settings?.foreground;
         if (!fg) return;
         const scopes = Array.isArray(rule.scope) ? rule.scope : [rule.scope];
         if (scopes.some(s => s.includes('keyword'))) {
@@ -2188,16 +2265,70 @@ class ThemeStudioWebview {
         }
       });
 
-      // 17. Live Theme Sync from VS Code (e.g. user changes theme in VS Code or extensions)
+      // 17. Live Theme Sync & Event Receiver from VS Code
       window.addEventListener('message', event => {
         const msg = event.data;
         if (!msg) return;
+
+        if (msg.command === 'themeApplied') {
+          const btn = document.getElementById('btnApplyAll');
+          if (btn) {
+            btn.innerText = '✨ Applied!';
+            btn.style.opacity = '1';
+            setTimeout(() => {
+              btn.innerText = '✨ Apply to VS Code';
+            }, 1800);
+          }
+          if (msg.profileName) {
+            activeState.profileName = msg.profileName;
+            const pLabel = document.getElementById('activeProfileLabel');
+            if (pLabel) pLabel.innerText = msg.profileName;
+          }
+          showToast('✨ Applied to VS Code!', '✨');
+        }
+
+        if (msg.command === 'presetApplied') {
+          if (msg.presetName) {
+            activeState.profileName = msg.presetName;
+            const pLabel = document.getElementById('activeProfileLabel');
+            if (pLabel) pLabel.innerText = msg.presetName;
+          }
+          showToast('✨ Applied preset "' + (msg.presetName || 'Preset') + '"!', '⚡');
+        }
+
+        if (msg.command === 'profileSaved') {
+          if (msg.profileName) {
+            activeState.profileName = msg.profileName;
+            const pLabel = document.getElementById('activeProfileLabel');
+            if (pLabel) pLabel.innerText = msg.profileName;
+          }
+          showToast('💾 Saved profile "' + msg.profileName + '"!', '💾');
+        }
+
+        if (msg.command === 'profileLoaded') {
+          if (msg.profileName) {
+            activeState.profileName = msg.profileName;
+            const pLabel = document.getElementById('activeProfileLabel');
+            if (pLabel) pLabel.innerText = msg.profileName;
+          }
+          if (msg.colors) {
+            activeState.colors = { ...activeState.colors, ...msg.colors };
+            Object.keys(msg.colors).forEach(k => {
+              updateLivePreview(k, msg.colors[k], false);
+            });
+          }
+          showToast('✨ Loaded profile "' + msg.profileName + '"!', '✨');
+        }
+
+        if (msg.command === 'themeReset') {
+          showToast('🔄 Theme reset to defaults.', '🔄');
+        }
 
         if (msg.command === 'syncActiveTheme') {
           if (msg.colors) {
             activeState.colors = { ...activeState.colors, ...msg.colors };
             Object.keys(msg.colors).forEach(k => {
-              updateLivePreview(k, msg.colors[k]);
+              updateLivePreview(k, msg.colors[k], false);
             });
           }
 
@@ -2207,14 +2338,14 @@ class ThemeStudioWebview {
               const scopes = Array.isArray(tc.scope) ? tc.scope : [tc.scope];
               const fg = tc.settings?.foreground;
               if (fg) {
-                if (scopes.some(s => s.includes('keyword'))) updateLiveSyntax('keywords', fg);
-                else if (scopes.some(s => s.includes('function'))) updateLiveSyntax('functions', fg);
-                else if (scopes.some(s => s.includes('property') || s.includes('key'))) updateLiveSyntax('properties', fg);
-                else if (scopes.some(s => s.includes('string'))) updateLiveSyntax('strings', fg);
-                else if (scopes.some(s => s.includes('variable'))) updateLiveSyntax('variables', fg);
-                else if (scopes.some(s => s.includes('type') || s.includes('class'))) updateLiveSyntax('types', fg);
-                else if (scopes.some(s => s.includes('comment'))) updateLiveSyntax('comments', fg);
-                else if (scopes.some(s => s.includes('numeric') || s.includes('number'))) updateLiveSyntax('numbers', fg);
+                if (scopes.some(s => s.includes('keyword'))) updateLiveSyntax('keywords', fg, false);
+                else if (scopes.some(s => s.includes('function'))) updateLiveSyntax('functions', fg, false);
+                else if (scopes.some(s => s.includes('property') || s.includes('key'))) updateLiveSyntax('properties', fg, false);
+                else if (scopes.some(s => s.includes('string'))) updateLiveSyntax('strings', fg, false);
+                else if (scopes.some(s => s.includes('variable'))) updateLiveSyntax('variables', fg, false);
+                else if (scopes.some(s => s.includes('type') || s.includes('class'))) updateLiveSyntax('types', fg, false);
+                else if (scopes.some(s => s.includes('comment'))) updateLiveSyntax('comments', fg, false);
+                else if (scopes.some(s => s.includes('numeric') || s.includes('number'))) updateLiveSyntax('numbers', fg, false);
               }
             });
           }
@@ -2223,6 +2354,8 @@ class ThemeStudioWebview {
             activeState.profileName = msg.themeName;
             const pDisplay = document.getElementById('activeProfileDisplay');
             if (pDisplay) pDisplay.innerText = msg.themeName;
+            const pLabel = document.getElementById('activeProfileLabel');
+            if (pLabel) pLabel.innerText = msg.themeName;
           }
 
           const activeEl = document.activeElement;

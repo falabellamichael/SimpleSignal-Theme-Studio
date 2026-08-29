@@ -1210,7 +1210,7 @@ class ThemeStudioWebview {
       <!-- Tab 3: Presets Library -->
       <div id="tab-presets" class="tab-pane" style="display: none;">
         <div class="filter-bar" style="margin-bottom: 12px;">
-          <input type="text" class="search-input" id="presetSearchInput" placeholder="🔍 Search 50 presets (e.g. checkered, colorblind, lemonade, gameboy, lego, matrix, latte)..." />
+          <input type="text" class="search-input" id="presetSearchInput" placeholder="🔍 Search ${presets_1.THEME_PRESETS.length} presets (e.g. tiger, jellyfish, fox, frog, peacock, lemonade, gameboy)..." />
           <div class="pill-filters" style="flex-wrap: wrap; gap: 4px;">
             <span class="pill preset-pill active" data-preset-filter="all">⚡ All (${presets_1.THEME_PRESETS.length})</span>
             <span class="pill preset-pill" data-preset-filter="dark">🌙 Dark (${presets_1.THEME_PRESETS.filter((p) => p.type === 'dark').length})</span>
@@ -1221,6 +1221,7 @@ class ThemeStudioWebview {
             <span class="pill preset-pill" data-preset-filter="cyber">⚡ Cyber & Neon</span>
             <span class="pill preset-pill" data-preset-filter="pastel">🌸 Pastel & Soft</span>
             <span class="pill preset-pill" data-preset-filter="creative">🎨 Creative & Retro</span>
+            <span class="pill preset-pill" data-preset-filter="animals">🐾 Animals & Wildlife</span>
           </div>
         </div>
         <div class="preset-grid" id="presetGrid">
@@ -1693,6 +1694,8 @@ class ThemeStudioWebview {
             matchesFilter = pName.includes('sakura') || pName.includes('cotton') || pName.includes('peach') || pName.includes('lavender') || pName.includes('mint') || pName.includes('vanilla') || pName.includes('catppuccin') || pName.includes('ghost') || pName.includes('clean');
           } else if (filter === 'creative') {
             matchesFilter = pName.includes('gameboy') || pName.includes('lego') || pName.includes('wave') || pName.includes('halloween') || pName.includes('bauhaus') || pName.includes('python') || pName.includes('rust') || pName.includes('arcade');
+          } else if (filter === 'animals') {
+            matchesFilter = pName.includes('panther') || pName.includes('chameleon') || pName.includes('tiger') || pName.includes('fox') || pName.includes('orca') || pName.includes('catppuccin') || pName.includes('jellyfish') || pName.includes('poison dart') || pName.includes('peacock') || pName.includes('firefly') || pName.includes('animal') || pName.includes('wildlife');
           }
 
           const matchesQuery = !query || pName.includes(query);

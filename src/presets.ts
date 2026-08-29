@@ -12856,84 +12856,84 @@ export const THEME_PRESETS: ThemePreset[] = [
       }
 ]
   },
-  // ⚗️ Breaking Bad (Heisenberg & Blue Sky)
+  // ⚗️ Breaking Bad (Periodic Table Elements)
   {
     id: "breaking-bad",
-    name: "\u2697\ufe0f Breaking Bad (Heisenberg & Blue Sky)",
-    description: "Albuquerque desert noir palette featuring 99.1% pure Crystal Blue Sky, hazmat suit chemical gold, desert terra cotta, and Heisenberg black fedora.",
+    name: "\u2697\ufe0f Breaking Bad (Periodic Table Elements)",
+    description: "Multi-elemental chemistry palette inspired by the Periodic Table title sequence with [Br] Bromine neon green, [Ba] Barium cobalt, radioactive isotope yellow, noble gas purple, and Blue Sky cyan.",
     type: "dark",
-    accentColor: "#00d4ff",
+    accentColor: "#00ff88",
     colors: {
-      "foreground": "#f0fdfa",
-      "descriptionForeground": "#526a80",
-      "disabledForeground": "#3b5166",
-      "icon.foreground": "#00d4ff",
-      "editor.background": "#0a0d10",
-      "editor.foreground": "#f0fdfa",
-      "editorLineNumber.foreground": "#3b5166",
-      "editorLineNumber.activeForeground": "#00d4ff",
-      "editorCursor.foreground": "#00d4ff",
-      "editor.selectionBackground": "#1a222b",
-      "editor.lineHighlightBackground": "#1a222b",
-      "editorHoverWidget.background": "#11161c",
-      "editorHoverWidget.foreground": "#ccfbf1",
-      "editorHoverWidget.border": "#1a222b",
-      "editorHoverWidget.statusBarBackground": "#1a222b",
-      "editorSuggestWidget.background": "#11161c",
-      "editorSuggestWidget.foreground": "#ccfbf1",
-      "editorSuggestWidget.border": "#1a222b",
-      "editorSuggestWidget.selectedBackground": "#1a222b",
-      "editorSuggestWidget.selectedForeground": "#00d4ff",
-      "editorSuggestWidget.highlightForeground": "#00d4ff",
-      "editorWidget.background": "#11161c",
-      "editorWidget.foreground": "#ccfbf1",
-      "editorWidget.border": "#1a222b",
-      "focusBorder": "#00d4ff",
-      "activityBar.background": "#06080a",
-      "activityBar.foreground": "#00d4ff",
-      "activityBar.inactiveForeground": "#3b5166",
-      "activityBarBadge.background": "#00d4ff",
+      "foreground": "#f0fdf4",
+      "descriptionForeground": "#4e738f",
+      "disabledForeground": "#3b637d",
+      "icon.foreground": "#00ff88",
+      "editor.background": "#060a0f",
+      "editor.foreground": "#f0fdf4",
+      "editorLineNumber.foreground": "#3b637d",
+      "editorLineNumber.activeForeground": "#00ff88",
+      "editorCursor.foreground": "#00ff88",
+      "editor.selectionBackground": "#142030",
+      "editor.lineHighlightBackground": "#142030",
+      "editorHoverWidget.background": "#0c131d",
+      "editorHoverWidget.foreground": "#86efac",
+      "editorHoverWidget.border": "#142030",
+      "editorHoverWidget.statusBarBackground": "#142030",
+      "editorSuggestWidget.background": "#0c131d",
+      "editorSuggestWidget.foreground": "#86efac",
+      "editorSuggestWidget.border": "#142030",
+      "editorSuggestWidget.selectedBackground": "#142030",
+      "editorSuggestWidget.selectedForeground": "#00ff88",
+      "editorSuggestWidget.highlightForeground": "#00ff88",
+      "editorWidget.background": "#0c131d",
+      "editorWidget.foreground": "#86efac",
+      "editorWidget.border": "#142030",
+      "focusBorder": "#00ff88",
+      "activityBar.background": "#03060a",
+      "activityBar.foreground": "#00ff88",
+      "activityBar.inactiveForeground": "#3b637d",
+      "activityBarBadge.background": "#00ff88",
       "activityBarBadge.foreground": "#000000",
-      "sideBar.background": "#11161c",
-      "sideBar.foreground": "#ccfbf1",
-      "sideBarTitle.foreground": "#00d4ff",
-      "sideBarSectionHeader.background": "#1a222b",
-      "sideBarSectionHeader.foreground": "#ccfbf1",
-      "titleBar.activeBackground": "#06080a",
+      "sideBar.background": "#0c131d",
+      "sideBar.foreground": "#86efac",
+      "sideBarTitle.foreground": "#00ff88",
+      "sideBarSectionHeader.background": "#142030",
+      "sideBarSectionHeader.foreground": "#86efac",
+      "titleBar.activeBackground": "#03060a",
       "titleBar.activeForeground": "#ffffff",
-      "titleBar.inactiveBackground": "#06080a",
+      "titleBar.inactiveBackground": "#03060a",
       "titleBar.inactiveForeground": "#999999",
-      "statusBar.background": "#eab308",
+      "statusBar.background": "#10b981",
       "statusBar.foreground": "#000000",
       "statusBar.debuggingBackground": "#e11d48",
-      "editorGroupHeader.tabsBackground": "#11161c",
-      "tab.activeBackground": "#0a0d10",
-      "tab.activeForeground": "#00d4ff",
-      "tab.activeBorderTop": "#00d4ff",
-      "tab.inactiveBackground": "#1a222b",
-      "tab.inactiveForeground": "#526a80",
-      "tab.hoverBackground": "#1a222b",
-      "breadcrumb.foreground": "#526a80",
-      "terminal.background": "#0a0d10",
-      "terminal.foreground": "#f0fdfa",
-      "terminalCursor.foreground": "#00d4ff",
-      "terminal.ansiGreen": "#facc15",
-      "terminal.ansiCyan": "#fb923c",
-      "terminal.ansiYellow": "#34d399",
-      "input.background": "#1c2530",
-      "input.foreground": "#ffffff",
-      "input.placeholderForeground": "#526a80",
-      "panel.background": "#0a0d10",
-      "panel.border": "#11161c",
-      "panelTitle.activeForeground": "#00d4ff",
-      "panelTitle.inactiveForeground": "#526a80",
-      "panelTitle.activeBorder": "#00d4ff",
-      "chat.requestBackground": "#1c2530",
-      "chat.requestBorder": "#1a222b",
-      "interactive.requestBackground": "#1c2530",
-      "textCodeBlock.background": "#1a222b",
-      "textLink.foreground": "#00d4ff",
-      "badge.background": "#00d4ff",
+      "editorGroupHeader.tabsBackground": "#0c131d",
+      "tab.activeBackground": "#060a0f",
+      "tab.activeForeground": "#00ff88",
+      "tab.activeBorderTop": "#00ff88",
+      "tab.inactiveBackground": "#142030",
+      "tab.inactiveForeground": "#4e738f",
+      "tab.hoverBackground": "#142030",
+      "breadcrumb.foreground": "#4e738f",
+      "terminal.background": "#060a0f",
+      "terminal.foreground": "#f0fdf4",
+      "terminalCursor.foreground": "#00ff88",
+      "terminal.ansiGreen": "#00d4ff",
+      "terminal.ansiCyan": "#c084fc",
+      "terminal.ansiYellow": "#ffd000",
+      "input.background": "#121e2e",
+      "input.foreground": "#f0fdf4",
+      "input.placeholderForeground": "#4e738f",
+      "panel.background": "#060a0f",
+      "panel.border": "#0c131d",
+      "panelTitle.activeForeground": "#00ff88",
+      "panelTitle.inactiveForeground": "#4e738f",
+      "panelTitle.activeBorder": "#00ff88",
+      "chat.requestBackground": "#121e2e",
+      "chat.requestBorder": "#142030",
+      "interactive.requestBackground": "#121e2e",
+      "textCodeBlock.background": "#142030",
+      "textLink.foreground": "#00ff88",
+      "badge.background": "#00ff88",
       "badge.foreground": "#000000"
 },
     tokenColors: [
@@ -12945,7 +12945,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "storage.modifier"
             ],
             "settings": {
-                  "foreground": "#00d4ff",
+                  "foreground": "#00ff88",
                   "fontStyle": "bold"
             }
       },
@@ -12956,7 +12956,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "meta.function-call"
             ],
             "settings": {
-                  "foreground": "#facc15"
+                  "foreground": "#00d4ff"
             }
       },
       {
@@ -12972,7 +12972,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "meta.structure.dictionary.value.json string.quoted.double.json"
             ],
             "settings": {
-                  "foreground": "#34d399"
+                  "foreground": "#ffd000"
             }
       },
       {
@@ -12984,7 +12984,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.name.tag.json"
             ],
             "settings": {
-                  "foreground": "#00d4ff"
+                  "foreground": "#00ff88"
             }
       },
       {
@@ -12995,7 +12995,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "variable.language"
             ],
             "settings": {
-                  "foreground": "#f0fdfa"
+                  "foreground": "#f0fdf4"
             }
       },
       {
@@ -13006,7 +13006,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.other.inherited-class"
             ],
             "settings": {
-                  "foreground": "#fb923c"
+                  "foreground": "#c084fc"
             }
       },
       {
@@ -13016,7 +13016,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "comment.block"
             ],
             "settings": {
-                  "foreground": "#3b5166",
+                  "foreground": "#3b637d",
                   "fontStyle": "italic"
             }
       },
@@ -13029,7 +13029,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "constant.language"
             ],
             "settings": {
-                  "foreground": "#ef4444"
+                  "foreground": "#ff3b5c"
             }
       },
       {
@@ -13039,7 +13039,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "punctuation.terminator"
             ],
             "settings": {
-                  "foreground": "#f0fdfa"
+                  "foreground": "#f0fdf4"
             }
       },
       {
@@ -13048,7 +13048,7 @@ export const THEME_PRESETS: ThemePreset[] = [
                   "entity.other.attribute-name"
             ],
             "settings": {
-                  "foreground": "#facc15"
+                  "foreground": "#00d4ff"
             }
       }
 ]

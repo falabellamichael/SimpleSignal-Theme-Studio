@@ -401,6 +401,7 @@ class ThemeStudioWebview {
         <div class="simple-card${state.mixed ? ' is-mixed' : ''}" data-simple-syntax-id="${definition.id}" title="Linked syntax roles: ${definition.targets.join(', ')}">
           <div class="color-card-header">
             <span class="color-name">${definition.icon} ${definition.name}</span>
+            <span class="contrast-badge contrast-aa" data-simple-syntax-contrast="${definition.id}">AA 4.5:1</span>
             <span class="color-category-badge simple-group-state${state.mixed ? ' is-mixed' : ''}" data-simple-syntax-state="${definition.id}">${stateLabel}</span>
           </div>
           <div class="color-desc">${definition.description}</div>
@@ -1494,6 +1495,33 @@ class ThemeStudioWebview {
       min-width: 0;
     }
 
+    .contrast-badge {
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      transition: all 0.2s ease;
+    }
+    .contrast-aaa {
+      background: rgba(46, 160, 67, 0.18);
+      color: #3fb950;
+      border: 1px solid rgba(46, 160, 67, 0.4);
+    }
+    .contrast-aa {
+      background: rgba(56, 139, 253, 0.18);
+      color: #58a6ff;
+      border: 1px solid rgba(56, 139, 253, 0.4);
+    }
+    .contrast-low {
+      background: rgba(218, 54, 51, 0.18);
+      color: #f85149;
+      border: 1px solid rgba(218, 54, 51, 0.4);
+    }
+
     .mock-statusbar {
       height: 20px;
       background: #007acc;
@@ -1536,6 +1564,14 @@ class ThemeStudioWebview {
         <span id="dockBtnLabel">Lock to Bottom</span>
       </button>
 
+      <button class="btn" id="btnUndo" onclick="undoThemeChange()" title="Undo theme edit (Ctrl+Z)" disabled>
+        <span>↩️</span>
+        <span>Undo</span>
+      </button>
+      <button class="btn" id="btnRedo" onclick="redoThemeChange()" title="Redo theme edit (Ctrl+Y)" disabled>
+        <span>↪️</span>
+        <span>Redo</span>
+      </button>
       <button class="btn btn-primary" id="btnApplyAll">✨ Apply to VS Code</button>
       <button class="btn" id="btnSaveProfile">💾 Save Profile</button>
       <button class="btn" id="btnExportJson">📋 Export JSON</button>
@@ -1649,6 +1685,7 @@ class ThemeStudioWebview {
               <div class="color-card" data-syntax-id="${item.id}">
                 <div class="color-card-header">
                   <span class="color-name">${item.name}</span>
+                  <span class="contrast-badge contrast-aa" data-adv-syntax-contrast="${item.id}">AA 4.5:1</span>
                   <span class="color-category-badge">Syntax</span>
                 </div>
                 <div class="color-desc">${item.description}</div>
@@ -2009,6 +2046,7 @@ class ThemeStudioWebview {
       }
 
       function markThemeModified(colorKeys = [], syntaxIds = []) {
+        pushHistorySnapshot();
         clientRevision += 1;
         colorKeys.forEach(key => {
           localColorEdits.set(key, {
@@ -2027,6 +2065,133 @@ class ThemeStudioWebview {
         }
         return clientRevision;
       }
+
+      function getHexLuminance(hexColor) {
+        const normalized = colorPickerValue(hexColor, '#1e1e1e').slice(1);
+        const r = parseInt(normalized.slice(0, 2), 16) / 255;
+        const g = parseInt(normalized.slice(2, 4), 16) / 255;
+        const b = parseInt(normalized.slice(4, 6), 16) / 255;
+        const a = [r, g, b].map(v => v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4));
+        return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+      }
+
+      function getWcagContrast(fgHex, bgHex) {
+        const l1 = getHexLuminance(fgHex);
+        const l2 = getHexLuminance(bgHex);
+        const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+        if (ratio >= 7.0) return { text: 'AAA ' + ratio.toFixed(1) + ':1', cls: 'contrast-aaa' };
+        if (ratio >= 4.5) return { text: 'AA ' + ratio.toFixed(1) + ':1', cls: 'contrast-aa' };
+        return { text: '⚠️ ' + ratio.toFixed(1) + ':1', cls: 'contrast-low' };
+      }
+
+      function updateContrastBadges() {
+        const editorBg = activeState.colors['editor.background'] || '#1e1e1e';
+        
+        SIMPLE_SYNTAX_MAP.forEach(def => {
+          const badge = document.querySelector('[data-simple-syntax-contrast="' + def.id + '"]');
+          if (badge) {
+            const syntaxVal = getActiveSyntaxColor(def.targets[0]) || def.defaultColor;
+            const res = getWcagContrast(syntaxVal, editorBg);
+            badge.innerText = res.text;
+            badge.className = 'contrast-badge ' + res.cls;
+          }
+        });
+
+        SYNTAX_DEFS.forEach(def => {
+          const badge = document.querySelector('[data-adv-syntax-contrast="' + def.id + '"]');
+          if (badge) {
+            const syntaxVal = getActiveSyntaxColor(def.id) || def.defaultColor;
+            const res = getWcagContrast(syntaxVal, editorBg);
+            badge.innerText = res.text;
+            badge.className = 'contrast-badge ' + res.cls;
+          }
+        });
+      }
+
+      // History Stack for Undo/Redo
+      const historyStack = [];
+      let historyIndex = -1;
+      const MAX_HISTORY = 40;
+      let isRestoringHistory = false;
+
+      function pushHistorySnapshot() {
+        if (isRestoringHistory) return;
+        const snapshot = {
+          colors: { ...activeState.colors },
+          tokenColors: activeState.tokenColors.map(r => ({
+            ...r,
+            settings: { ...r.settings }
+          })),
+          themeKind: activeState.themeKind,
+          profileName: activeState.profileName
+        };
+
+        if (historyIndex < historyStack.length - 1) {
+          historyStack.splice(historyIndex + 1);
+        }
+        historyStack.push(snapshot);
+        if (historyStack.length > MAX_HISTORY) {
+          historyStack.shift();
+        }
+        historyIndex = historyStack.length - 1;
+        updateHistoryButtonsState();
+      }
+
+      function updateHistoryButtonsState() {
+        const btnUndo = document.getElementById('btnUndo');
+        const btnRedo = document.getElementById('btnRedo');
+        if (btnUndo) btnUndo.disabled = historyIndex <= 0;
+        if (btnRedo) btnRedo.disabled = historyIndex >= historyStack.length - 1;
+      }
+
+      window.undoThemeChange = function() {
+        if (historyIndex > 0) {
+          historyIndex--;
+          restoreHistorySnapshot(historyStack[historyIndex]);
+        }
+      };
+
+      window.redoThemeChange = function() {
+        if (historyIndex < historyStack.length - 1) {
+          historyIndex++;
+          restoreHistorySnapshot(historyStack[historyIndex]);
+        }
+      };
+
+      function restoreHistorySnapshot(snapshot) {
+        if (!snapshot) return;
+        isRestoringHistory = true;
+        try {
+          activeState.colors = { ...snapshot.colors };
+          activeState.tokenColors = snapshot.tokenColors.map(r => ({
+            ...r,
+            settings: { ...r.settings }
+          }));
+          activeState.themeKind = snapshot.themeKind;
+          activeState.profileName = snapshot.profileName;
+          setProfileName(snapshot.profileName);
+          renderActiveTheme();
+          
+          const editRevision = markThemeModified(Object.keys(snapshot.colors), SYNTAX_DEFS.map(s => s.id));
+          Object.entries(snapshot.colors).forEach(([k, v]) => queueLiveColor(k, v, editRevision));
+          SYNTAX_DEFS.forEach(s => queueLiveToken(s.id, getActiveSyntaxColor(s.id), editRevision));
+          flushLiveColors();
+          flushLiveTokens();
+          updateHistoryButtonsState();
+        } finally {
+          isRestoringHistory = false;
+        }
+      }
+
+      window.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z') && !e.shiftKey) {
+          e.preventDefault();
+          window.undoThemeChange();
+        } else if (((e.ctrlKey || e.metaKey) && (e.key === 'y' || e.key === 'Y')) || ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'z' || e.key === 'Z'))) {
+          e.preventDefault();
+          window.redoThemeChange();
+        }
+      });
 
       applyStudioTheme();
 
@@ -3117,6 +3282,7 @@ class ThemeStudioWebview {
         renderSyntaxPreview();
         applyStudioTheme();
         syncControlValues();
+        updateContrastBadges();
       }
 
       function replaceThemeSnapshot(message, includeAllLocalEdits = false) {

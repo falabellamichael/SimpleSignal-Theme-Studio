@@ -857,9 +857,15 @@ const skeletonValley = presets.THEME_PRESETS.find((preset) => preset.id === 'ske
 assert.ok(skeletonValley, 'The off-white Skeleton Valley preset must remain bundled');
 assert.equal(skeletonValley.name, '💀 Skeleton Valley', 'Skeleton Valley must keep its emoji and tree-label spacing');
 assert.equal(skeletonValley.type, 'light', 'Skeleton Valley must activate light extension and webview fallbacks');
-assert.equal(skeletonValley.colors['editor.background'], '#000000', 'Skeleton Valley must preserve the black half of the checkerboard');
+assert.equal(skeletonValley.colors['editor.background'], '#171512', 'Skeleton Valley must preserve the warm off-black half of the checkerboard');
 assert.equal(skeletonValley.colors['sideBar.background'], '#f2eee3', 'Skeleton Valley must use warm off-white chrome');
-assert.equal(skeletonValley.colors['textCodeBlock.background'], '#000000', 'Skeleton Valley must retain its existing pure-black code blocks');
+for (const [key, color] of Object.entries(skeletonValley.colors)) {
+  if (key.toLowerCase().includes('background')) {
+    assert.notEqual(color.toLowerCase(), '#000000', `Skeleton Valley ${key} must not fall back to pure black`);
+    assert.notEqual(color.toLowerCase(), '#000', `Skeleton Valley ${key} must not fall back to shorthand pure black`);
+  }
+}
+assert.equal(skeletonValley.colors['textCodeBlock.background'], '#171512', 'Skeleton Valley code blocks must use the shared warm off-black');
 for (const [foreground, background, label] of [
   ['foreground', 'sideBar.background', 'global webview text'],
   ['descriptionForeground', 'sideBar.background', 'muted webview text'],

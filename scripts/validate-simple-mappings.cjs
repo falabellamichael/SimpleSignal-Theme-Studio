@@ -34,6 +34,23 @@ function readAttribute(tag, name) {
   return match?.[1];
 }
 
+function relativeLuminance(hex) {
+  const channels = hex.slice(1).match(/.{2}/g).map((value) => parseInt(value, 16) / 255);
+  const linear = channels.map((value) => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
+  return (0.2126 * linear[0]) + (0.7152 * linear[1]) + (0.0722 * linear[2]);
+}
+
+function contrastRatio(first, second) {
+  const high = Math.max(relativeLuminance(first), relativeLuminance(second));
+  const low = Math.min(relativeLuminance(first), relativeLuminance(second));
+  return (high + 0.05) / (low + 0.05);
+}
+
+function assertReadablePair(colors, foreground, background, label) {
+  const ratio = contrastRatio(colors[foreground], colors[background]);
+  assert.ok(ratio >= 4.5, `${label} must remain WCAG AA readable; received ${ratio.toFixed(2)}:1`);
+}
+
 function validatePreviewMappings(markup, simpleAttribute, advancedAttribute, groups, owners, label) {
   const byId = new Map(groups.map((group) => [group.id, group]));
   const represented = new Set();
@@ -787,7 +804,47 @@ assertUniqueIds(presets.SIMPLE_SYNTAX_DEFINITIONS, 'Simple syntax');
 assertUniqueIds(presets.THEME_PRESETS, 'Preset');
 assert.equal(uiIds.size, 83, 'Advanced UI role coverage must include all normal, empty-window and debugging status-bar roles');
 assert.equal(syntaxIds.size, 10, 'Advanced syntax role coverage must remain at 10');
-assert.equal(presets.THEME_PRESETS.length, 65, 'The bundled Studio preset catalog must remain complete');
+assert.equal(presets.THEME_PRESETS.length, 66, 'The bundled Studio preset catalog must remain complete');
+
+const whiteTuxedo = presets.THEME_PRESETS.find((preset) => preset.id === 'white-tuxedo');
+assert.ok(whiteTuxedo, 'The screenshot-inspired White Tuxedo preset must remain bundled');
+for (const [foreground, background, label] of [
+  ['foreground', 'editor.background', 'global text'],
+  ['descriptionForeground', 'editor.background', 'muted workspace text'],
+  ['editor.foreground', 'editor.background', 'editor text'],
+  ['editorLineNumber.foreground', 'editor.background', 'editor line numbers'],
+  ['editorHoverWidget.foreground', 'editorHoverWidget.background', 'hover widget text'],
+  ['editorSuggestWidget.foreground', 'editorSuggestWidget.background', 'suggestion text'],
+  ['editorSuggestWidget.selectedForeground', 'editorSuggestWidget.selectedBackground', 'selected suggestion text'],
+  ['editorWidget.foreground', 'editorWidget.background', 'Studio card text'],
+  ['activityBar.foreground', 'activityBar.background', 'activity-bar text'],
+  ['activityBar.inactiveForeground', 'activityBar.background', 'inactive activity-bar text'],
+  ['activityBarBadge.foreground', 'activityBarBadge.background', 'activity badge text'],
+  ['sideBar.foreground', 'sideBar.background', 'sidebar text'],
+  ['sideBarSectionHeader.foreground', 'sideBarSectionHeader.background', 'sidebar section text'],
+  ['titleBar.activeForeground', 'titleBar.activeBackground', 'active title-bar text'],
+  ['titleBar.inactiveForeground', 'titleBar.inactiveBackground', 'inactive title-bar text'],
+  ['statusBar.foreground', 'statusBar.background', 'status-bar text'],
+  ['statusBar.noFolderForeground', 'statusBar.noFolderBackground', 'empty-window status text'],
+  ['statusBar.debuggingForeground', 'statusBar.debuggingBackground', 'debug status text'],
+  ['tab.activeForeground', 'tab.activeBackground', 'active tab text'],
+  ['tab.inactiveForeground', 'tab.inactiveBackground', 'inactive tab text'],
+  ['terminal.foreground', 'terminal.background', 'terminal text'],
+  ['input.foreground', 'input.background', 'input text'],
+  ['input.placeholderForeground', 'input.background', 'input placeholder text'],
+  ['panelTitle.activeForeground', 'panel.background', 'active panel title'],
+  ['panelTitle.inactiveForeground', 'panel.background', 'inactive panel title'],
+  ['chat.avatarForeground', 'chat.avatarBackground', 'chat avatar text'],
+  ['chat.slashCommandForeground', 'chat.slashCommandBackground', 'slash-command text'],
+  ['badge.foreground', 'badge.background', 'badge text'],
+]) {
+  assertReadablePair(whiteTuxedo.colors, foreground, background, `White Tuxedo ${label}`);
+}
+for (const rule of whiteTuxedo.tokenColors) {
+  const scope = Array.isArray(rule.scope) ? rule.scope[0] : rule.scope;
+  const ratio = contrastRatio(rule.settings.foreground, whiteTuxedo.colors['editor.background']);
+  assert.ok(ratio >= 4.5, `White Tuxedo ${scope} syntax must remain readable; received ${ratio.toFixed(2)}:1`);
+}
 
 const inheritedStatusBar = presets.normalizeStatusBarVariants({
   'statusBar.background': '#123456',
@@ -909,6 +966,10 @@ try {
   assert.ok(html.includes(`All UI (${uiIds.size})`), 'Preview must expose its complete UI role gallery');
   assert.ok(html.includes(`Syntax (${syntaxIds.size})`), 'Preview must expose its complete syntax role gallery');
   assert.match(html, /\.mock-clickable:focus-visible/, 'Preview click targets must retain a visible keyboard focus state');
+  assert.match(html, /--card-text:/, 'Studio cards must expose a foreground paired to their own background');
+  assert.match(html, /--card-text-muted:/, 'Studio cards must derive readable contextual secondary text');
+  assert.match(script, /\['editorWidget\.background', 'sideBar\.background', 'panel\.background'\]/, 'Studio cards must prefer editor-widget colors over unrelated sidebar colors');
+  assert.match(script, /setProperty\('--card-text', cardText\)/, 'Live preset changes must refresh the contextual card foreground');
   assert.match(script, /addEventListener\('keydown'/, 'Non-button preview targets must support keyboard activation');
 
   validatePreviewMappings(html, 'data-inspect-simple-ui', 'data-inspect-ui', presets.SIMPLE_UI_DEFINITIONS, uiOwners, 'UI');

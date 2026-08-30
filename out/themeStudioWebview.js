@@ -501,7 +501,9 @@ class ThemeStudioWebview {
   <style>
     :root {
       --bg: var(--vscode-editor-background, #07070a);
-      --card-bg: var(--vscode-sideBar-background, #0e0e14);
+      --card-bg: var(--vscode-editorWidget-background, var(--vscode-sideBar-background, #0e0e14));
+      --card-text: var(--vscode-editorWidget-foreground, var(--vscode-sideBar-foreground, var(--vscode-foreground, #f0f0f8)));
+      --card-text-muted: color-mix(in srgb, var(--card-text) 72%, var(--card-bg));
       --card-border: var(--vscode-panel-border, color-mix(in srgb, var(--text) 16%, transparent));
       --accent: var(--vscode-focusBorder, #ffe600);
       --accent-blue: var(--vscode-textLink-foreground, var(--accent));
@@ -942,6 +944,16 @@ class ThemeStudioWebview {
       gap: 6px;
       min-width: 0;
       transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .color-card,
+    .preset-card,
+    .preview-sticky,
+    .search-input,
+    .toast-popup {
+      --text: var(--card-text);
+      --text-muted: var(--card-text-muted);
+      color: var(--card-text);
     }
 
     .color-card:hover {
@@ -2015,8 +2027,9 @@ class ThemeStudioWebview {
         const colors = activeState.colors || {};
         const isLight = (activeState.themeKind || '').includes('light');
         const bg = readThemeColor(colors, ['editor.background', 'panel.background'], isLight ? '#ffffff' : '#07070a');
-        const card = readThemeColor(colors, ['sideBar.background', 'editorWidget.background', 'panel.background'], bg);
+        const card = readThemeColor(colors, ['editorWidget.background', 'sideBar.background', 'panel.background'], bg);
         const text = readThemeColor(colors, ['foreground', 'editor.foreground', 'sideBar.foreground'], isLight ? '#1f2328' : '#f0f0f8');
+        const cardText = readThemeColor(colors, ['editorWidget.foreground', 'sideBar.foreground', 'foreground'], text);
         const muted = readThemeColor(colors, ['descriptionForeground', 'sideBar.foreground', 'input.placeholderForeground'], text);
         const accent = readThemeColor(colors, ['focusBorder', 'tab.activeBorderTop', 'textLink.foreground', 'activityBarBadge.background'], isLight ? '#0969da' : '#ffe600');
         const secondary = readThemeColor(colors, ['textLink.foreground', 'terminal.ansiCyan', 'editorCursor.foreground'], accent);
@@ -2029,6 +2042,7 @@ class ThemeStudioWebview {
         root.style.colorScheme = isLight ? 'light' : 'dark';
         root.style.setProperty('--bg', bg);
         root.style.setProperty('--card-bg', card);
+        root.style.setProperty('--card-text', cardText);
         root.style.setProperty('--text', text);
         root.style.setProperty('--text-muted', muted);
         root.style.setProperty('--accent', accent);

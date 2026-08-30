@@ -28,6 +28,7 @@ exports.UI_COLOR_DEFINITIONS = [
     { id: 'focusBorder', name: 'Focus Border', description: 'Global focus outline on interactive elements', category: 'core', defaultValue: '#007fd4' },
     // 2. Editor Canvas & Hover Widgets
     { id: 'editor.background', name: 'Editor Background', description: 'Main coding canvas background color', category: 'core', defaultValue: '#1e1e1e' },
+    { id: 'editorGutter.background', name: 'Editor Gutter Background', description: 'Background behind line numbers, glyphs and folding controls', category: 'core', defaultValue: '#1e1e1e' },
     { id: 'editor.foreground', name: 'Editor Code Text', description: 'Default code text / punctuation color', category: 'core', defaultValue: '#d4d4d4' },
     { id: 'editorLineNumber.foreground', name: 'Line Numbers', description: 'Gutter line number color', category: 'core', defaultValue: '#858585' },
     { id: 'editorLineNumber.activeForeground', name: 'Active Line Number', description: 'Line number of current cursor line', category: 'core', defaultValue: '#c6c6c6' },
@@ -150,10 +151,10 @@ exports.SIMPLE_UI_DEFINITIONS = [
     {
         id: 'simple.canvasBg',
         name: 'Canvas & Main Panels',
-        description: 'Editor, terminal, active tab and main panel backgrounds',
+        description: 'Editor, line-number gutter, terminal, active tab and main panel backgrounds',
         icon: '🖥️',
         section: 'Foundations',
-        targets: ['editor.background', 'tab.activeBackground', 'terminal.background', 'panel.background'],
+        targets: ['editor.background', 'editorGutter.background', 'tab.activeBackground', 'terminal.background', 'panel.background'],
         defaultColor: '#1e1e1e',
     },
     {
@@ -485,6 +486,7 @@ const SKELETON_VALLEY_PRESET = {
         'icon.foreground': '#17130f',
         'focusBorder': '#7a4b00',
         'editor.background': '#171512',
+        'editorGutter.background': '#f2eee3',
         'editorHoverWidget.background': '#f2eee3',
         'editorHoverWidget.foreground': '#17130f',
         'editorHoverWidget.statusBarBackground': '#ded6c8',
@@ -522,7 +524,7 @@ const SKELETON_VALLEY_PRESET = {
         'chat.avatarBackground': '#171512',
         'chat.slashCommandBackground': '#171512',
         'interactive.requestBorder': '#f2eee3',
-        'textCodeBlock.background': '#171512',
+        'textCodeBlock.background': '#f2eee3',
         'textLink.foreground': '#7a4b00',
         'badge.background': '#171512',
     },
@@ -13926,8 +13928,14 @@ const RAW_THEME_PRESETS = [
         ]
     }
 ];
-exports.THEME_PRESETS = RAW_THEME_PRESETS.map((preset) => ({
-    ...preset,
-    colors: normalizeStatusBarVariants(preset.colors),
-}));
+exports.THEME_PRESETS = RAW_THEME_PRESETS.map((preset) => {
+    const colors = normalizeStatusBarVariants(preset.colors);
+    return {
+        ...preset,
+        colors: {
+            'editorGutter.background': colors['editor.background'] || '#1e1e1e',
+            ...colors,
+        },
+    };
+});
 //# sourceMappingURL=presets.js.map

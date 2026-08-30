@@ -802,7 +802,7 @@ assertUniqueIds(presets.SYNTAX_SCOPE_DEFINITIONS, 'Advanced syntax');
 assertUniqueIds(presets.SIMPLE_UI_DEFINITIONS, 'Simple UI');
 assertUniqueIds(presets.SIMPLE_SYNTAX_DEFINITIONS, 'Simple syntax');
 assertUniqueIds(presets.THEME_PRESETS, 'Preset');
-assert.equal(uiIds.size, 83, 'Advanced UI role coverage must include all normal, empty-window and debugging status-bar roles');
+assert.equal(uiIds.size, 84, 'Advanced UI role coverage must include the editor gutter and all status-bar variants');
 assert.equal(syntaxIds.size, 10, 'Advanced syntax role coverage must remain at 10');
 assert.equal(presets.THEME_PRESETS.length, 67, 'The bundled Studio preset catalog must remain complete');
 
@@ -858,6 +858,7 @@ assert.ok(skeletonValley, 'The off-white Skeleton Valley preset must remain bund
 assert.equal(skeletonValley.name, '💀 Skeleton Valley', 'Skeleton Valley must keep its emoji and tree-label spacing');
 assert.equal(skeletonValley.type, 'light', 'Skeleton Valley must activate light extension and webview fallbacks');
 assert.equal(skeletonValley.colors['editor.background'], '#171512', 'Skeleton Valley must preserve the warm off-black half of the checkerboard');
+assert.equal(skeletonValley.colors['editorGutter.background'], '#f2eee3', 'Skeleton Valley must use bone for the editor gutter');
 assert.equal(skeletonValley.colors['sideBar.background'], '#f2eee3', 'Skeleton Valley must use warm off-white chrome');
 for (const [key, color] of Object.entries(skeletonValley.colors)) {
   if (key.toLowerCase().includes('background')) {
@@ -865,11 +866,12 @@ for (const [key, color] of Object.entries(skeletonValley.colors)) {
     assert.notEqual(color.toLowerCase(), '#000', `Skeleton Valley ${key} must not fall back to shorthand pure black`);
   }
 }
-assert.equal(skeletonValley.colors['textCodeBlock.background'], '#171512', 'Skeleton Valley code blocks must use the shared warm off-black');
+assert.equal(skeletonValley.colors['textCodeBlock.background'], '#f2eee3', 'Skeleton Valley formatted code blocks must use the shared bone surface');
 for (const [foreground, background, label] of [
   ['foreground', 'sideBar.background', 'global webview text'],
   ['descriptionForeground', 'sideBar.background', 'muted webview text'],
   ['disabledForeground', 'sideBar.background', 'disabled webview text'],
+  ['foreground', 'textCodeBlock.background', 'formatted code-block text fallback'],
   ['editor.foreground', 'editor.background', 'editor text'],
   ['editorLineNumber.foreground', 'editor.background', 'editor line numbers'],
   ['editorHoverWidget.foreground', 'editorHoverWidget.background', 'hover widget text'],
@@ -1032,6 +1034,8 @@ try {
   assert.match(html, /--card-text-muted:/, 'Studio cards must derive readable contextual secondary text');
   assert.match(script, /\['editorWidget\.background', 'sideBar\.background', 'panel\.background'\]/, 'Studio cards must prefer editor-widget colors over unrelated sidebar colors');
   assert.match(script, /setProperty\('--card-text', cardText\)/, 'Live preset changes must refresh the contextual card foreground');
+  assert.match(html, /id="mockEditorGutter"[^>]*data-inspect-ui="editorGutter\.background"[^>]*data-inspect-simple-ui="simple\.canvasBg"/, 'The workbench preview gutter must be independently clickable and owned by Canvas & Main Panels');
+  assert.match(script, /key === 'editorGutter\.background'[\s\S]*?mockEditorGutter[\s\S]*?style\.background = val/, 'Live gutter changes must repaint the preview gutter');
   assert.match(script, /addEventListener\('keydown'/, 'Non-button preview targets must support keyboard activation');
 
   validatePreviewMappings(html, 'data-inspect-simple-ui', 'data-inspect-ui', presets.SIMPLE_UI_DEFINITIONS, uiOwners, 'UI');

@@ -1510,6 +1510,7 @@ export class ThemeStudioWebview {
 
     .mock-editor-canvas {
       flex: 1;
+      position: relative;
       background: #1e1e1e;
       color: #d4d4d4;
       padding: 10px;
@@ -1517,6 +1518,23 @@ export class ThemeStudioWebview {
       font-size: calc(10.5px * var(--preview-scale));
       overflow: auto;
       min-width: 0;
+    }
+
+    .mock-editor-gutter {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 34px;
+      z-index: 0;
+      border: 0;
+      border-radius: 0;
+      padding: 0;
+      background: #1e1e1e;
+      cursor: pointer;
+    }
+
+    .mock-editor-canvas > :not(.mock-editor-gutter) {
+      position: relative;
+      z-index: 1;
     }
 
     .contrast-badge {
@@ -1891,6 +1909,7 @@ export class ThemeStudioWebview {
 
               <!-- Editor Code Canvas -->
               <div class="mock-editor-canvas mock-clickable" id="mockCanvas" data-inspect-ui="editor.background" data-inspect-simple-ui="simple.canvasBg" title="Click to highlight Editor Canvas Background">
+                <button type="button" class="mock-editor-gutter mock-clickable" id="mockEditorGutter" data-preview-target="editor-gutter-background" data-inspect-ui="editorGutter.background" data-inspect-simple-ui="simple.canvasBg" aria-label="Editor gutter background — edit the line-number column color" title="Click to highlight Editor Gutter Background"></button>
                 <div style="margin-bottom: 3px;"><span class="mock-line-number mock-clickable" id="mockLineNumber" data-preview-target="editor-line-number-1" data-inspect-ui="editorLineNumber.foreground" data-inspect-simple-ui="simple.mutedText" aria-label="Line number 1 — edit line-number text" title="Click to highlight Line Numbers">1</span>  <span class="syn-comment mock-clickable" id="synComment" data-inspect-syntax="comments" data-inspect-simple-syntax="simple.comments" title="Click to highlight Comments">// SimpleTheme Realtime Studio</span></div>
                 <div><span class="mock-line-number mock-clickable" data-preview-target="editor-line-number-2" data-inspect-ui="editorLineNumber.foreground" data-inspect-simple-ui="simple.mutedText" aria-label="Line number 2 — edit line-number text" title="Click to highlight Line Numbers">2</span>  <span class="syn-keyword mock-clickable" id="synKw1" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">import</span> <span class="syn-op mock-clickable" data-preview-target="code-brace-import-open" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">{</span> <span class="syn-var mock-clickable" id="synVar1" data-inspect-syntax="variables" data-inspect-simple-syntax="simple.variables" title="Click to highlight Variables">SimpleTheme</span> <span class="syn-op mock-clickable" data-preview-target="code-brace-import-close" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">}</span> <span class="syn-keyword mock-clickable" id="synKw2" data-inspect-syntax="keywords" data-inspect-simple-syntax="simple.keywords" title="Click to highlight Keywords">from</span> <span class="syn-string mock-clickable" id="synStr1" data-inspect-syntax="strings" data-inspect-simple-syntax="simple.strings" title="Click to highlight Strings">'simpletheme'</span><span class="syn-op mock-clickable" data-preview-target="code-semicolon-import" data-inspect-syntax="operators" data-inspect-simple-syntax="simple.variables" title="Click to highlight Operators">;</span></div>
                 <div><span class="mock-line-number mock-clickable" data-preview-target="editor-line-number-3" data-inspect-ui="editorLineNumber.foreground" data-inspect-simple-ui="simple.mutedText" aria-label="Line number 3 — edit line-number text" title="Click to highlight Line Numbers">3</span></div>
@@ -2723,6 +2742,9 @@ export class ThemeStudioWebview {
         if (key === 'editor.background') {
           const canvas = document.getElementById('mockCanvas');
           if (canvas) canvas.style.background = val;
+        } else if (key === 'editorGutter.background') {
+          const gutter = document.getElementById('mockEditorGutter');
+          if (gutter) gutter.style.background = val;
         } else if (key === 'editor.foreground') {
           const canvas = document.getElementById('mockCanvas');
           if (canvas) canvas.style.color = val;

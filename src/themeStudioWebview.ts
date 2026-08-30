@@ -519,8 +519,8 @@ export class ThemeStudioWebview {
       --card-border: var(--vscode-panel-border, color-mix(in srgb, var(--text) 16%, transparent));
       --accent: var(--vscode-focusBorder, #ffe600);
       --accent-blue: var(--vscode-textLink-foreground, var(--accent));
-      --text: var(--vscode-foreground, #f0f0f8);
-      --text-muted: var(--vscode-descriptionForeground, #858599);
+      --text: var(--vscode-editor-foreground, var(--vscode-foreground, #f0f0f8));
+      --text-muted: var(--vscode-editorLineNumber-foreground, var(--vscode-descriptionForeground, #858599));
       --on-accent: var(--vscode-activityBarBadge-foreground, #000000);
       --control-bg: var(--vscode-input-background, color-mix(in srgb, var(--card-bg) 88%, var(--text) 12%));
       --surface-subtle: color-mix(in srgb, var(--text) 6%, transparent);
@@ -2040,9 +2040,9 @@ export class ThemeStudioWebview {
         const isLight = (activeState.themeKind || '').includes('light');
         const bg = readThemeColor(colors, ['editor.background', 'panel.background'], isLight ? '#ffffff' : '#07070a');
         const card = readThemeColor(colors, ['editorWidget.background', 'sideBar.background', 'panel.background'], bg);
-        const text = readThemeColor(colors, ['foreground', 'editor.foreground', 'sideBar.foreground'], isLight ? '#1f2328' : '#f0f0f8');
+        const text = readThemeColor(colors, ['editor.foreground', 'foreground', 'sideBar.foreground'], isLight ? '#1f2328' : '#f0f0f8');
         const cardText = readThemeColor(colors, ['editorWidget.foreground', 'sideBar.foreground', 'foreground'], text);
-        const muted = readThemeColor(colors, ['descriptionForeground', 'sideBar.foreground', 'input.placeholderForeground'], text);
+        const muted = readThemeColor(colors, ['editorLineNumber.foreground', 'descriptionForeground', 'input.placeholderForeground'], text);
         const accent = readThemeColor(colors, ['focusBorder', 'tab.activeBorderTop', 'textLink.foreground', 'activityBarBadge.background'], isLight ? '#0969da' : '#ffe600');
         const secondary = readThemeColor(colors, ['textLink.foreground', 'terminal.ansiCyan', 'editorCursor.foreground'], accent);
         const control = readThemeColor(colors, ['input.background', 'editorWidget.background', 'sideBarSectionHeader.background'], card);

@@ -808,9 +808,11 @@ assert.equal(presets.THEME_PRESETS.length, 66, 'The bundled Studio preset catalo
 
 const whiteTuxedo = presets.THEME_PRESETS.find((preset) => preset.id === 'white-tuxedo');
 assert.ok(whiteTuxedo, 'The screenshot-inspired White Tuxedo preset must remain bundled');
+assert.equal(whiteTuxedo.type, 'light', 'White Tuxedo must provide light fallbacks for unspecified chat and webview surfaces');
 for (const [foreground, background, label] of [
-  ['foreground', 'editor.background', 'global text'],
-  ['descriptionForeground', 'editor.background', 'muted workspace text'],
+  ['foreground', 'sideBar.background', 'global webview text'],
+  ['descriptionForeground', 'sideBar.background', 'muted webview text'],
+  ['disabledForeground', 'sideBar.background', 'disabled webview text'],
   ['editor.foreground', 'editor.background', 'editor text'],
   ['editorLineNumber.foreground', 'editor.background', 'editor line numbers'],
   ['editorHoverWidget.foreground', 'editorHoverWidget.background', 'hover widget text'],

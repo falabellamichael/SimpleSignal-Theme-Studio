@@ -429,10 +429,31 @@ export class ThemeEngine {
     return false;
   }
 
+  private static getBaseThemeName(
+    colors: Record<string, string>,
+    themeType?: ThemePreset['type']
+  ): string {
+    if (themeType === 'light') {
+      return 'SimpleTheme (Light Modern)';
+    }
+    if (themeType === 'dark') {
+      return colors['editor.background'] === '#000000' || colors['editor.background'] === '#000'
+        ? 'SimpleTheme (OLED Pure Black)'
+        : 'SimpleTheme (Dark Modern)';
+    }
+    if (this.isLightTheme(colors)) {
+      return 'SimpleTheme (Light Modern)';
+    }
+    return colors['editor.background'] === '#000000' || colors['editor.background'] === '#000'
+      ? 'SimpleTheme (OLED Pure Black)'
+      : 'SimpleTheme (Dark Modern)';
+  }
+
   public static async applyTheme(
     colors: Record<string, string>,
     tokenColors?: TokenRule[],
-    profileName?: string
+    profileName?: string,
+    themeType?: ThemePreset['type']
   ): Promise<void> {
     await this.ensureSettingsFileSaved();
     const target = this.getTargetScope();
@@ -449,14 +470,7 @@ export class ThemeEngine {
     const cleanColors = normalizeStatusBarVariants(sanitizedColors);
 
     // 0. Ensure base VS Code colorTheme is set to SimpleTheme
-    const isLight = this.isLightTheme(cleanColors);
-    const isOled = (cleanColors['editor.background'] === '#000000' || cleanColors['editor.background'] === '#000');
-    let targetThemeName = 'SimpleTheme (Dark Modern)';
-    if (isLight) {
-      targetThemeName = 'SimpleTheme (Light Modern)';
-    } else if (isOled) {
-      targetThemeName = 'SimpleTheme (OLED Pure Black)';
-    }
+    const targetThemeName = this.getBaseThemeName(cleanColors, themeType);
 
     try {
       const currentTheme = workbench.get<string>('colorTheme');
@@ -646,7 +660,7 @@ export class ThemeEngine {
   }
 
   public static async applyPreset(preset: ThemePreset): Promise<void> {
-    await this.applyTheme(preset.colors, preset.tokenColors, preset.name);
+    await this.applyTheme(preset.colors, preset.tokenColors, preset.name, preset.type);
   }
 
   public static async resetTheme(): Promise<void> {

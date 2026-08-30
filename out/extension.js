@@ -95,7 +95,7 @@ async function activate(context) {
     // 4. Direct Profile Application (from TreeView)
     const applyProfileDirectCmd = vscode.commands.registerCommand('simpletheme.applyProfileDirect', async (profile) => {
         if (profile) {
-            await themeEngine_1.ThemeEngine.applyTheme(profile.colors, profile.tokenColors, profile.name);
+            await themeEngine_1.ThemeEngine.applyTheme(profile.colors, profile.tokenColors, profile.name, profile.type);
             vscode.window.showInformationMessage(`✨ Applied profile "${profile.name}"!`);
             treeProvider.refresh();
             updateStatusBar(statusBarItem);
@@ -198,7 +198,7 @@ async function activate(context) {
             return;
         try {
             const profile = await profileManager_1.ProfileManager.importProfile(jsonStr.trim());
-            await themeEngine_1.ThemeEngine.applyTheme(profile.colors, profile.tokenColors, profile.name);
+            await themeEngine_1.ThemeEngine.applyTheme(profile.colors, profile.tokenColors, profile.name, profile.type);
             vscode.window.showInformationMessage(`✨ Imported and applied "${profile.name}"!`);
             treeProvider.refresh();
             updateStatusBar(statusBarItem);

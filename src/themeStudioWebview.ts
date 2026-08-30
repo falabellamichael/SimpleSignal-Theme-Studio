@@ -228,7 +228,7 @@ export class ThemeStudioWebview {
             const profile = ProfileManager.getProfile(message.profileId);
             if (profile) {
               const profileState = await this._enqueueMutation(async () => {
-                await this._runInternalChange(() => ThemeEngine.applyTheme(profile.colors, profile.tokenColors, profile.name));
+                await this._runInternalChange(() => ThemeEngine.applyTheme(profile.colors, profile.tokenColors, profile.name, profile.type));
                 return ThemeEngine.getEffectiveThemeState();
               });
               vscode.window.showInformationMessage(`✨ Loaded profile "${profile.name}"!`);

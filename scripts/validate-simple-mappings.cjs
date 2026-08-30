@@ -804,11 +804,16 @@ assertUniqueIds(presets.SIMPLE_SYNTAX_DEFINITIONS, 'Simple syntax');
 assertUniqueIds(presets.THEME_PRESETS, 'Preset');
 assert.equal(uiIds.size, 83, 'Advanced UI role coverage must include all normal, empty-window and debugging status-bar roles');
 assert.equal(syntaxIds.size, 10, 'Advanced syntax role coverage must remain at 10');
-assert.equal(presets.THEME_PRESETS.length, 66, 'The bundled Studio preset catalog must remain complete');
+assert.equal(presets.THEME_PRESETS.length, 67, 'The bundled Studio preset catalog must remain complete');
 
 const whiteTuxedo = presets.THEME_PRESETS.find((preset) => preset.id === 'white-tuxedo');
 assert.ok(whiteTuxedo, 'The screenshot-inspired White Tuxedo preset must remain bundled');
 assert.equal(whiteTuxedo.type, 'light', 'White Tuxedo must provide light fallbacks for unspecified chat and webview surfaces');
+assert.equal(
+  whiteTuxedo.colors['textCodeBlock.background'],
+  whiteTuxedo.colors['chat.requestBackground'],
+  'White Tuxedo code blocks must use the adjoining charcoal chat surface instead of dropping to pure black'
+);
 for (const [foreground, background, label] of [
   ['foreground', 'sideBar.background', 'global webview text'],
   ['descriptionForeground', 'sideBar.background', 'muted webview text'],
@@ -846,6 +851,39 @@ for (const rule of whiteTuxedo.tokenColors) {
   const scope = Array.isArray(rule.scope) ? rule.scope[0] : rule.scope;
   const ratio = contrastRatio(rule.settings.foreground, whiteTuxedo.colors['editor.background']);
   assert.ok(ratio >= 4.5, `White Tuxedo ${scope} syntax must remain readable; received ${ratio.toFixed(2)}:1`);
+}
+
+const skeletonValley = presets.THEME_PRESETS.find((preset) => preset.id === 'skeleton-valley');
+assert.ok(skeletonValley, 'The off-white Skeleton Valley preset must remain bundled');
+assert.equal(skeletonValley.name, '💀 Skeleton Valley', 'Skeleton Valley must keep its emoji and tree-label spacing');
+assert.equal(skeletonValley.type, 'light', 'Skeleton Valley must activate light extension and webview fallbacks');
+assert.equal(skeletonValley.colors['editor.background'], '#000000', 'Skeleton Valley must preserve the black half of the checkerboard');
+assert.equal(skeletonValley.colors['sideBar.background'], '#f2eee3', 'Skeleton Valley must use warm off-white chrome');
+assert.equal(skeletonValley.colors['textCodeBlock.background'], '#000000', 'Skeleton Valley must retain its existing pure-black code blocks');
+for (const [foreground, background, label] of [
+  ['foreground', 'sideBar.background', 'global webview text'],
+  ['descriptionForeground', 'sideBar.background', 'muted webview text'],
+  ['disabledForeground', 'sideBar.background', 'disabled webview text'],
+  ['editor.foreground', 'editor.background', 'editor text'],
+  ['editorLineNumber.foreground', 'editor.background', 'editor line numbers'],
+  ['editorHoverWidget.foreground', 'editorHoverWidget.background', 'hover widget text'],
+  ['editorSuggestWidget.foreground', 'editorSuggestWidget.background', 'suggestion text'],
+  ['activityBar.foreground', 'activityBar.background', 'activity-bar text'],
+  ['activityBar.inactiveForeground', 'activityBar.background', 'inactive activity-bar text'],
+  ['sideBar.foreground', 'sideBar.background', 'sidebar text'],
+  ['titleBar.activeForeground', 'titleBar.activeBackground', 'active title-bar text'],
+  ['titleBar.inactiveForeground', 'titleBar.inactiveBackground', 'inactive title-bar text'],
+  ['statusBar.foreground', 'statusBar.background', 'status-bar text'],
+  ['statusBar.noFolderForeground', 'statusBar.noFolderBackground', 'empty-window status text'],
+  ['input.foreground', 'input.background', 'input text'],
+  ['input.placeholderForeground', 'input.background', 'input placeholder text'],
+]) {
+  assertReadablePair(skeletonValley.colors, foreground, background, `Skeleton Valley ${label}`);
+}
+for (const rule of skeletonValley.tokenColors) {
+  const scope = Array.isArray(rule.scope) ? rule.scope[0] : rule.scope;
+  const ratio = contrastRatio(rule.settings.foreground, skeletonValley.colors['editor.background']);
+  assert.ok(ratio >= 4.5, `Skeleton Valley ${scope} syntax must remain readable; received ${ratio.toFixed(2)}:1`);
 }
 
 const inheritedStatusBar = presets.normalizeStatusBarVariants({
@@ -957,6 +995,22 @@ try {
     })),
   });
   ProfileManager.getProfiles = () => [];
+
+  assert.match(
+    ThemeEngine.applyPreset.toString(),
+    /preset\.name,\s*preset\.type/,
+    'Applying a preset must pass its declared light or dark type to the base-theme selector'
+  );
+  assert.equal(
+    ThemeEngine.getBaseThemeName({ 'editor.background': '#000000' }, 'light'),
+    'SimpleTheme (Light Modern)',
+    'An explicitly light checkerboard preset must use the light base even when its editor is black'
+  );
+  assert.equal(
+    ThemeEngine.getBaseThemeName({ 'editor.background': '#000000' }, 'dark'),
+    'SimpleTheme (OLED Pure Black)',
+    'A dark pure-black preset must retain the OLED base'
+  );
 
   const studio = Object.create(ThemeStudioWebview.prototype);
   const html = studio._getHtmlForWebview();

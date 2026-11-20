@@ -8,7 +8,7 @@
     "focusBorder": "#38bdf8",
     "editor.background": "#000000",
     "editor.foreground": "#f8fafc",
-    "editorLineNumber.foreground": "#475569",
+    "editorLineNumber.foreground": "#4f5f75",
     "editorLineNumber.activeForeground": "#38bdf8",
     "editorCursor.foreground": "#38bdf8",
     "editor.selectionBackground": "#1e293b",
@@ -26,7 +26,7 @@
     "editorWidget.border": "#1a1a1a",
     "activityBar.background": "#000000",
     "activityBar.foreground": "#38bdf8",
-    "activityBar.inactiveForeground": "#475569",
+    "activityBar.inactiveForeground": "#4f5f75",
     "activityBarBadge.background": "#38bdf8",
     "activityBarBadge.foreground": "#000000",
     "sideBar.background": "#050505",
@@ -56,7 +56,7 @@
     "terminalCursor.foreground": "#38bdf8",
     "input.background": "#0a0a0a",
     "input.foreground": "#f8fafc",
-    "input.placeholderForeground": "#475569",
+    "input.placeholderForeground": "#4f5f75",
     "panel.background": "#000000",
     "panel.border": "#111111",
     "panelTitle.activeForeground": "#38bdf8",
@@ -74,7 +74,7 @@
         "comment"
       ],
       "settings": {
-        "foreground": "#475569",
+        "foreground": "#4f5f75",
         "fontStyle": "italic"
       }
     },

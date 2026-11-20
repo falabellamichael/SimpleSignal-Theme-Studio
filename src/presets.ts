@@ -1,4 +1,4 @@
-import { ThemePreset, UISectionColor, SyntaxScopeItem } from './types';
+import { ThemePreset, UISectionColor, SyntaxScopeItem, TokenRule } from './types';
 
 export function normalizeStatusBarVariants(colors: Record<string, string>): Record<string, string> {
   const normalized = { ...colors };
@@ -407,7 +407,7 @@ const WHITE_TUXEDO_PRESET: ThemePreset = {
     'foreground': '#000000',
     'descriptionForeground': '#595959',
     'disabledForeground': '#767676',
-    'icon.foreground': '#ffffff',
+    'icon.foreground': '#000000',
     'focusBorder': '#007acc',
     'editor.background': '#000000',
     'editor.foreground': '#ffffff',
@@ -426,13 +426,13 @@ const WHITE_TUXEDO_PRESET: ThemePreset = {
     'editorSuggestWidget.selectedBackground': '#000000',
     'editorSuggestWidget.selectedForeground': '#ffffff',
     'editorSuggestWidget.highlightForeground': '#007acc',
-    'editorWidget.background': '#262626',
-    'editorWidget.foreground': '#ffffff',
+    'editorWidget.background': '#ffffff',
+    'editorWidget.foreground': '#000000',
     'editorWidget.border': '#8f8f8f',
-    'textBlockQuote.background': '#1a1a1a',
-    'textBlockQuote.border': '#ffffff',
+    'textBlockQuote.background': '#ffffff',
+    'textBlockQuote.border': '#000000',
     'textLink.activeForeground': '#007acc',
-    'textPreformat.foreground': '#ffffff',
+    'textPreformat.foreground': '#000000',
     'activityBar.background': '#ffffff',
     'activityBar.foreground': '#000000',
     'activityBar.inactiveForeground': '#595959',
@@ -470,20 +470,20 @@ const WHITE_TUXEDO_PRESET: ThemePreset = {
     'input.background': '#ffffff',
     'input.foreground': '#000000',
     'input.placeholderForeground': '#595959',
-    'panel.background': '#000000',
+    'panel.background': '#ffffff',
     'panel.border': '#8f8f8f',
-    'panelTitle.activeForeground': '#ffffff',
-    'panelTitle.inactiveForeground': '#a3a3a3',
-    'panelTitle.activeBorder': '#ffffff',
-    'chat.requestBackground': '#262626',
-    'chat.requestBorder': '#ffffff',
+    'panelTitle.activeForeground': '#000000',
+    'panelTitle.inactiveForeground': '#595959',
+    'panelTitle.activeBorder': '#000000',
+    'chat.requestBackground': '#ffffff',
+    'chat.requestBorder': '#000000',
     'chat.avatarBackground': '#000000',
     'chat.avatarForeground': '#ffffff',
     'chat.slashCommandBackground': '#000000',
     'chat.slashCommandForeground': '#ffffff',
-    'interactive.requestBackground': '#262626',
-    'interactive.requestBorder': '#ffffff',
-    'textCodeBlock.background': '#262626',
+    'interactive.requestBackground': '#ffffff',
+    'interactive.requestBorder': '#000000',
+    'textCodeBlock.background': '#000000',
     'textLink.foreground': '#007acc',
     'badge.background': '#000000',
     'badge.foreground': '#ffffff',
@@ -517,8 +517,16 @@ const SKELETON_VALLEY_PRESET: ThemePreset = {
     'editorHoverWidget.statusBarBackground': '#ded6c8',
     'editorSuggestWidget.background': '#f2eee3',
     'editorSuggestWidget.foreground': '#17130f',
-    'editorSuggestWidget.selectedBackground': '#171512',
+    'editorSuggestWidget.selectedBackground': '#ded6c8',
+    'editorSuggestWidget.selectedForeground': '#17130f',
     'editorSuggestWidget.highlightForeground': '#7a4b00',
+    'editorWidget.background': '#f2eee3',
+    'editorWidget.foreground': '#17130f',
+    'editorLineNumber.foreground': '#5f584e',
+    'editorLineNumber.activeForeground': '#7a4b00',
+    'textBlockQuote.background': '#e9e2d3',
+    'textBlockQuote.border': '#171512',
+    'textPreformat.foreground': '#17130f',
     'textLink.activeForeground': '#a96800',
     'activityBar.background': '#f2eee3',
     'activityBar.foreground': '#17130f',
@@ -544,12 +552,17 @@ const SKELETON_VALLEY_PRESET: ThemePreset = {
     'input.background': '#faf7f0',
     'input.foreground': '#17130f',
     'input.placeholderForeground': '#5f584e',
-    'panel.background': '#171512',
-    'chat.requestBorder': '#f2eee3',
+    'panel.background': '#f2eee3',
+    'panelTitle.activeForeground': '#17130f',
+    'panelTitle.inactiveForeground': '#5f584e',
+    'panelTitle.activeBorder': '#171512',
+    'chat.requestBackground': '#e9e2d3',
+    'chat.requestBorder': '#171512',
     'chat.avatarBackground': '#171512',
     'chat.slashCommandBackground': '#171512',
-    'interactive.requestBorder': '#f2eee3',
-    'textCodeBlock.background': '#f2eee3',
+    'interactive.requestBackground': '#e9e2d3',
+    'interactive.requestBorder': '#171512',
+    'textCodeBlock.background': '#171512',
     'textLink.foreground': '#7a4b00',
     'badge.background': '#171512',
   },
@@ -560,10 +573,829 @@ const SKELETON_VALLEY_PRESET: ThemePreset = {
   })),
 };
 
+interface PastelPaletteSpec {
+  id: string;
+  name: string;
+  description: string;
+  ink: string;
+  muted: string;
+  faint: string;
+  accent: string;
+  badge?: string;
+  canvas: string;
+  chrome: string;
+  raised: string;
+  bubble: string;
+  input: string;
+  border: string;
+  popup: string;
+  selection: string;
+  panel?: string;
+  functions: string;
+  strings: string;
+  types: string;
+  numbers: string;
+  comments?: string;
+}
+
+const PASTEL_BADGE_TEXT = '#ffffff';
+const PASTEL_DEBUG = '#7f1d1d';
+
+function createPastelPreset(palette: PastelPaletteSpec): ThemePreset {
+  const badge = palette.badge || palette.accent;
+  const panel = palette.panel || palette.canvas;
+  const comments = palette.comments || palette.faint;
+  const syntax: Record<string, string> = {
+    keywords: palette.accent,
+    functions: palette.functions,
+    strings: palette.strings,
+    variables: palette.ink,
+    properties: palette.accent,
+    types: palette.types,
+    comments,
+    numbers: palette.numbers,
+    operators: palette.ink,
+    tags: palette.functions,
+  };
+
+  return {
+    id: palette.id,
+    name: palette.name,
+    description: palette.description,
+    type: 'light',
+    accentColor: badge,
+    colors: {
+      'foreground': palette.ink,
+      'descriptionForeground': palette.muted,
+      'disabledForeground': palette.faint,
+      'icon.foreground': palette.accent,
+      'focusBorder': palette.accent,
+      'editor.background': palette.canvas,
+      'editorGutter.background': palette.chrome,
+      'editor.foreground': palette.ink,
+      'editorLineNumber.foreground': palette.muted,
+      'editorLineNumber.activeForeground': palette.accent,
+      'editorCursor.foreground': palette.accent,
+      'editor.selectionBackground': palette.selection,
+      'editor.lineHighlightBackground': palette.raised,
+      'editorHoverWidget.background': palette.popup,
+      'editorHoverWidget.foreground': palette.ink,
+      'editorHoverWidget.border': palette.border,
+      'editorHoverWidget.statusBarBackground': palette.raised,
+      'editorSuggestWidget.background': palette.popup,
+      'editorSuggestWidget.foreground': palette.ink,
+      'editorSuggestWidget.border': palette.border,
+      'editorSuggestWidget.selectedBackground': palette.selection,
+      'editorSuggestWidget.selectedForeground': palette.ink,
+      'editorSuggestWidget.highlightForeground': palette.accent,
+      'editorWidget.background': palette.popup,
+      'editorWidget.foreground': palette.ink,
+      'editorWidget.border': palette.border,
+      'textBlockQuote.background': palette.raised,
+      'textBlockQuote.border': palette.accent,
+      'textLink.activeForeground': palette.accent,
+      'textPreformat.foreground': palette.ink,
+      'activityBar.background': palette.chrome,
+      'activityBar.foreground': palette.accent,
+      'activityBar.inactiveForeground': palette.faint,
+      'activityBarBadge.background': badge,
+      'activityBarBadge.foreground': PASTEL_BADGE_TEXT,
+      'sideBar.background': palette.chrome,
+      'sideBar.foreground': palette.ink,
+      'sideBarTitle.foreground': palette.accent,
+      'sideBarSectionHeader.background': palette.raised,
+      'sideBarSectionHeader.foreground': palette.ink,
+      'titleBar.activeBackground': palette.chrome,
+      'titleBar.activeForeground': palette.ink,
+      'titleBar.inactiveBackground': palette.raised,
+      'titleBar.inactiveForeground': palette.muted,
+      'statusBar.background': badge,
+      'statusBar.foreground': PASTEL_BADGE_TEXT,
+      'statusBar.noFolderBackground': badge,
+      'statusBar.noFolderForeground': PASTEL_BADGE_TEXT,
+      'statusBar.debuggingBackground': PASTEL_DEBUG,
+      'statusBar.debuggingForeground': PASTEL_BADGE_TEXT,
+      'editorGroupHeader.tabsBackground': palette.chrome,
+      'tab.activeBackground': palette.canvas,
+      'tab.activeForeground': palette.ink,
+      'tab.activeBorderTop': palette.accent,
+      'tab.inactiveBackground': palette.raised,
+      'tab.inactiveForeground': palette.muted,
+      'tab.hoverBackground': palette.bubble,
+      'breadcrumb.foreground': palette.muted,
+      'terminal.background': palette.canvas,
+      'terminal.foreground': palette.ink,
+      'terminalCursor.foreground': palette.accent,
+      'terminal.ansiGreen': '#157a3a',
+      'terminal.ansiCyan': '#0e7490',
+      'terminal.ansiYellow': '#8a5a08',
+      'input.background': palette.input,
+      'input.foreground': palette.ink,
+      'input.placeholderForeground': palette.muted,
+      'panel.background': panel,
+      'panel.border': palette.border,
+      'panelTitle.activeForeground': palette.accent,
+      'panelTitle.inactiveForeground': palette.muted,
+      'panelTitle.activeBorder': palette.accent,
+      'chat.requestBackground': palette.bubble,
+      'chat.requestBorder': palette.border,
+      'chat.avatarBackground': badge,
+      'chat.avatarForeground': PASTEL_BADGE_TEXT,
+      'chat.slashCommandBackground': badge,
+      'chat.slashCommandForeground': PASTEL_BADGE_TEXT,
+      'interactive.requestBackground': palette.input,
+      'interactive.requestBorder': palette.border,
+      'textCodeBlock.background': palette.raised,
+      'textLink.foreground': palette.accent,
+      'badge.background': badge,
+      'badge.foreground': PASTEL_BADGE_TEXT,
+    },
+    tokenColors: SYNTAX_SCOPE_DEFINITIONS.map((definition) => ({
+      scope: [...definition.scopes],
+      settings: {
+        foreground: syntax[definition.id],
+        ...(definition.id === 'keywords' ? { fontStyle: 'bold' } : {}),
+        ...(definition.id === 'comments' ? { fontStyle: 'italic' } : {}),
+      },
+    })),
+  };
+}
+
+const PASTEL_THEME_PRESETS: ThemePreset[] = [
+  createPastelPreset({
+    id: 'pastel-sage-garden',
+    name: '🌿 Sage Garden Pastel',
+    description: 'Soft sage chat palette with a pale leaf page, mint sidebar, leafy user bubbles, and a deeper garden green for links.',
+    ink: '#1e3324',
+    muted: '#3f5a46',
+    faint: '#4d6854',
+    accent: '#186b34',
+    canvas: '#f3faf1',
+    chrome: '#dcefd8',
+    raised: '#e7f5e3',
+    bubble: '#d3ebcc',
+    input: '#fbfdf8',
+    border: '#b7d4b0',
+    popup: '#f7fbf5',
+    selection: '#c9e4c0',
+    functions: '#0f6f86',
+    strings: '#9a5b0a',
+    types: '#5b46a8',
+    numbers: '#9a5b0a',
+  }),
+  createPastelPreset({
+    id: 'pastel-baby-blue',
+    name: '💙 Baby Blue Blush Pastel',
+    description: 'Baby-blue sidebar and user bubbles, a blush chat panel, and a rose accent for badges and the send action.',
+    ink: '#1c2c42',
+    muted: '#3e5674',
+    faint: '#4c6480',
+    accent: '#1d5fa8',
+    badge: '#b43364',
+    canvas: '#f5f9fe',
+    chrome: '#dceaf8',
+    raised: '#e7f2fc',
+    bubble: '#d3e6f8',
+    input: '#fbfdff',
+    border: '#c5d7ea',
+    popup: '#fbf6fa',
+    selection: '#d5e4f6',
+    panel: '#f8eef5',
+    functions: '#0f766e',
+    strings: '#9a5b0a',
+    types: '#7a3d8a',
+    numbers: '#a32854',
+  }),
+  createPastelPreset({
+    id: 'pastel-lilac-spark',
+    name: '💜 Lilac Spark Pastel',
+    description: 'Lavender chrome and assistant field, pink user bubbles, and a violet link color on a pale lilac page.',
+    ink: '#2a2148',
+    muted: '#56487a',
+    faint: '#645688',
+    accent: '#5b46a8',
+    badge: '#b03070',
+    canvas: '#f7f4fc',
+    chrome: '#e6dff6',
+    raised: '#efeafb',
+    bubble: '#f6d4ea',
+    input: '#fcfbfe',
+    border: '#d4c6ee',
+    popup: '#fbf8fe',
+    selection: '#e4daf6',
+    panel: '#f4effb',
+    functions: '#0f766e',
+    strings: '#9a5b0a',
+    types: '#a21caf',
+    numbers: '#a32854',
+  }),
+  createPastelPreset({
+    id: 'pastel-peach-cream',
+    name: '🍑 Peach Cream Pastel',
+    description: 'Warm peach-cream page and sidebar, apricot user bubbles, and a terracotta accent.',
+    ink: '#3a2418',
+    muted: '#7a4e38',
+    faint: '#8a5c44',
+    accent: '#a33a18',
+    canvas: '#fff7f2',
+    chrome: '#ffe6d6',
+    raised: '#ffefe6',
+    bubble: '#ffd8c2',
+    input: '#fffdfb',
+    border: '#f0cbb8',
+    popup: '#fffaf7',
+    selection: '#ffdcc8',
+    functions: '#0f766e',
+    strings: '#9a3412',
+    types: '#9d174d',
+    numbers: '#8a5a08',
+  }),
+  createPastelPreset({
+    id: 'pastel-buttercream',
+    name: '🍋 Buttercream Pastel',
+    description: 'Soft buttercream yellows with honey user bubbles and a deep gold accent.',
+    ink: '#332b12',
+    muted: '#6b5820',
+    faint: '#6b5820',
+    accent: '#7a5606',
+    canvas: '#fffbeb',
+    chrome: '#ffefc2',
+    raised: '#fff6d8',
+    bubble: '#ffe7a8',
+    input: '#fffef8',
+    border: '#ead89a',
+    popup: '#fffdf6',
+    selection: '#ffe8b0',
+    functions: '#0f766e',
+    strings: '#9a5b0a',
+    types: '#9d174d',
+    numbers: '#8a5a08',
+  }),
+  createPastelPreset({
+    id: 'pastel-seafoam-sand',
+    name: '🐚 Seafoam Sand Pastel',
+    description: 'Seafoam sidebar, a sandy user bubble, and a coral badge on a pale mint page.',
+    ink: '#16332e',
+    muted: '#3d635c',
+    faint: '#4a726a',
+    accent: '#0c675f',
+    badge: '#a33e24',
+    canvas: '#f3faf7',
+    chrome: '#d7f1e8',
+    raised: '#e5f6f1',
+    bubble: '#f6e2d0',
+    input: '#fbfefd',
+    border: '#b7ddd2',
+    popup: '#f8fbfa',
+    selection: '#d5eee6',
+    functions: '#1d5fa8',
+    strings: '#9a5b0a',
+    types: '#7a3d8a',
+    numbers: '#a33e24',
+  }),
+  createPastelPreset({
+    id: 'pastel-rose-milk',
+    name: '🌷 Rose Milk Pastel',
+    description: 'Strawberry-milk pinks with rose user bubbles and a deepened berry accent.',
+    ink: '#3a1826',
+    muted: '#7a3d56',
+    faint: '#8a4c64',
+    accent: '#a32854',
+    canvas: '#fff5f8',
+    chrome: '#ffe0ea',
+    raised: '#ffebf1',
+    bubble: '#ffd0e0',
+    input: '#fffdfd',
+    border: '#f0c0d0',
+    popup: '#fffafb',
+    selection: '#ffd6e4',
+    functions: '#0f766e',
+    strings: '#9a5b0a',
+    types: '#7e22ce',
+    numbers: '#a3330a',
+  }),
+  createPastelPreset({
+    id: 'pastel-periwinkle',
+    name: '🔷 Periwinkle Pastel',
+    description: 'Cool periwinkle page, blue-violet sidebar, and indigo links and badges.',
+    ink: '#22244a',
+    muted: '#4a4e7a',
+    faint: '#585c88',
+    accent: '#3d42b0',
+    canvas: '#f5f6ff',
+    chrome: '#e2e6ff',
+    raised: '#eceeff',
+    bubble: '#d6dcff',
+    input: '#fcfcff',
+    border: '#c8cef0',
+    popup: '#f8f8ff',
+    selection: '#d8defc',
+    functions: '#0f766e',
+    strings: '#9a5b0a',
+    types: '#7e22ce',
+    numbers: '#a32854',
+  }),
+  createPastelPreset({
+    id: 'pastel-pistachio',
+    name: '🥝 Pistachio Pastel',
+    description: 'Yellow-green pistachio cream with a leafy sidebar, bright user bubbles, and an olive accent.',
+    ink: '#243016',
+    muted: '#526438',
+    faint: '#526438',
+    accent: '#3f6b12',
+    canvas: '#f7fbea',
+    chrome: '#e4f3c4',
+    raised: '#eef7d8',
+    bubble: '#d7eeae',
+    input: '#fcfef6',
+    border: '#c6dfa0',
+    popup: '#f9fced',
+    selection: '#d4ecb0',
+    functions: '#0f766e',
+    strings: '#8a5a08',
+    types: '#5b46a8',
+    numbers: '#8a5a08',
+  }),
+  createPastelPreset({
+    id: 'pastel-cloudberry',
+    name: '🍊 Cloudberry Pastel',
+    description: 'Apricot sidebar and user bubbles over a pale sky chat panel, with a berry badge.',
+    ink: '#3a2218',
+    muted: '#7a4a34',
+    faint: '#885840',
+    accent: '#9a3412',
+    badge: '#be185d',
+    canvas: '#fff8f4',
+    chrome: '#ffe4d4',
+    raised: '#fff0e6',
+    bubble: '#ffd0bc',
+    input: '#fffdfb',
+    border: '#f0c8b4',
+    popup: '#f4f9ff',
+    selection: '#ffd8c8',
+    panel: '#eef6ff',
+    functions: '#1d5fa8',
+    strings: '#be185d',
+    types: '#7e22ce',
+    numbers: '#8a5a08',
+  }),
+  createPastelPreset({
+    id: 'pastel-slate-denim',
+    name: '👖 Slate Denim Pastel',
+    description: 'Faded chambray page, worn-denim sidebar and user bubbles, and a deep indigo accent.',
+    ink: '#1c2836',
+    muted: '#3e5166',
+    faint: '#4c6074',
+    accent: '#1a456e',
+    canvas: '#f4f7fb',
+    chrome: '#d5dee9',
+    raised: '#e4ebf3',
+    bubble: '#c9d6e6',
+    input: '#f8fafc',
+    border: '#b7c5d6',
+    popup: '#f7f9fb',
+    selection: '#c5d3e4',
+    functions: '#0f5c68',
+    strings: '#7a5228',
+    types: '#334868',
+    numbers: '#7a5228',
+  }),
+  createPastelPreset({
+    id: 'pastel-olive-drab',
+    name: '🪖 Olive Drab Pastel',
+    description: 'Field-jacket khaki and muted olive, with a drab green accent instead of a bright leaf tone.',
+    ink: '#24291c',
+    muted: '#4e5640',
+    faint: '#5c6450',
+    accent: '#3a4a1c',
+    canvas: '#f4f6ef',
+    chrome: '#dde3d0',
+    raised: '#e8eddf',
+    bubble: '#d0d8be',
+    input: '#fafbf7',
+    border: '#c3ccb0',
+    popup: '#f7f8f3',
+    selection: '#cdd6b8',
+    functions: '#1a5560',
+    strings: '#7a5424',
+    types: '#4a4030',
+    numbers: '#7a4a1c',
+  }),
+  createPastelPreset({
+    id: 'pastel-quarry-stone',
+    name: '🪨 Quarry Stone Pastel',
+    description: 'Limestone page, warm gray sidebar, stone user bubbles, and a charcoal accent.',
+    ink: '#2a2824',
+    muted: '#5a554c',
+    faint: '#686258',
+    accent: '#3e3832',
+    canvas: '#f6f5f2',
+    chrome: '#e4e1da',
+    raised: '#eeece6',
+    bubble: '#d9d4c8',
+    input: '#fbfaf8',
+    border: '#c9c4b8',
+    popup: '#f8f7f4',
+    selection: '#d4cfc3',
+    panel: '#f3f2ef',
+    functions: '#3a5558',
+    strings: '#7a5428',
+    types: '#4e4638',
+    numbers: '#6e4a28',
+  }),
+  createPastelPreset({
+    id: 'pastel-harbor-steel',
+    name: '⚓ Harbor Steel Pastel',
+    description: 'Fog-gray page, steel sidebar, tide-pool user bubbles, and a navy badge.',
+    ink: '#1a282c',
+    muted: '#3e5258',
+    faint: '#4c6168',
+    accent: '#16485a',
+    badge: '#16384a',
+    canvas: '#f3f6f7',
+    chrome: '#d5dfe3',
+    raised: '#e4ecee',
+    bubble: '#c5d4d8',
+    input: '#f8fbfb',
+    border: '#b4c4c8',
+    popup: '#f6f9f9',
+    selection: '#c3d2d6',
+    panel: '#eef3f4',
+    functions: '#1a5270',
+    strings: '#7a5c30',
+    types: '#2c4554',
+    numbers: '#7a4e28',
+  }),
+  createPastelPreset({
+    id: 'pastel-cedar-smoke',
+    name: '🪵 Cedar Smoke Pastel',
+    description: 'Ash page, weathered cedar sidebar, smoked-wood user bubbles, and a deep cedar accent.',
+    ink: '#2c241c',
+    muted: '#5e5146',
+    faint: '#6c5e52',
+    accent: '#6a3c22',
+    badge: '#5c3420',
+    canvas: '#f7f4f0',
+    chrome: '#e6ddd4',
+    raised: '#efe8e1',
+    bubble: '#ddd0c4',
+    input: '#fbf9f7',
+    border: '#cfc3b6',
+    popup: '#f8f6f3',
+    selection: '#d8ccc0',
+    panel: '#f3f1ee',
+    functions: '#3a5652',
+    strings: '#7a4e22',
+    types: '#5a4638',
+    numbers: '#6e4520',
+  }),
+];
+
+interface DarkPaletteSpec {
+  id: string;
+  name: string;
+  description: string;
+  ink: string;
+  muted: string;
+  faint: string;
+  accent: string;
+  badge: string;
+  badgeText: string;
+  canvas: string;
+  chrome: string;
+  raised: string;
+  bubble: string;
+  input: string;
+  border: string;
+  popup: string;
+  selection: string;
+  panel?: string;
+  functions: string;
+  strings: string;
+  types: string;
+  numbers: string;
+}
+
+function createDarkPreset(palette: DarkPaletteSpec): ThemePreset {
+  const panel = palette.panel || palette.canvas;
+  const syntax: Record<string, string> = {
+    keywords: palette.accent,
+    functions: palette.functions,
+    strings: palette.strings,
+    variables: palette.ink,
+    properties: palette.accent,
+    types: palette.types,
+    comments: palette.faint,
+    numbers: palette.numbers,
+    operators: palette.ink,
+    tags: palette.functions,
+  };
+
+  return {
+    id: palette.id,
+    name: palette.name,
+    description: palette.description,
+    type: 'dark',
+    accentColor: palette.badge,
+    colors: {
+      'foreground': palette.ink,
+      'descriptionForeground': palette.muted,
+      'disabledForeground': palette.faint,
+      'icon.foreground': palette.accent,
+      'focusBorder': palette.accent,
+      'editor.background': palette.canvas,
+      'editorGutter.background': palette.chrome,
+      'editor.foreground': palette.ink,
+      'editorLineNumber.foreground': palette.muted,
+      'editorLineNumber.activeForeground': palette.accent,
+      'editorCursor.foreground': palette.accent,
+      'editor.selectionBackground': palette.selection,
+      'editor.lineHighlightBackground': palette.raised,
+      'editorHoverWidget.background': palette.popup,
+      'editorHoverWidget.foreground': palette.ink,
+      'editorHoverWidget.border': palette.border,
+      'editorHoverWidget.statusBarBackground': palette.raised,
+      'editorSuggestWidget.background': palette.popup,
+      'editorSuggestWidget.foreground': palette.ink,
+      'editorSuggestWidget.border': palette.border,
+      'editorSuggestWidget.selectedBackground': palette.selection,
+      'editorSuggestWidget.selectedForeground': palette.ink,
+      'editorSuggestWidget.highlightForeground': palette.accent,
+      'editorWidget.background': palette.popup,
+      'editorWidget.foreground': palette.ink,
+      'editorWidget.border': palette.border,
+      'textBlockQuote.background': palette.raised,
+      'textBlockQuote.border': palette.accent,
+      'textLink.activeForeground': palette.accent,
+      'textPreformat.foreground': palette.ink,
+      'activityBar.background': palette.chrome,
+      'activityBar.foreground': palette.accent,
+      'activityBar.inactiveForeground': palette.faint,
+      'activityBarBadge.background': palette.badge,
+      'activityBarBadge.foreground': palette.badgeText,
+      'sideBar.background': palette.chrome,
+      'sideBar.foreground': palette.ink,
+      'sideBarTitle.foreground': palette.accent,
+      'sideBarSectionHeader.background': palette.raised,
+      'sideBarSectionHeader.foreground': palette.ink,
+      'titleBar.activeBackground': palette.chrome,
+      'titleBar.activeForeground': palette.ink,
+      'titleBar.inactiveBackground': palette.raised,
+      'titleBar.inactiveForeground': palette.muted,
+      'statusBar.background': palette.badge,
+      'statusBar.foreground': palette.badgeText,
+      'statusBar.noFolderBackground': palette.badge,
+      'statusBar.noFolderForeground': palette.badgeText,
+      'statusBar.debuggingBackground': '#7f1d1d',
+      'statusBar.debuggingForeground': '#ffffff',
+      'editorGroupHeader.tabsBackground': palette.chrome,
+      'tab.activeBackground': palette.canvas,
+      'tab.activeForeground': palette.ink,
+      'tab.activeBorderTop': palette.accent,
+      'tab.inactiveBackground': palette.raised,
+      'tab.inactiveForeground': palette.muted,
+      'tab.hoverBackground': palette.bubble,
+      'breadcrumb.foreground': palette.muted,
+      'terminal.background': palette.canvas,
+      'terminal.foreground': palette.ink,
+      'terminalCursor.foreground': palette.accent,
+      'terminal.ansiGreen': '#8fd18f',
+      'terminal.ansiCyan': '#8fd0dc',
+      'terminal.ansiYellow': '#f0c36a',
+      'input.background': palette.input,
+      'input.foreground': palette.ink,
+      'input.placeholderForeground': palette.muted,
+      'panel.background': panel,
+      'panel.border': palette.border,
+      'panelTitle.activeForeground': palette.accent,
+      'panelTitle.inactiveForeground': palette.muted,
+      'panelTitle.activeBorder': palette.accent,
+      'chat.requestBackground': palette.bubble,
+      'chat.requestBorder': palette.border,
+      'chat.avatarBackground': palette.badge,
+      'chat.avatarForeground': palette.badgeText,
+      'chat.slashCommandBackground': palette.badge,
+      'chat.slashCommandForeground': palette.badgeText,
+      'interactive.requestBackground': palette.input,
+      'interactive.requestBorder': palette.border,
+      'textCodeBlock.background': palette.raised,
+      'textLink.foreground': palette.accent,
+      'badge.background': palette.badge,
+      'badge.foreground': palette.badgeText,
+    },
+    tokenColors: SYNTAX_SCOPE_DEFINITIONS.map((definition) => ({
+      scope: [...definition.scopes],
+      settings: {
+        foreground: syntax[definition.id],
+        ...(definition.id === 'keywords' ? { fontStyle: 'bold' } : {}),
+        ...(definition.id === 'comments' ? { fontStyle: 'italic' } : {}),
+      },
+    })),
+  };
+}
+
+const COFFEE_THEME_PRESETS: ThemePreset[] = [
+  createDarkPreset({
+    id: 'coffee-tims-regular',
+    name: '☕ Tim Hortons Regular',
+    description: 'Everyday brewed coffee in the dark: a rich brown cup, cream in the type, and the red Tims accent.',
+    ink: '#f8ead9',
+    muted: '#d7b89a',
+    faint: '#c4a484',
+    accent: '#ff9a94',
+    badge: '#c8102e',
+    badgeText: '#ffffff',
+    canvas: '#2c1812',
+    chrome: '#1a0e0c',
+    raised: '#3a221a',
+    bubble: '#4a2e24',
+    input: '#241410',
+    border: '#6a4034',
+    popup: '#321c16',
+    selection: '#5a382c',
+    functions: '#f0c27a',
+    strings: '#f2d3a2',
+    types: '#ffb4a2',
+    numbers: '#f0c27a',
+  }),
+  createDarkPreset({
+    id: 'coffee-espresso',
+    name: '🖤 Espresso',
+    description: 'A near-black pull. The canvas stays almost unlit, with a thin crema-gold accent.',
+    ink: '#f6ecdf',
+    muted: '#cbb8a0',
+    faint: '#a89078',
+    accent: '#e6c27a',
+    badge: '#e6c27a',
+    badgeText: '#1a1008',
+    canvas: '#0c0908',
+    chrome: '#070504',
+    raised: '#1a120e',
+    bubble: '#241812',
+    input: '#100c0a',
+    border: '#3a2a20',
+    popup: '#16100c',
+    selection: '#3a281c',
+    functions: '#f0d7a8',
+    strings: '#e6c27a',
+    types: '#d7b08a',
+    numbers: '#f2d3a2',
+  }),
+  createDarkPreset({
+    id: 'coffee-tiramisu',
+    name: '🍰 Tiramisu',
+    description: 'Dark cocoa layers, mascarpone cream on the status bar, and ladyfinger gold for links.',
+    ink: '#f7efe6',
+    muted: '#e0cbb4',
+    faint: '#cbb49a',
+    accent: '#f0c27a',
+    badge: '#f3e4d0',
+    badgeText: '#2a1c14',
+    canvas: '#261910',
+    chrome: '#160f0c',
+    raised: '#3a281c',
+    bubble: '#4a3426',
+    input: '#1e1511',
+    border: '#6a4c38',
+    popup: '#2e211a',
+    selection: '#5a4030',
+    panel: '#2a1c16',
+    functions: '#f0c98a',
+    strings: '#f6e0b8',
+    types: '#e7c2a0',
+    numbers: '#e6b15c',
+  }),
+];
+
+const SATURATED_THEME_PRESETS: ThemePreset[] = [
+  createDarkPreset({
+    id: 'saturated-crimson',
+    name: '🔴 Crimson Saturated',
+    description: 'Semi-saturated crimson panes framed by a hot rose border, with rose-tinted text kept light enough to read.',
+    ink: '#faf5f6',
+    muted: '#dec4c9',
+    faint: '#d0b3b9',
+    accent: '#fd879f',
+    badge: '#fb375e',
+    badgeText: '#1f0a0e',
+    canvas: '#361119',
+    chrome: '#280b11',
+    raised: '#441821',
+    bubble: '#4d1a24',
+    input: '#2e0f15',
+    border: '#fb375e',
+    popup: '#3c161e',
+    selection: '#541c27',
+    panel: '#39141b',
+    functions: '#f6be8e',
+    strings: '#f9f08b',
+    types: '#94f0ba',
+    numbers: '#fc9388',
+  }),
+  createDarkPreset({
+    id: 'saturated-cobalt',
+    name: '🔵 Cobalt Saturated',
+    description: 'Semi-saturated cobalt panes inside a saturated blue border. Text stays a light blue-white.',
+    ink: '#f5f7fa',
+    muted: '#c4cfde',
+    faint: '#b3c0d0',
+    accent: '#87bafd',
+    badge: '#378cfb',
+    badgeText: '#0a131f',
+    canvas: '#112136',
+    chrome: '#0b1828',
+    raised: '#182b44',
+    bubble: '#1a304d',
+    input: '#0f1d2e',
+    border: '#378cfb',
+    popup: '#16263c',
+    selection: '#1c3454',
+    panel: '#142439',
+    functions: '#8ef6e1',
+    strings: '#f9dd8b',
+    types: '#f094c2',
+    numbers: '#8897fc',
+  }),
+  createDarkPreset({
+    id: 'saturated-emerald',
+    name: '🟢 Emerald Saturated',
+    description: 'Semi-saturated emerald panes with a bright green border and pale mint text.',
+    ink: '#f5faf8',
+    muted: '#c4ded2',
+    faint: '#b3d0c3',
+    accent: '#87fdc6',
+    badge: '#37fba0',
+    badgeText: '#0a1f15',
+    canvas: '#113625',
+    chrome: '#0b281a',
+    raised: '#18442f',
+    bubble: '#1a4d35',
+    input: '#0f2e20',
+    border: '#37fba0',
+    popup: '#163c2a',
+    selection: '#1c543a',
+    panel: '#143927',
+    functions: '#8ee4f6',
+    strings: '#f9e38b',
+    types: '#f094e0',
+    numbers: '#88fce9',
+  }),
+  createDarkPreset({
+    id: 'saturated-saffron',
+    name: '🟠 Saffron Saturated',
+    description: 'Semi-saturated saffron panes framed by a saturated gold border, with warm light text.',
+    ink: '#faf8f5',
+    muted: '#ded4c4',
+    faint: '#d0c5b3',
+    accent: '#fdce87',
+    badge: '#fbad37',
+    badgeText: '#1f160a',
+    canvas: '#362711',
+    chrome: '#281c0b',
+    raised: '#443218',
+    bubble: '#4d381a',
+    input: '#2e220f',
+    border: '#fbad37',
+    popup: '#3c2d16',
+    selection: '#543e1c',
+    panel: '#392a14',
+    functions: '#d7f68e',
+    strings: '#8bf9e3',
+    types: '#94d1f0',
+    numbers: '#fcf088',
+  }),
+  createDarkPreset({
+    id: 'saturated-violet',
+    name: '🟣 Violet Saturated',
+    description: 'Semi-saturated violet panes inside a saturated purple border, with light violet text.',
+    ink: '#f8f5fa',
+    muted: '#d4c4de',
+    faint: '#c5b3d0',
+    accent: '#ce87fd',
+    badge: '#840bd5',
+    badgeText: '#ffffff',
+    canvas: '#271136',
+    chrome: '#1c0b28',
+    raised: '#321844',
+    bubble: '#381a4d',
+    input: '#220f2e',
+    border: '#ad37fb',
+    popup: '#2d163c',
+    selection: '#3e1c54',
+    panel: '#2a1439',
+    functions: '#f68ed3',
+    strings: '#f9e78b',
+    types: '#94f0ba',
+    numbers: '#f088fc',
+  }),
+];
 
 const RAW_THEME_PRESETS: ThemePreset[] = [
   WHITE_TUXEDO_PRESET,
   SKELETON_VALLEY_PRESET,
+  ...PASTEL_THEME_PRESETS,
+  ...COFFEE_THEME_PRESETS,
+  ...SATURATED_THEME_PRESETS,
   // 🍋 Lemonade Dark
   {
     id: "lemonade-dark",
@@ -13956,13 +14788,344 @@ const RAW_THEME_PRESETS: ThemePreset[] = [
   }
 ];
 
+// ---------------------------------------------------------------------------
+// Catalog-wide contrast repair.
+// Every preset ships through repairPresetContrast so no text, icon or syntax
+// color can blend into the surface it renders on (agent chat text on the panel,
+// avatars, badges, debug status, muted labels, gutter numbers, code blocks...).
+// Repairs are minimal lightness shifts that preserve hue, saturation and alpha;
+// colors that already pass are never touched.
+// ---------------------------------------------------------------------------
+
+interface ParsedColor { r: number; g: number; b: number; a: number; }
+
+function parseHexColor(hex: string): ParsedColor | null {
+  const match = /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.exec((hex || '').trim());
+  if (!match) return null;
+  let h = match[1];
+  if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+  return {
+    r: parseInt(h.slice(0, 2), 16),
+    g: parseInt(h.slice(2, 4), 16),
+    b: parseInt(h.slice(4, 6), 16),
+    a: h.length === 8 ? parseInt(h.slice(6, 8), 16) / 255 : 1,
+  };
+}
+
+function compositeOver(fg: ParsedColor, bg: ParsedColor): ParsedColor {
+  if (fg.a >= 1) return fg;
+  return {
+    r: Math.round(fg.r * fg.a + bg.r * (1 - fg.a)),
+    g: Math.round(fg.g * fg.a + bg.g * (1 - fg.a)),
+    b: Math.round(fg.b * fg.a + bg.b * (1 - fg.a)),
+    a: 1,
+  };
+}
+
+function colorLuminance(c: ParsedColor): number {
+  const channel = (v: number) => {
+    v /= 255;
+    return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * channel(c.r) + 0.7152 * channel(c.g) + 0.0722 * channel(c.b);
+}
+
+function parsedContrast(fg: ParsedColor, bg: ParsedColor): number {
+  const opaque = compositeOver(fg, bg);
+  const l1 = colorLuminance(opaque);
+  const l2 = colorLuminance(bg);
+  return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+}
+
+function rgbToHsl(c: ParsedColor): { h: number; s: number; l: number } {
+  const r = c.r / 255, g = c.g / 255, b = c.b / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  if (max === min) return { h: 0, s: 0, l };
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  let h: number;
+  if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+  else if (max === g) h = ((b - r) / d + 2) / 6;
+  else h = ((r - g) / d + 4) / 6;
+  return { h, s, l };
+}
+
+function hslToHex(h: number, s: number, l: number, a: number): string {
+  const hue = ((h % 1) + 1) % 1;
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+  const channel = (t0: number) => {
+    let t = t0;
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  };
+  const to255 = (v: number) => Math.max(0, Math.min(255, Math.round(v * 255)));
+  const hex = (v: number) => v.toString(16).padStart(2, '0');
+  const alpha = a >= 1 ? '' : hex(Math.round(a * 255));
+  return `#${hex(to255(channel(hue + 1 / 3)))}${hex(to255(channel(hue)))}${hex(to255(channel(hue - 1 / 3)))}${alpha}`;
+}
+
+// Where each color actually renders. Core text must hit WCAG AA (4.5:1);
+// muted labels, icons and comments only need the 3:1 non-text/incidental floor.
+const REPAIR_CORE_PAIRS: ReadonlyArray<readonly [string, string]> = [
+  ['editor.foreground', 'editor.background'],
+  ['editor.foreground', 'editor.selectionBackground'],
+  ['foreground', 'panel.background'],
+  ['foreground', 'chat.requestBackground'],
+  ['foreground', 'interactive.requestBackground'],
+  ['foreground', 'textBlockQuote.background'],
+  ['foreground', 'editorWidget.background'],
+  ['foreground', 'sideBar.background'],
+  ['editorHoverWidget.foreground', 'editorHoverWidget.background'],
+  ['editorSuggestWidget.foreground', 'editorSuggestWidget.background'],
+  ['editorSuggestWidget.selectedForeground', 'editorSuggestWidget.selectedBackground'],
+  ['editorSuggestWidget.highlightForeground', 'editorSuggestWidget.selectedBackground'],
+  ['editorSuggestWidget.highlightForeground', 'editorSuggestWidget.background'],
+  ['editorWidget.foreground', 'editorWidget.background'],
+  ['activityBar.foreground', 'activityBar.background'],
+  ['activityBarBadge.foreground', 'activityBarBadge.background'],
+  ['sideBar.foreground', 'sideBar.background'],
+  ['sideBarTitle.foreground', 'sideBar.background'],
+  ['sideBarSectionHeader.foreground', 'sideBarSectionHeader.background'],
+  ['titleBar.activeForeground', 'titleBar.activeBackground'],
+  ['titleBar.inactiveForeground', 'titleBar.inactiveBackground'],
+  ['statusBar.foreground', 'statusBar.background'],
+  ['statusBar.noFolderForeground', 'statusBar.noFolderBackground'],
+  ['statusBar.debuggingForeground', 'statusBar.debuggingBackground'],
+  ['tab.activeForeground', 'tab.activeBackground'],
+  ['tab.activeForeground', 'tab.hoverBackground'],
+  ['terminal.foreground', 'terminal.background'],
+  ['terminal.ansiGreen', 'terminal.background'],
+  ['terminal.ansiCyan', 'terminal.background'],
+  ['terminal.ansiYellow', 'terminal.background'],
+  ['input.foreground', 'input.background'],
+  ['panelTitle.activeForeground', 'panel.background'],
+  ['chat.avatarForeground', 'chat.avatarBackground'],
+  ['chat.slashCommandForeground', 'chat.slashCommandBackground'],
+  ['badge.foreground', 'badge.background'],
+  ['textLink.foreground', 'editor.background'],
+  ['textLink.foreground', 'panel.background'],
+  ['textLink.foreground', 'chat.requestBackground'],
+  ['textLink.foreground', 'sideBar.background'],
+  ['textLink.foreground', 'textCodeBlock.background'],
+  ['textLink.foreground', 'editorWidget.background'],
+  ['textLink.foreground', 'editorHoverWidget.background'],
+  ['textLink.activeForeground', 'editor.background'],
+  ['textLink.activeForeground', 'panel.background'],
+  ['textLink.activeForeground', 'chat.requestBackground'],
+  ['textLink.activeForeground', 'editorWidget.background'],
+  // Inline code renders on prose surfaces, never inside fenced code blocks.
+  ['textPreformat.foreground', 'panel.background'],
+  ['textPreformat.foreground', 'chat.requestBackground'],
+  ['textPreformat.foreground', 'textBlockQuote.background'],
+  ['textPreformat.foreground', 'sideBar.background'],
+  ['textPreformat.foreground', 'editorHoverWidget.background'],
+];
+
+const REPAIR_MUTED_PAIRS: ReadonlyArray<readonly [string, string]> = [
+  ['descriptionForeground', 'sideBar.background'],
+  ['descriptionForeground', 'editor.background'],
+  ['descriptionForeground', 'panel.background'],
+  ['descriptionForeground', 'chat.requestBackground'],
+  ['descriptionForeground', 'input.background'],
+  ['descriptionForeground', 'editorWidget.background'],
+  ['descriptionForeground', 'tab.inactiveBackground'],
+  ['descriptionForeground', 'editorHoverWidget.background'],
+  ['disabledForeground', 'editor.background'],
+  ['disabledForeground', 'sideBar.background'],
+  ['editorLineNumber.foreground', 'editorGutter.background'],
+  ['editorLineNumber.activeForeground', 'editorGutter.background'],
+  ['activityBar.inactiveForeground', 'activityBar.background'],
+  ['tab.inactiveForeground', 'tab.inactiveBackground'],
+  ['tab.inactiveForeground', 'tab.hoverBackground'],
+  ['input.placeholderForeground', 'input.background'],
+  ['breadcrumb.foreground', 'editor.background'],
+  ['panelTitle.inactiveForeground', 'panel.background'],
+];
+
+// Toolbar/action icons use the global icon color on these surfaces. (The
+// status bar, activity bar and title bar paint icons with their own foreground.)
+const REPAIR_ICON_SURFACES: readonly string[] = [
+  'sideBar.background',
+  'editor.background',
+  'panel.background',
+  'editorWidget.background',
+  'editorHoverWidget.background',
+  'editorSuggestWidget.background',
+  'input.background',
+  'tab.inactiveBackground',
+  'editorGroupHeader.tabsBackground',
+  'chat.requestBackground',
+  'textCodeBlock.background',
+  'terminal.background',
+];
+
+// Small glyph surfaces read best as crisp white-or-black rather than a lifted
+// mid-tone, so failing pairs snap to whichever pure ink passes.
+const REPAIR_SNAP_KEYS: ReadonlySet<string> = new Set([
+  'chat.avatarForeground',
+  'chat.slashCommandForeground',
+  'badge.foreground',
+  'activityBarBadge.foreground',
+  'statusBar.debuggingForeground',
+]);
+
+// The two hand-tuned checkerboards keep a black editor/terminal/tabs half and a
+// light chrome/chat half. Global icons and links belong to the light half; the
+// black half paints its own icons with editor/tab foregrounds.
+const CHECKERBOARD_IDS: ReadonlySet<string> = new Set(['white-tuxedo', 'skeleton-valley']);
+const CHECKERBOARD_DARK_SURFACES: ReadonlySet<string> = new Set([
+  'editor.background',
+  'terminal.background',
+  'textCodeBlock.background',
+  'editorGroupHeader.tabsBackground',
+  'tab.inactiveBackground',
+]);
+
+function repairPresetContrast(
+  presetId: string,
+  colors: Record<string, string>,
+  tokenColors: TokenRule[]
+): { colors: Record<string, string>; tokenColors: TokenRule[] } {
+  const repaired: Record<string, string> = { ...colors };
+  const isCheckerboard = CHECKERBOARD_IDS.has(presetId);
+
+  const resolveBg = (bgKey: string): ParsedColor | null => {
+    const raw = parseHexColor(repaired[bgKey] || '');
+    if (!raw) return null;
+    if (raw.a >= 1) return raw;
+    const behind = parseHexColor(repaired['editor.background'] || '#1e1e1e') || { r: 30, g: 30, b: 30, a: 1 };
+    return compositeOver(raw, behind);
+  };
+  const pairRatio = (fgHex: string, bgKey: string): number | null => {
+    const fg = parseHexColor(fgHex || '');
+    const bg = resolveBg(bgKey);
+    if (!fg || !bg) return null;
+    return parsedContrast(fg, bg);
+  };
+
+  // Syntax first: a code block whose surface fights the editor palette falls
+  // back to the editor canvas, where the token colors were tuned to live.
+  const repairedTokens: TokenRule[] = tokenColors.map((rule) => ({
+    ...rule,
+    scope: Array.isArray(rule.scope) ? [...rule.scope] : rule.scope,
+    settings: { ...rule.settings },
+  }));
+  for (const rule of repairedTokens) {
+    const fg = rule.settings.foreground;
+    if (!fg) continue;
+    const scopes = Array.isArray(rule.scope) ? rule.scope : [rule.scope];
+    const min = scopes.some((s) => s.includes('comment')) ? 3 : 4.5;
+    const editorBg = repaired['editor.background'];
+    const blockBg = repaired['textCodeBlock.background'];
+    const editorRatio = pairRatio(fg, 'editor.background');
+    const blockRatio = blockBg ? pairRatio(fg, 'textCodeBlock.background') : null;
+    if ((editorRatio === null || editorRatio >= min) && (blockRatio === null || blockRatio >= min)) continue;
+    const shift = (candidate: string) => {
+      const er = pairRatio(candidate, 'editor.background');
+      const br = pairRatio(candidate, 'textCodeBlock.background');
+      return (er === null || er >= min) && (br === null || br >= min);
+    };
+    const lifted = minimalLightnessShift(fg, shift);
+    if (lifted) {
+      rule.settings.foreground = lifted;
+    } else if (blockBg && editorBg && blockBg !== editorBg) {
+      repaired['textCodeBlock.background'] = editorBg;
+      const retry = minimalLightnessShift(fg, (candidate) => {
+        const er = pairRatio(candidate, 'editor.background');
+        return er === null || er >= min;
+      });
+      if (retry) rule.settings.foreground = retry;
+    }
+  }
+
+  // Group surface requirements by foreground key so a shared global color
+  // (text, links, icons, muted labels) satisfies every surface it lands on.
+  const requirements = new Map<string, { bgKey: string; min: number }[]>();
+  const addRequirement = (fgKey: string, bgKey: string, min: number) => {
+    if (!repaired[fgKey] || !repaired[bgKey]) return;
+    if (isCheckerboard) {
+      if (fgKey === 'icon.foreground' && CHECKERBOARD_DARK_SURFACES.has(bgKey)) return;
+      if ((fgKey === 'textLink.foreground' || fgKey === 'textLink.activeForeground')
+        && (bgKey === 'editor.background' || bgKey === 'textCodeBlock.background')) return;
+      // Muted chrome text (descriptions, disabled labels) lives on the light
+      // half; the dark editor/tabs half paints its own foregrounds.
+      if ((fgKey === 'descriptionForeground' || fgKey === 'disabledForeground')
+        && CHECKERBOARD_DARK_SURFACES.has(bgKey)) return;
+    }
+    const list = requirements.get(fgKey) || [];
+    list.push({ bgKey, min });
+    requirements.set(fgKey, list);
+  };
+  for (const [fgKey, bgKey] of REPAIR_CORE_PAIRS) addRequirement(fgKey, bgKey, 4.5);
+  for (const [fgKey, bgKey] of REPAIR_MUTED_PAIRS) addRequirement(fgKey, bgKey, 3);
+  for (const bgKey of REPAIR_ICON_SURFACES) addRequirement('icon.foreground', bgKey, 3);
+
+  for (const [fgKey, reqs] of requirements) {
+    const current = repaired[fgKey];
+    const failing = reqs.filter(({ bgKey, min }) => {
+      const r = pairRatio(current, bgKey);
+      return r !== null && r < min;
+    });
+    if (failing.length === 0) continue;
+    if (REPAIR_SNAP_KEYS.has(fgKey) && reqs.length === 1) {
+      const { bgKey, min } = reqs[0];
+      const white = pairRatio('#ffffff', bgKey);
+      const black = pairRatio('#000000', bgKey);
+      if (white !== null && white >= min && (black === null || white >= black)) {
+        repaired[fgKey] = '#ffffff';
+        continue;
+      }
+      if (black !== null && black >= min) {
+        repaired[fgKey] = '#000000';
+        continue;
+      }
+    }
+    const lifted = minimalLightnessShift(current, (candidate) =>
+      reqs.every(({ bgKey, min }) => {
+        const r = pairRatio(candidate, bgKey);
+        return r === null || r >= min;
+      })
+    );
+    if (lifted) repaired[fgKey] = lifted;
+  }
+
+  return { colors: repaired, tokenColors: repairedTokens };
+}
+
+// Smallest lightness move (either direction, hue/saturation/alpha preserved)
+// that satisfies every requirement. Returns null when the surfaces conflict.
+function minimalLightnessShift(fgHex: string, passes: (candidate: string) => boolean): string | null {
+  const parsed = parseHexColor(fgHex);
+  if (!parsed) return null;
+  if (passes(fgHex)) return fgHex;
+  const { h, s, l } = rgbToHsl(parsed);
+  for (let step = 1; step <= 255; step++) {
+    const delta = step / 255;
+    for (const direction of [1, -1]) {
+      const lightness = Math.max(0, Math.min(1, l + direction * delta));
+      const candidate = hslToHex(h, s, lightness, parsed.a);
+      if (passes(candidate)) return candidate;
+    }
+  }
+  return null;
+}
+
 export const THEME_PRESETS: ThemePreset[] = RAW_THEME_PRESETS.map((preset) => {
   const colors = normalizeStatusBarVariants(preset.colors);
+  const withGutter = {
+    'editorGutter.background': colors['editor.background'] || '#1e1e1e',
+    ...colors,
+  };
+  const repaired = repairPresetContrast(preset.id, withGutter, preset.tokenColors);
   return {
     ...preset,
-    colors: {
-      'editorGutter.background': colors['editor.background'] || '#1e1e1e',
-      ...colors,
-    },
+    colors: repaired.colors,
+    tokenColors: repaired.tokenColors,
   };
 });

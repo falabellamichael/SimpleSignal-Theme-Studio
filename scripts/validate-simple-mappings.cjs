@@ -34,20 +34,51 @@ function readAttribute(tag, name) {
   return match?.[1];
 }
 
-function relativeLuminance(hex) {
-  const channels = hex.slice(1).match(/.{2}/g).map((value) => parseInt(value, 16) / 255);
-  const linear = channels.map((value) => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
-  return (0.2126 * linear[0]) + (0.7152 * linear[1]) + (0.0722 * linear[2]);
+function parseHexColor(hex) {
+  let h = String(hex || '').trim().replace('#', '');
+  if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+  if (h.length !== 6 && h.length !== 8) return null;
+  return {
+    r: parseInt(h.slice(0, 2), 16),
+    g: parseInt(h.slice(2, 4), 16),
+    b: parseInt(h.slice(4, 6), 16),
+    a: h.length === 8 ? parseInt(h.slice(6, 8), 16) / 255 : 1,
+  };
 }
 
-function contrastRatio(first, second) {
-  const high = Math.max(relativeLuminance(first), relativeLuminance(second));
-  const low = Math.min(relativeLuminance(first), relativeLuminance(second));
+function compositeColor(fg, bg) {
+  if (fg.a >= 1) return { ...fg, a: 1 };
+  return {
+    r: Math.round(fg.r * fg.a + bg.r * (1 - fg.a)),
+    g: Math.round(fg.g * fg.a + bg.g * (1 - fg.a)),
+    b: Math.round(fg.b * fg.a + bg.b * (1 - fg.a)),
+    a: 1,
+  };
+}
+
+function relativeLuminance(color) {
+  const linear = (value) => {
+    value /= 255;
+    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  };
+  return (0.2126 * linear(color.r)) + (0.7152 * linear(color.g)) + (0.0722 * linear(color.b));
+}
+
+// Alpha-aware WCAG contrast, matching repairPresetContrast: translucent
+// backgrounds composite over the editor canvas, foregrounds over their surface.
+function contrastRatio(first, second, backdrop) {
+  let fg = parseHexColor(first);
+  let bg = parseHexColor(second);
+  if (!fg || !bg) return 0;
+  if (bg.a < 1) bg = compositeColor(bg, parseHexColor(backdrop) || { r: 30, g: 30, b: 30, a: 1 });
+  fg = compositeColor(fg, bg);
+  const high = Math.max(relativeLuminance(fg), relativeLuminance(bg));
+  const low = Math.min(relativeLuminance(fg), relativeLuminance(bg));
   return (high + 0.05) / (low + 0.05);
 }
 
 function assertReadablePair(colors, foreground, background, label) {
-  const ratio = contrastRatio(colors[foreground], colors[background]);
+  const ratio = contrastRatio(colors[foreground], colors[background], colors['editor.background']);
   assert.ok(ratio >= 4.5, `${label} must remain WCAG AA readable; received ${ratio.toFixed(2)}:1`);
 }
 
@@ -804,16 +835,16 @@ assertUniqueIds(presets.SIMPLE_SYNTAX_DEFINITIONS, 'Simple syntax');
 assertUniqueIds(presets.THEME_PRESETS, 'Preset');
 assert.equal(uiIds.size, 84, 'Advanced UI role coverage must include the editor gutter and all status-bar variants');
 assert.equal(syntaxIds.size, 10, 'Advanced syntax role coverage must remain at 10');
-assert.equal(presets.THEME_PRESETS.length, 67, 'The bundled Studio preset catalog must remain complete');
+assert.equal(presets.THEME_PRESETS.length, 90, 'The bundled Studio preset catalog must remain complete');
 
 const whiteTuxedo = presets.THEME_PRESETS.find((preset) => preset.id === 'white-tuxedo');
 assert.ok(whiteTuxedo, 'The screenshot-inspired White Tuxedo preset must remain bundled');
 assert.equal(whiteTuxedo.type, 'light', 'White Tuxedo must provide light fallbacks for unspecified chat and webview surfaces');
-assert.equal(
-  whiteTuxedo.colors['textCodeBlock.background'],
-  whiteTuxedo.colors['chat.requestBackground'],
-  'White Tuxedo code blocks must use the adjoining charcoal chat surface instead of dropping to pure black'
-);
+assert.equal(whiteTuxedo.colors['textCodeBlock.background'], '#000000', 'White Tuxedo code blocks must match the pitch-black editor');
+assert.equal(whiteTuxedo.colors['editor.foreground'], '#ffffff', 'White Tuxedo default editor and code text must remain white');
+assert.equal(whiteTuxedo.colors['textPreformat.foreground'], '#000000', 'White Tuxedo inline code must stay readable on the light chat surfaces');
+assert.equal(whiteTuxedo.colors['panel.background'], '#ffffff', 'White Tuxedo agent chat and panel text must land on the light half of the checkerboard');
+assert.equal(whiteTuxedo.colors['icon.foreground'], '#000000', 'White Tuxedo toolbar icons must stay visible on the light chrome');
 for (const [foreground, background, label] of [
   ['foreground', 'sideBar.background', 'global webview text'],
   ['descriptionForeground', 'sideBar.background', 'muted webview text'],
@@ -866,14 +897,17 @@ for (const [key, color] of Object.entries(skeletonValley.colors)) {
     assert.notEqual(color.toLowerCase(), '#000', `Skeleton Valley ${key} must not fall back to shorthand pure black`);
   }
 }
-assert.equal(skeletonValley.colors['textCodeBlock.background'], '#f2eee3', 'Skeleton Valley formatted code blocks must use the shared bone surface');
+assert.equal(skeletonValley.colors['textCodeBlock.background'], '#171512', 'Skeleton Valley code blocks must stay on the warm off-black editor surface so the bone-white syntax remains readable');
+assert.equal(skeletonValley.colors['panel.background'], '#f2eee3', 'Skeleton Valley agent chat and panel text must land on the bone half of the checkerboard');
+assert.equal(skeletonValley.colors['editorLineNumber.foreground'], '#5f584e', 'Skeleton Valley line numbers must stay readable on the bone gutter');
+assert.equal(skeletonValley.colors['editorLineNumber.activeForeground'], '#7a4b00', 'Skeleton Valley active line number must use the readable amber accent on bone');
 for (const [foreground, background, label] of [
   ['foreground', 'sideBar.background', 'global webview text'],
   ['descriptionForeground', 'sideBar.background', 'muted webview text'],
   ['disabledForeground', 'sideBar.background', 'disabled webview text'],
-  ['foreground', 'textCodeBlock.background', 'formatted code-block text fallback'],
+  ['editor.foreground', 'textCodeBlock.background', 'formatted code-block text fallback'],
   ['editor.foreground', 'editor.background', 'editor text'],
-  ['editorLineNumber.foreground', 'editor.background', 'editor line numbers'],
+  ['editorLineNumber.foreground', 'editorGutter.background', 'gutter line numbers'],
   ['editorHoverWidget.foreground', 'editorHoverWidget.background', 'hover widget text'],
   ['editorSuggestWidget.foreground', 'editorSuggestWidget.background', 'suggestion text'],
   ['activityBar.foreground', 'activityBar.background', 'activity-bar text'],
@@ -892,6 +926,339 @@ for (const rule of skeletonValley.tokenColors) {
   const scope = Array.isArray(rule.scope) ? rule.scope[0] : rule.scope;
   const ratio = contrastRatio(rule.settings.foreground, skeletonValley.colors['editor.background']);
   assert.ok(ratio >= 4.5, `Skeleton Valley ${scope} syntax must remain readable; received ${ratio.toFixed(2)}:1`);
+}
+
+const pastelPresets = presets.THEME_PRESETS.filter((preset) => preset.id.startsWith('pastel-'));
+assert.equal(pastelPresets.length, 15, 'The pastel chat palette set must stay at 15 themes');
+assert.deepEqual(
+  pastelPresets.map((preset) => preset.id),
+  [
+    'pastel-sage-garden',
+    'pastel-baby-blue',
+    'pastel-lilac-spark',
+    'pastel-peach-cream',
+    'pastel-buttercream',
+    'pastel-seafoam-sand',
+    'pastel-rose-milk',
+    'pastel-periwinkle',
+    'pastel-pistachio',
+    'pastel-cloudberry',
+    'pastel-slate-denim',
+    'pastel-olive-drab',
+    'pastel-quarry-stone',
+    'pastel-harbor-steel',
+    'pastel-cedar-smoke',
+  ],
+  'Pastel chat palettes must keep the original set and the five muted companions'
+);
+for (const preset of pastelPresets) {
+  assert.equal(preset.type, 'light', `${preset.id} must stay a light pastel`);
+  for (const [foreground, background] of [
+    ['foreground', 'editor.background'],
+    ['foreground', 'sideBar.background'],
+    ['foreground', 'chat.requestBackground'],
+    ['foreground', 'panel.background'],
+    ['foreground', 'input.background'],
+    ['foreground', 'editorHoverWidget.background'],
+    ['foreground', 'editor.selectionBackground'],
+    ['foreground', 'textCodeBlock.background'],
+    ['editor.foreground', 'editor.background'],
+    ['editor.foreground', 'editor.selectionBackground'],
+    ['descriptionForeground', 'sideBar.background'],
+    ['descriptionForeground', 'editor.background'],
+    ['descriptionForeground', 'input.background'],
+    ['descriptionForeground', 'tab.inactiveBackground'],
+    ['descriptionForeground', 'panel.background'],
+    ['disabledForeground', 'activityBar.background'],
+    ['disabledForeground', 'editor.background'],
+    ['editorLineNumber.foreground', 'editorGutter.background'],
+    ['editorLineNumber.activeForeground', 'editorGutter.background'],
+    ['editorHoverWidget.foreground', 'editorHoverWidget.background'],
+    ['editorSuggestWidget.foreground', 'editorSuggestWidget.background'],
+    ['editorSuggestWidget.selectedForeground', 'editorSuggestWidget.selectedBackground'],
+    ['editorWidget.foreground', 'editorWidget.background'],
+    ['activityBar.foreground', 'activityBar.background'],
+    ['activityBar.inactiveForeground', 'activityBar.background'],
+    ['activityBarBadge.foreground', 'activityBarBadge.background'],
+    ['sideBar.foreground', 'sideBar.background'],
+    ['sideBarTitle.foreground', 'sideBar.background'],
+    ['sideBarSectionHeader.foreground', 'sideBarSectionHeader.background'],
+    ['titleBar.activeForeground', 'titleBar.activeBackground'],
+    ['titleBar.inactiveForeground', 'titleBar.inactiveBackground'],
+    ['statusBar.foreground', 'statusBar.background'],
+    ['statusBar.noFolderForeground', 'statusBar.noFolderBackground'],
+    ['statusBar.debuggingForeground', 'statusBar.debuggingBackground'],
+    ['tab.activeForeground', 'tab.activeBackground'],
+    ['tab.inactiveForeground', 'tab.inactiveBackground'],
+    ['terminal.foreground', 'terminal.background'],
+    ['terminal.ansiGreen', 'terminal.background'],
+    ['terminal.ansiCyan', 'terminal.background'],
+    ['terminal.ansiYellow', 'terminal.background'],
+    ['input.foreground', 'input.background'],
+    ['input.placeholderForeground', 'input.background'],
+    ['panelTitle.activeForeground', 'panel.background'],
+    ['panelTitle.inactiveForeground', 'panel.background'],
+    ['chat.avatarForeground', 'chat.avatarBackground'],
+    ['chat.slashCommandForeground', 'chat.slashCommandBackground'],
+    ['badge.foreground', 'badge.background'],
+    ['textLink.foreground', 'editor.background'],
+    ['textLink.foreground', 'panel.background'],
+    ['textLink.foreground', 'chat.requestBackground'],
+    ['textLink.foreground', 'sideBar.background'],
+  ]) {
+    assertReadablePair(preset.colors, foreground, background, `${preset.name} ${foreground} on ${background}`);
+  }
+  for (const rule of preset.tokenColors) {
+    const scope = Array.isArray(rule.scope) ? rule.scope[0] : rule.scope;
+    const ratio = contrastRatio(rule.settings.foreground, preset.colors['editor.background']);
+    assert.ok(ratio >= 4.5, `${preset.name} ${scope} syntax must remain readable; received ${ratio.toFixed(2)}:1`);
+  }
+}
+
+const coffeePresets = presets.THEME_PRESETS.filter((preset) => preset.id.startsWith('coffee-'));
+assert.deepEqual(
+  coffeePresets.map((preset) => preset.id),
+  ['coffee-tims-regular', 'coffee-espresso', 'coffee-tiramisu'],
+  'The dark coffee set must stay Tim Hortons Regular, Espresso, and Tiramisu'
+);
+for (const preset of coffeePresets) {
+  assert.equal(preset.type, 'dark', `${preset.id} must stay a dark coffee theme`);
+  for (const [foreground, background] of [
+    ['foreground', 'editor.background'],
+    ['foreground', 'sideBar.background'],
+    ['foreground', 'chat.requestBackground'],
+    ['foreground', 'panel.background'],
+    ['foreground', 'input.background'],
+    ['foreground', 'editor.selectionBackground'],
+    ['editor.foreground', 'editor.background'],
+    ['descriptionForeground', 'chat.requestBackground'],
+    ['descriptionForeground', 'editor.selectionBackground'],
+    ['disabledForeground', 'editor.background'],
+    ['editorLineNumber.foreground', 'editorGutter.background'],
+    ['editorLineNumber.activeForeground', 'editorGutter.background'],
+    ['activityBar.foreground', 'activityBar.background'],
+    ['activityBar.inactiveForeground', 'activityBar.background'],
+    ['activityBarBadge.foreground', 'activityBarBadge.background'],
+    ['sideBar.foreground', 'sideBar.background'],
+    ['sideBarTitle.foreground', 'sideBar.background'],
+    ['statusBar.foreground', 'statusBar.background'],
+    ['tab.activeForeground', 'tab.activeBackground'],
+    ['tab.inactiveForeground', 'tab.inactiveBackground'],
+    ['terminal.foreground', 'terminal.background'],
+    ['terminal.ansiGreen', 'terminal.background'],
+    ['terminal.ansiCyan', 'terminal.background'],
+    ['terminal.ansiYellow', 'terminal.background'],
+    ['input.foreground', 'input.background'],
+    ['textLink.foreground', 'editor.background'],
+    ['textLink.foreground', 'chat.requestBackground'],
+    ['textLink.foreground', 'editor.selectionBackground'],
+    ['badge.foreground', 'badge.background'],
+  ]) {
+    assertReadablePair(preset.colors, foreground, background, `${preset.name} ${foreground} on ${background}`);
+  }
+  for (const rule of preset.tokenColors) {
+    const scope = Array.isArray(rule.scope) ? rule.scope[0] : rule.scope;
+    const ratio = contrastRatio(rule.settings.foreground, preset.colors['editor.background']);
+    assert.ok(ratio >= 4.5, `${preset.name} ${scope} syntax must remain readable; received ${ratio.toFixed(2)}:1`);
+  }
+}
+
+const saturatedPresets = presets.THEME_PRESETS.filter((preset) => preset.id.startsWith('saturated-'));
+assert.deepEqual(
+  saturatedPresets.map((preset) => preset.id),
+  ['saturated-crimson', 'saturated-cobalt', 'saturated-emerald', 'saturated-saffron', 'saturated-violet'],
+  'The saturated set must stay crimson, cobalt, emerald, saffron, and violet'
+);
+for (const preset of saturatedPresets) {
+  assert.equal(preset.type, 'dark', `${preset.id} must stay a dark saturated theme`);
+  assert.notEqual(preset.colors['panel.border'], preset.colors['editor.background'], `${preset.id} borders must stay distinct from the pane`);
+  for (const [foreground, background] of [
+    ['foreground', 'editor.background'],
+    ['foreground', 'sideBar.background'],
+    ['foreground', 'chat.requestBackground'],
+    ['foreground', 'panel.background'],
+    ['foreground', 'input.background'],
+    ['foreground', 'editor.selectionBackground'],
+    ['foreground', 'editorHoverWidget.background'],
+    ['foreground', 'textCodeBlock.background'],
+    ['editor.foreground', 'editor.background'],
+    ['editor.foreground', 'editor.selectionBackground'],
+    ['descriptionForeground', 'editor.background'],
+    ['descriptionForeground', 'chat.requestBackground'],
+    ['descriptionForeground', 'editor.selectionBackground'],
+    ['descriptionForeground', 'input.background'],
+    ['disabledForeground', 'editor.background'],
+    ['disabledForeground', 'sideBar.background'],
+    ['disabledForeground', 'editor.selectionBackground'],
+    ['editorLineNumber.foreground', 'editorGutter.background'],
+    ['editorLineNumber.activeForeground', 'editorGutter.background'],
+    ['editorLineNumber.activeForeground', 'editor.selectionBackground'],
+    ['activityBar.foreground', 'activityBar.background'],
+    ['activityBar.inactiveForeground', 'activityBar.background'],
+    ['activityBarBadge.foreground', 'activityBarBadge.background'],
+    ['sideBar.foreground', 'sideBar.background'],
+    ['sideBarTitle.foreground', 'sideBar.background'],
+    ['sideBarSectionHeader.foreground', 'sideBarSectionHeader.background'],
+    ['titleBar.activeForeground', 'titleBar.activeBackground'],
+    ['titleBar.inactiveForeground', 'titleBar.inactiveBackground'],
+    ['statusBar.foreground', 'statusBar.background'],
+    ['statusBar.debuggingForeground', 'statusBar.debuggingBackground'],
+    ['tab.activeForeground', 'tab.activeBackground'],
+    ['tab.inactiveForeground', 'tab.inactiveBackground'],
+    ['terminal.foreground', 'terminal.background'],
+    ['terminal.ansiGreen', 'terminal.background'],
+    ['terminal.ansiCyan', 'terminal.background'],
+    ['terminal.ansiYellow', 'terminal.background'],
+    ['input.foreground', 'input.background'],
+    ['input.placeholderForeground', 'input.background'],
+    ['panelTitle.activeForeground', 'panel.background'],
+    ['panelTitle.inactiveForeground', 'panel.background'],
+    ['textLink.foreground', 'editor.background'],
+    ['textLink.foreground', 'panel.background'],
+    ['textLink.foreground', 'chat.requestBackground'],
+    ['textLink.foreground', 'editor.selectionBackground'],
+    ['badge.foreground', 'badge.background'],
+    ['chat.avatarForeground', 'chat.avatarBackground'],
+  ]) {
+    assertReadablePair(preset.colors, foreground, background, `${preset.name} ${foreground} on ${background}`);
+  }
+  for (const rule of preset.tokenColors) {
+    const scope = Array.isArray(rule.scope) ? rule.scope[0] : rule.scope;
+    const ratio = contrastRatio(rule.settings.foreground, preset.colors['editor.background']);
+    assert.ok(ratio >= 4.5, `${preset.name} ${scope} syntax must remain readable; received ${ratio.toFixed(2)}:1`);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Catalog-wide readability contract (mirrors repairPresetContrast in presets.ts).
+// Agent chat text is the global foreground on the panel/chat surfaces; avatars,
+// badges and debug status must pair; syntax must survive chat code blocks;
+// toolbar icons must survive every surface they land on.
+// ---------------------------------------------------------------------------
+const catalogCheckerboards = new Set(['white-tuxedo', 'skeleton-valley']);
+const catalogDarkHalf = new Set([
+  'editor.background',
+  'terminal.background',
+  'textCodeBlock.background',
+  'editorGroupHeader.tabsBackground',
+  'tab.inactiveBackground',
+]);
+const catalogCorePairs = [
+  ['editor.foreground', 'editor.background'],
+  ['editor.foreground', 'editor.selectionBackground'],
+  ['foreground', 'panel.background'],
+  ['foreground', 'chat.requestBackground'],
+  ['foreground', 'interactive.requestBackground'],
+  ['foreground', 'textBlockQuote.background'],
+  ['foreground', 'editorWidget.background'],
+  ['foreground', 'sideBar.background'],
+  ['editorHoverWidget.foreground', 'editorHoverWidget.background'],
+  ['editorSuggestWidget.foreground', 'editorSuggestWidget.background'],
+  ['editorSuggestWidget.selectedForeground', 'editorSuggestWidget.selectedBackground'],
+  ['editorSuggestWidget.highlightForeground', 'editorSuggestWidget.selectedBackground'],
+  ['editorSuggestWidget.highlightForeground', 'editorSuggestWidget.background'],
+  ['editorWidget.foreground', 'editorWidget.background'],
+  ['activityBar.foreground', 'activityBar.background'],
+  ['activityBarBadge.foreground', 'activityBarBadge.background'],
+  ['sideBar.foreground', 'sideBar.background'],
+  ['sideBarTitle.foreground', 'sideBar.background'],
+  ['sideBarSectionHeader.foreground', 'sideBarSectionHeader.background'],
+  ['titleBar.activeForeground', 'titleBar.activeBackground'],
+  ['titleBar.inactiveForeground', 'titleBar.inactiveBackground'],
+  ['statusBar.foreground', 'statusBar.background'],
+  ['statusBar.noFolderForeground', 'statusBar.noFolderBackground'],
+  ['statusBar.debuggingForeground', 'statusBar.debuggingBackground'],
+  ['tab.activeForeground', 'tab.activeBackground'],
+  ['tab.activeForeground', 'tab.hoverBackground'],
+  ['terminal.foreground', 'terminal.background'],
+  ['terminal.ansiGreen', 'terminal.background'],
+  ['terminal.ansiCyan', 'terminal.background'],
+  ['terminal.ansiYellow', 'terminal.background'],
+  ['input.foreground', 'input.background'],
+  ['panelTitle.activeForeground', 'panel.background'],
+  ['chat.avatarForeground', 'chat.avatarBackground'],
+  ['chat.slashCommandForeground', 'chat.slashCommandBackground'],
+  ['badge.foreground', 'badge.background'],
+  ['textLink.foreground', 'editor.background'],
+  ['textLink.foreground', 'panel.background'],
+  ['textLink.foreground', 'chat.requestBackground'],
+  ['textLink.foreground', 'sideBar.background'],
+  ['textLink.foreground', 'textCodeBlock.background'],
+  ['textLink.foreground', 'editorWidget.background'],
+  ['textLink.foreground', 'editorHoverWidget.background'],
+  ['textLink.activeForeground', 'editor.background'],
+  ['textLink.activeForeground', 'panel.background'],
+  ['textLink.activeForeground', 'chat.requestBackground'],
+  ['textLink.activeForeground', 'editorWidget.background'],
+  ['textPreformat.foreground', 'panel.background'],
+  ['textPreformat.foreground', 'chat.requestBackground'],
+  ['textPreformat.foreground', 'textBlockQuote.background'],
+  ['textPreformat.foreground', 'sideBar.background'],
+  ['textPreformat.foreground', 'editorHoverWidget.background'],
+];
+const catalogMutedPairs = [
+  ['descriptionForeground', 'sideBar.background'],
+  ['descriptionForeground', 'editor.background'],
+  ['descriptionForeground', 'panel.background'],
+  ['descriptionForeground', 'chat.requestBackground'],
+  ['descriptionForeground', 'input.background'],
+  ['descriptionForeground', 'editorWidget.background'],
+  ['descriptionForeground', 'tab.inactiveBackground'],
+  ['descriptionForeground', 'editorHoverWidget.background'],
+  ['disabledForeground', 'editor.background'],
+  ['disabledForeground', 'sideBar.background'],
+  ['editorLineNumber.foreground', 'editorGutter.background'],
+  ['editorLineNumber.activeForeground', 'editorGutter.background'],
+  ['activityBar.inactiveForeground', 'activityBar.background'],
+  ['tab.inactiveForeground', 'tab.inactiveBackground'],
+  ['tab.inactiveForeground', 'tab.hoverBackground'],
+  ['input.placeholderForeground', 'input.background'],
+  ['breadcrumb.foreground', 'editor.background'],
+  ['panelTitle.inactiveForeground', 'panel.background'],
+];
+const catalogIconSurfaces = [
+  'sideBar.background',
+  'editor.background',
+  'panel.background',
+  'editorWidget.background',
+  'editorHoverWidget.background',
+  'editorSuggestWidget.background',
+  'input.background',
+  'tab.inactiveBackground',
+  'editorGroupHeader.tabsBackground',
+  'chat.requestBackground',
+  'textCodeBlock.background',
+  'terminal.background',
+];
+for (const preset of presets.THEME_PRESETS) {
+  const checkerboard = catalogCheckerboards.has(preset.id);
+  for (const [foreground, background] of catalogCorePairs) {
+    if (checkerboard
+      && (foreground === 'textLink.foreground' || foreground === 'textLink.activeForeground')
+      && (background === 'editor.background' || background === 'textCodeBlock.background')) continue;
+    assertReadablePair(preset.colors, foreground, background, `${preset.name} ${foreground} on ${background}`);
+  }
+  for (const [foreground, background] of catalogMutedPairs) {
+    if (checkerboard
+      && (foreground === 'descriptionForeground' || foreground === 'disabledForeground')
+      && catalogDarkHalf.has(background)) continue;
+    const ratio = contrastRatio(preset.colors[foreground], preset.colors[background], preset.colors['editor.background']);
+    assert.ok(ratio >= 3, `${preset.name} muted ${foreground} on ${background} must stay legible; received ${ratio.toFixed(2)}:1`);
+  }
+  for (const background of catalogIconSurfaces) {
+    if (checkerboard && catalogDarkHalf.has(background)) continue;
+    const ratio = contrastRatio(preset.colors['icon.foreground'], preset.colors[background], preset.colors['editor.background']);
+    assert.ok(ratio >= 3, `${preset.name} icons on ${background} must stay visible; received ${ratio.toFixed(2)}:1`);
+  }
+  for (const rule of preset.tokenColors) {
+    const scopes = Array.isArray(rule.scope) ? rule.scope : [rule.scope];
+    const min = scopes.some((scope) => scope.includes('comment')) ? 3 : 4.5;
+    const scope = scopes[0];
+    for (const background of ['editor.background', 'textCodeBlock.background']) {
+      const ratio = contrastRatio(rule.settings.foreground, preset.colors[background], preset.colors['editor.background']);
+      assert.ok(ratio >= min, `${preset.name} ${scope} syntax on ${background} must remain readable; received ${ratio.toFixed(2)}:1`);
+    }
+  }
 }
 
 const inheritedStatusBar = presets.normalizeStatusBarVariants({

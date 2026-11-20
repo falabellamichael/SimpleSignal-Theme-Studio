@@ -6,7 +6,7 @@
     "foreground": "#333333",
     "descriptionForeground": "#717171",
     "errorForeground": "#a1260d",
-    "disabledForeground": "#a6a6a6",
+    "disabledForeground": "#8c8c8c",
     "icon.foreground": "#424242",
     "focusBorder": "#0090f1",
     "selection.background": "#add6ff",
@@ -139,7 +139,7 @@
         "constant.language"
       ],
       "settings": {
-        "foreground": "#098658"
+        "foreground": "#098256"
       }
     },
     {
@@ -161,7 +161,7 @@
         "support.type"
       ],
       "settings": {
-        "foreground": "#267f99"
+        "foreground": "#257b94"
       }
     },
     {
@@ -197,10 +197,10 @@
       "bold": true
     },
     "string": "#a31515",
-    "number": "#098658",
+    "number": "#098256",
     "function": "#795e26",
-    "class": "#267f99",
-    "type": "#267f99",
+    "class": "#257b94",
+    "type": "#257b94",
     "variable": "#001080",
     "property": "#001080"
   }

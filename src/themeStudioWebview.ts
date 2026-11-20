@@ -1745,7 +1745,7 @@ export class ThemeStudioWebview {
       <!-- Tab 3: Presets Library -->
       <div id="tab-presets" class="tab-pane" style="display: none;">
         <div class="filter-bar" style="margin-bottom: 12px;">
-          <input type="text" class="search-input" id="presetSearchInput" placeholder="🔍 Search ${THEME_PRESETS.length} presets (e.g. tiger, jellyfish, fox, frog, peacock, lemonade, gameboy)..." />
+          <input type="text" class="search-input" id="presetSearchInput" placeholder="🔍 Search ${THEME_PRESETS.length} presets (e.g. crimson, cobalt, espresso, denim, sage, lemonade)..." />
           <div class="pill-filters" style="flex-wrap: wrap; gap: 4px;">
             <span class="pill preset-pill active" data-preset-filter="all">⚡ All (${THEME_PRESETS.length})</span>
             <span class="pill preset-pill" data-preset-filter="dark">🌙 Dark (${THEME_PRESETS.filter((p) => p.type === 'dark').length})</span>
@@ -2510,6 +2510,7 @@ export class ThemeStudioWebview {
 
         document.querySelectorAll('.preset-card[data-preset-type]').forEach(card => {
           const pType = card.getAttribute('data-preset-type') || '';
+          const pId = card.getAttribute('data-preset-id') || '';
           const pName = card.getAttribute('data-preset-name') || '';
 
           let matchesFilter = true;
@@ -2522,11 +2523,11 @@ export class ThemeStudioWebview {
           } else if (filter === 'checkered') {
             matchesFilter = pName.includes('checker') || pName.includes('b&w') || pName.includes('binary') || pName.includes('carbon');
           } else if (filter === 'warm') {
-            matchesFilter = pName.includes('latte') || pName.includes('sepia') || pName.includes('amber') || pName.includes('pastry') || pName.includes('cabin') || pName.includes('sunflower') || pName.includes('sunset') || pName.includes('solarized') || pName.includes('matcha') || pName.includes('espresso') || pName.includes('walnut');
+            matchesFilter = pName.includes('latte') || pName.includes('sepia') || pName.includes('amber') || pName.includes('pastry') || pName.includes('cabin') || pName.includes('sunflower') || pName.includes('sunset') || pName.includes('solarized') || pName.includes('matcha') || pName.includes('espresso') || pName.includes('walnut') || pName.includes('hortons') || pName.includes('tiramisu') || pName.includes('coffee');
           } else if (filter === 'cyber') {
-            matchesFilter = pName.includes('cyber') || pName.includes('matrix') || pName.includes('synthwave') || pName.includes('alien') || pName.includes('void') || pName.includes('hyperion') || pName.includes('abyssal') || pName.includes('neon') || pName.includes('tokyo') || pName.includes('dracula') || pName.includes('oled') || pName.includes('lemonade');
+            matchesFilter = pId.startsWith('saturated-') || pName.includes('cyber') || pName.includes('matrix') || pName.includes('synthwave') || pName.includes('alien') || pName.includes('void') || pName.includes('hyperion') || pName.includes('abyssal') || pName.includes('neon') || pName.includes('tokyo') || pName.includes('dracula') || pName.includes('oled') || pName.includes('lemonade');
           } else if (filter === 'pastel') {
-            matchesFilter = pName.includes('sakura') || pName.includes('cotton') || pName.includes('peach') || pName.includes('lavender') || pName.includes('mint') || pName.includes('vanilla') || pName.includes('catppuccin') || pName.includes('ghost') || pName.includes('clean');
+            matchesFilter = pId.startsWith('pastel-') || pName.includes('sakura') || pName.includes('cotton') || pName.includes('peach') || pName.includes('lavender') || pName.includes('mint') || pName.includes('vanilla') || pName.includes('catppuccin') || pName.includes('ghost') || pName.includes('clean');
           } else if (filter === 'creative') {
             matchesFilter = pName.includes('gameboy') || pName.includes('lego') || pName.includes('wave') || pName.includes('halloween') || pName.includes('bauhaus') || pName.includes('python') || pName.includes('rust') || pName.includes('arcade');
           } else if (filter === 'animals') {

@@ -1,0 +1,160 @@
+import type { ThemePreset } from './types';
+
+type AtlasSyntaxRole = 'keywords' | 'functions' | 'strings' | 'variables' | 'properties'
+  | 'types' | 'comments' | 'numbers' | 'operators' | 'tags';
+
+interface AtlasPalette {
+  id: `atlas-${string}`;
+  name: string;
+  description: string;
+  type: ThemePreset['type'];
+  ink: string;
+  muted: string;
+  faint: string;
+  accent: string;
+  badge: string;
+  badgeText: string;
+  canvas: string;
+  chrome: string;
+  raised: string;
+  bubble: string;
+  input: string;
+  border: string;
+  popup: string;
+  selection: string;
+  panel: string;
+  syntax: Record<AtlasSyntaxRole, string>;
+}
+
+export const ATLAS_PALETTES: readonly AtlasPalette[] = [
+  {
+    id: 'atlas-reykjavik-aurora', name: 'Reykjavík Aurora', type: 'dark',
+    description: 'Icelandic basalt and midnight fjords under ribbons of mint aurora and violet sky.',
+    canvas: '#0d191b', chrome: '#091416', panel: '#101f22',
+    raised: '#162a2e', popup: '#193038', input: '#13262a', bubble: '#20353b', selection: '#254548',
+    ink: '#edf9f5', muted: '#b2cecb', faint: '#849e9d', border: '#728e90',
+    accent: '#80efd2', badge: '#70d7bc', badgeText: '#09231e',
+    syntax: {
+      keywords: '#86f1d5', functions: '#c8b6ff', strings: '#bfe493', variables: '#e4f1ef',
+      properties: '#9ce3ed', types: '#adc9ff', comments: '#8aa7a7', numbers: '#ffc593',
+      operators: '#baceda', tags: '#ffb9de',
+    },
+  },
+  {
+    id: 'atlas-petra-afterglow', name: 'Petra Afterglow', type: 'dark',
+    description: 'Copper light on the rose-red sandstone of Petra, Jordan, fading into plum canyon shadows.',
+    canvas: '#21161c', chrome: '#190f16', panel: '#271a20',
+    raised: '#35232a', popup: '#3a272e', input: '#2c1c23', bubble: '#412932', selection: '#51313b',
+    ink: '#fff0e4', muted: '#dcc1ba', faint: '#ac908e', border: '#ae8489',
+    accent: '#ffb79d', badge: '#f09d81', badgeText: '#31170e',
+    syntax: {
+      keywords: '#ffb7a5', functions: '#ffdda1', strings: '#c1e5a9', variables: '#ffead9',
+      properties: '#f4b9e9', types: '#a6e0dc', comments: '#b39a9d', numbers: '#dabfff',
+      operators: '#d9c8ce', tags: '#ff9fb5',
+    },
+  },
+  {
+    id: 'atlas-kyoto-maple', name: 'Kyoto Maple', type: 'dark',
+    description: 'Autumn in Kyoto, Japan: vermilion maple leaves and gold ginkgo against cedar-green shade.',
+    canvas: '#172019', chrome: '#101810', panel: '#1b251c',
+    raised: '#232f22', popup: '#2a3628', input: '#202d20', bubble: '#2f3928', selection: '#3a452c',
+    ink: '#f8f3dc', muted: '#cbcfb0', faint: '#9fa58b', border: '#7e936d',
+    accent: '#ffa58e', badge: '#ef967d', badgeText: '#2c170e',
+    syntax: {
+      keywords: '#ffa88f', functions: '#f9d687', strings: '#c7e58e', variables: '#f8efd6',
+      properties: '#b0dfcd', types: '#bcd1ff', comments: '#a5ae91', numbers: '#f3b8d5',
+      operators: '#cccfc0', tags: '#e6c0a0',
+    },
+  },
+  {
+    id: 'atlas-new-orleans-twilight', name: 'New Orleans Twilight', type: 'dark',
+    description: 'French Quarter ironwork in Louisiana, with gaslamp gold, parade violet, and jade-green trim.',
+    canvas: '#201a2b', chrome: '#171323', panel: '#261e32',
+    raised: '#2f2540', popup: '#352a47', input: '#2b2238', bubble: '#392f49', selection: '#443553',
+    ink: '#f6efff', muted: '#d1c3e0', faint: '#a59ab6', border: '#9a81aa',
+    accent: '#f5d181', badge: '#e8bf69', badgeText: '#2d1e11',
+    syntax: {
+      keywords: '#d9b9ff', functions: '#f9d88e', strings: '#a8e0b7', variables: '#f4e6ff',
+      properties: '#a9ddfa', types: '#f5b4d2', comments: '#b19fbf', numbers: '#ffbf94',
+      operators: '#cfbed9', tags: '#8fdfd2',
+    },
+  },
+  {
+    id: 'atlas-patagonia-blue-hour', name: 'Patagonia Blue Hour', type: 'dark',
+    description: 'Glacial blue and cold slate at nightfall in the southern Andes of Argentina and Chile.',
+    canvas: '#121b2a', chrome: '#0b1321', panel: '#172133',
+    raised: '#1f2d44', popup: '#23334b', input: '#1b2a40', bubble: '#293952', selection: '#2e4360',
+    ink: '#edf5ff', muted: '#b7cbe3', faint: '#8da2bc', border: '#7c97b9',
+    accent: '#a5c9ff', badge: '#8bb9fa', badgeText: '#0d213d',
+    syntax: {
+      keywords: '#abc9ff', functions: '#91eadb', strings: '#cee6a9', variables: '#e9f2ff',
+      properties: '#b3e6ff', types: '#dcc5ff', comments: '#96aac6', numbers: '#ffc6a4',
+      operators: '#bdcbdc', tags: '#ffb7cc',
+    },
+  },
+  {
+    id: 'atlas-amalfi-coast', name: 'Amalfi Coast', type: 'light',
+    description: 'Italy’s Amalfi Coast in daylight: whitewashed walls, Mediterranean blue, and lemon-gold detail.',
+    canvas: '#fffcf1', chrome: '#e8edf1', panel: '#faf6e7',
+    raised: '#eeeedb', popup: '#f1f3e7', input: '#fffdf4', bubble: '#e5edf1', selection: '#c9dfe9',
+    ink: '#213548', muted: '#4b5f6f', faint: '#5c7383', border: '#667f92',
+    accent: '#175a80', badge: '#175a80', badgeText: '#ffffff',
+    syntax: {
+      keywords: '#124f7c', functions: '#714a00', strings: '#315722', variables: '#23394c',
+      properties: '#006263', types: '#5e4085', comments: '#56666b', numbers: '#8b3b2d',
+      operators: '#485568', tags: '#7e3164',
+    },
+  },
+  {
+    id: 'atlas-chefchaouen-blue', name: 'Chefchaouen Blue', type: 'light',
+    description: 'Cobalt-painted lanes, indigo doorways, and warm terracotta from Morocco’s blue city.',
+    canvas: '#f3f7ff', chrome: '#dee7fc', panel: '#edf3ff',
+    raised: '#e2eaff', popup: '#eaf0ff', input: '#f8faff', bubble: '#dce6fd', selection: '#c9d8fa',
+    ink: '#243657', muted: '#4a5b7f', faint: '#60708f', border: '#657da7',
+    accent: '#294e9b', badge: '#294e9b', badgeText: '#ffffff',
+    syntax: {
+      keywords: '#27468e', functions: '#803d26', strings: '#305c46', variables: '#2a3d60',
+      properties: '#065773', types: '#614087', comments: '#516381', numbers: '#7b344e',
+      operators: '#465573', tags: '#6e4d19',
+    },
+  },
+  {
+    id: 'atlas-jaipur-sandstone', name: 'Jaipur Sandstone', type: 'light',
+    description: 'Rose sandstone, shaded courtyards, and marigold accents inspired by Jaipur, India.',
+    canvas: '#fff5ed', chrome: '#f2dfd5', panel: '#faece3',
+    raised: '#f3e3da', popup: '#fcf0e7', input: '#fff8f2', bubble: '#f2ded9', selection: '#eccfc4',
+    ink: '#452b2c', muted: '#6c4b50', faint: '#865f63', border: '#926c72',
+    accent: '#8c374c', badge: '#8c374c', badgeText: '#ffffff',
+    syntax: {
+      keywords: '#842e45', functions: '#6d4b08', strings: '#355826', variables: '#493030',
+      properties: '#126062', types: '#604082', comments: '#795f61', numbers: '#813b22',
+      operators: '#615052', tags: '#325175',
+    },
+  },
+  {
+    id: 'atlas-salar-de-uyuni', name: 'Salar de Uyuni', type: 'light',
+    description: 'Bolivia’s salt flats turned mirror: chalk-white salt, lilac reflections, and a distant blue horizon.',
+    canvas: '#faf9ff', chrome: '#e9e4f3', panel: '#f4f1fa',
+    raised: '#ece8f6', popup: '#f2eefb', input: '#fdfbff', bubble: '#e9e2f4', selection: '#dad0ed',
+    ink: '#382d4d', muted: '#5a4c70', faint: '#736687', border: '#817199',
+    accent: '#63448b', badge: '#63448b', badgeText: '#ffffff',
+    syntax: {
+      keywords: '#5e3689', functions: '#174c77', strings: '#305941', variables: '#3f3457',
+      properties: '#145d63', types: '#89395d', comments: '#6d627e', numbers: '#774718',
+      operators: '#574f6b', tags: '#8a382f',
+    },
+  },
+  {
+    id: 'atlas-great-barrier-reef', name: 'Great Barrier Reef', type: 'light',
+    description: 'Queensland’s shallow reef waters in sea glass, blue-green, and living coral pink.',
+    canvas: '#f2fdf9', chrome: '#d9ede7', panel: '#e9f7f3',
+    raised: '#e0f1ed', popup: '#eaf9f4', input: '#f8fffc', bubble: '#d7efe8', selection: '#bee4da',
+    ink: '#173b3b', muted: '#3c6060', faint: '#577676', border: '#5e8681',
+    accent: '#126154', badge: '#126154', badgeText: '#ffffff',
+    syntax: {
+      keywords: '#0f5b54', functions: '#87374e', strings: '#365624', variables: '#234148',
+      properties: '#13567b', types: '#644184', comments: '#506966', numbers: '#7f421a',
+      operators: '#475c63', tags: '#883c3b',
+    },
+  },
+];

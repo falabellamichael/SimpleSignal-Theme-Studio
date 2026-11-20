@@ -914,6 +914,11 @@ export class ThemeStudioWebview {
       border-color: var(--accent);
     }
 
+    .preset-pill:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
     /* Color Pickers Grid */
     .color-grid {
       display: grid;
@@ -1745,18 +1750,19 @@ export class ThemeStudioWebview {
       <!-- Tab 3: Presets Library -->
       <div id="tab-presets" class="tab-pane" style="display: none;">
         <div class="filter-bar" style="margin-bottom: 12px;">
-          <input type="text" class="search-input" id="presetSearchInput" placeholder="🔍 Search ${THEME_PRESETS.length} presets (e.g. crimson, cobalt, espresso, denim, sage, lemonade)..." />
+          <input type="text" class="search-input" id="presetSearchInput" aria-label="Search theme presets" placeholder="🔍 Search ${THEME_PRESETS.length} presets (e.g. Kyoto, Morocco, espresso)..." />
           <div class="pill-filters" style="flex-wrap: wrap; gap: 4px;">
-            <span class="pill preset-pill active" data-preset-filter="all">⚡ All (${THEME_PRESETS.length})</span>
-            <span class="pill preset-pill" data-preset-filter="dark">🌙 Dark (${THEME_PRESETS.filter((p) => p.type === 'dark').length})</span>
-            <span class="pill preset-pill" data-preset-filter="light">☀️ Light (${THEME_PRESETS.filter((p) => p.type === 'light').length})</span>
-            <span class="pill preset-pill" data-preset-filter="colorblind">👁️ Accessible & Safe</span>
-            <span class="pill preset-pill" data-preset-filter="checkered">🏁 Checkered & B&W</span>
-            <span class="pill preset-pill" data-preset-filter="warm">☕ Coffee & Warm</span>
-            <span class="pill preset-pill" data-preset-filter="cyber">⚡ Cyber & Neon</span>
-            <span class="pill preset-pill" data-preset-filter="pastel">🌸 Pastel & Soft</span>
-            <span class="pill preset-pill" data-preset-filter="creative">🎨 Creative & Retro</span>
-            <span class="pill preset-pill" data-preset-filter="animals">🐾 Animals & Wildlife</span>
+            <button type="button" class="pill preset-pill active" data-preset-filter="all" aria-pressed="true">⚡ All (${THEME_PRESETS.length})</button>
+            <button type="button" class="pill preset-pill" data-preset-filter="atlas" aria-pressed="false">🌍 Atlas (${THEME_PRESETS.filter((p) => p.id.startsWith('atlas-')).length})</button>
+            <button type="button" class="pill preset-pill" data-preset-filter="dark" aria-pressed="false">🌙 Dark (${THEME_PRESETS.filter((p) => p.type === 'dark').length})</button>
+            <button type="button" class="pill preset-pill" data-preset-filter="light" aria-pressed="false">☀️ Light (${THEME_PRESETS.filter((p) => p.type === 'light').length})</button>
+            <button type="button" class="pill preset-pill" data-preset-filter="colorblind" aria-pressed="false">👁️ Accessible & Safe</button>
+            <button type="button" class="pill preset-pill" data-preset-filter="checkered" aria-pressed="false">🏁 Checkered & B&W</button>
+            <button type="button" class="pill preset-pill" data-preset-filter="warm" aria-pressed="false">☕ Coffee & Warm</button>
+            <button type="button" class="pill preset-pill" data-preset-filter="cyber" aria-pressed="false">⚡ Cyber & Neon</button>
+            <button type="button" class="pill preset-pill" data-preset-filter="pastel" aria-pressed="false">🌸 Pastel & Soft</button>
+            <button type="button" class="pill preset-pill" data-preset-filter="creative" aria-pressed="false">🎨 Creative & Retro</button>
+            <button type="button" class="pill preset-pill" data-preset-filter="animals" aria-pressed="false">🐾 Animals & Wildlife</button>
           </div>
         </div>
         <div class="preset-grid" id="presetGrid">
@@ -2490,10 +2496,13 @@ export class ThemeStudioWebview {
       }
 
       // 8. Preset Search & Type Filter
-      document.querySelectorAll('.preset-pill').forEach(pill => {
+      const presetPills = document.querySelectorAll('.preset-pill');
+      presetPills.forEach(pill => {
         pill.addEventListener('click', function() {
-          document.querySelectorAll('.preset-pill').forEach(p => p.classList.remove('active'));
-          this.classList.add('active');
+          presetPills.forEach(p => {
+            p.classList.toggle('active', p === this);
+            p.setAttribute('aria-pressed', String(p === this));
+          });
           filterPresets();
         });
       });
@@ -2503,8 +2512,12 @@ export class ThemeStudioWebview {
         presetSearchInput.addEventListener('input', filterPresets);
       }
 
+      function foldPresetSearch(value) {
+        return value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      }
+
       function filterPresets() {
-        const query = (presetSearchInput ? presetSearchInput.value : '').toLowerCase().trim();
+        const query = foldPresetSearch(presetSearchInput ? presetSearchInput.value : '').trim();
         const activePill = document.querySelector('.preset-pill.active');
         const filter = activePill ? (activePill.getAttribute('data-preset-filter') || 'all') : 'all';
 
@@ -2518,6 +2531,8 @@ export class ThemeStudioWebview {
             matchesFilter = true;
           } else if (filter === 'dark' || filter === 'light') {
             matchesFilter = pType === filter;
+          } else if (filter === 'atlas') {
+            matchesFilter = pId.startsWith('atlas-');
           } else if (filter === 'colorblind') {
             matchesFilter = pName.includes('colorblind') || pName.includes('accessible') || pName.includes('contrast');
           } else if (filter === 'checkered') {
@@ -2534,7 +2549,7 @@ export class ThemeStudioWebview {
             matchesFilter = pName.includes('panther') || pName.includes('chameleon') || pName.includes('tiger') || pName.includes('fox') || pName.includes('orca') || pName.includes('catppuccin') || pName.includes('jellyfish') || pName.includes('poison dart') || pName.includes('peacock') || pName.includes('firefly') || pName.includes('animal') || pName.includes('wildlife');
           }
 
-          const matchesQuery = !query || pName.includes(query);
+          const matchesQuery = !query || foldPresetSearch(pName).includes(query);
 
           if (matchesFilter && matchesQuery) {
             card.style.display = 'flex';

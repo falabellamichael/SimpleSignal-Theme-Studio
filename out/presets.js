@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.THEME_PRESETS = exports.SIMPLE_SYNTAX_DEFINITIONS = exports.SIMPLE_UI_DEFINITIONS = exports.SYNTAX_SCOPE_MAP = exports.SYNTAX_SCOPE_DEFINITIONS = exports.UI_COLOR_DEFINITIONS = void 0;
 exports.normalizeStatusBarVariants = normalizeStatusBarVariants;
+const atlasPalettes_1 = require("./atlasPalettes");
 function normalizeStatusBarVariants(colors) {
     const normalized = { ...colors };
     const background = normalized['statusBar.background'];
@@ -1306,9 +1307,32 @@ const SATURATED_THEME_PRESETS = [
         numbers: '#f088fc',
     }),
 ];
+function createAtlasPreset(palette) {
+    // Reuse the full workbench mapping, then give Atlas its own restrained chrome
+    // and explicitly chosen token colors instead of the factories' shared hues.
+    const base = { ...palette, ...palette.syntax };
+    const preset = palette.type === 'light' ? createPastelPreset(base) : createDarkPreset(base);
+    return {
+        ...preset,
+        colors: {
+            ...preset.colors,
+            'icon.foreground': palette.muted,
+            'statusBar.background': palette.chrome,
+            'statusBar.foreground': palette.accent,
+            'statusBar.noFolderBackground': palette.chrome,
+            'statusBar.noFolderForeground': palette.accent,
+            'textPreformat.foreground': palette.syntax.properties,
+        },
+        tokenColors: preset.tokenColors.map((rule, index) => {
+            const role = exports.SYNTAX_SCOPE_DEFINITIONS[index].id;
+            return { ...rule, settings: { ...rule.settings, foreground: palette.syntax[role] } };
+        }),
+    };
+}
 const RAW_THEME_PRESETS = [
     WHITE_TUXEDO_PRESET,
     SKELETON_VALLEY_PRESET,
+    ...atlasPalettes_1.ATLAS_PALETTES.map(createAtlasPreset),
     ...PASTEL_THEME_PRESETS,
     ...COFFEE_THEME_PRESETS,
     ...SATURATED_THEME_PRESETS,

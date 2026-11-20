@@ -33,6 +33,20 @@ Design, customize, preview, live-apply, export, and manage your own custom theme
 
 ---
 
+## 🌍 Atlas Collection
+
+Open **SimpleTheme → Presets → Atlas (10)** to browse and apply the collection. You can also run **SimpleTheme: Load Theme Preset…** and search by name. These are Studio presets, not entries in VS Code’s standard Color Theme picker.
+
+| Dark | Palette | Light | Palette |
+| --- | --- | --- | --- |
+| Reykjavík Aurora | Basalt, mint, and violet | Amalfi Coast | Whitewash, Mediterranean blue, and lemon |
+| Petra Afterglow | Rose sandstone, copper, and plum | Chefchaouen Blue | Cobalt, indigo, and terracotta |
+| Kyoto Maple | Cedar green, vermilion, and ginkgo gold | Jaipur Sandstone | Rose sandstone and marigold |
+| New Orleans Twilight | Ironwork violet, brass, and jade | Salar de Uyuni | White salt, lilac reflections, and horizon blue |
+| Patagonia Blue Hour | Cold slate, glacial blue, and ice teal | Great Barrier Reef | Sea glass, blue-green, and coral pink |
+
+Each preset defines all 84 Studio UI roles and 10 syntax roles. Atlas checks also cover syntax on selected and current lines, fenced chat code, input hints, focus rings, and popup and chat borders.
+
 ## 🚀 Quick Start
 
 1. Open the Command Palette (**`Ctrl + Shift + P`**) and run:

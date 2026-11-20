@@ -1,4 +1,5 @@
 import { ThemePreset, UISectionColor, SyntaxScopeItem, TokenRule } from './types';
+import { ATLAS_PALETTES } from './atlasPalettes';
 
 export function normalizeStatusBarVariants(colors: Record<string, string>): Record<string, string> {
   const normalized = { ...colors };
@@ -1390,9 +1391,33 @@ const SATURATED_THEME_PRESETS: ThemePreset[] = [
   }),
 ];
 
+function createAtlasPreset(palette: (typeof ATLAS_PALETTES)[number]): ThemePreset {
+  // Reuse the full workbench mapping, then give Atlas its own restrained chrome
+  // and explicitly chosen token colors instead of the factories' shared hues.
+  const base = { ...palette, ...palette.syntax };
+  const preset = palette.type === 'light' ? createPastelPreset(base) : createDarkPreset(base);
+  return {
+    ...preset,
+    colors: {
+      ...preset.colors,
+      'icon.foreground': palette.muted,
+      'statusBar.background': palette.chrome,
+      'statusBar.foreground': palette.accent,
+      'statusBar.noFolderBackground': palette.chrome,
+      'statusBar.noFolderForeground': palette.accent,
+      'textPreformat.foreground': palette.syntax.properties,
+    },
+    tokenColors: preset.tokenColors.map((rule, index) => {
+      const role = SYNTAX_SCOPE_DEFINITIONS[index].id as keyof typeof palette.syntax;
+      return { ...rule, settings: { ...rule.settings, foreground: palette.syntax[role] } };
+    }),
+  };
+}
+
 const RAW_THEME_PRESETS: ThemePreset[] = [
   WHITE_TUXEDO_PRESET,
   SKELETON_VALLEY_PRESET,
+  ...ATLAS_PALETTES.map(createAtlasPreset),
   ...PASTEL_THEME_PRESETS,
   ...COFFEE_THEME_PRESETS,
   ...SATURATED_THEME_PRESETS,

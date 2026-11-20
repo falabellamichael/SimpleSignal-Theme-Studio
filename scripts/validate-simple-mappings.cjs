@@ -301,7 +301,7 @@ function createFakeElement(attributes = {}) {
   };
 }
 
-function createWebviewHarness(script) {
+function createWebviewHarness(script, { presetPills = [], presetCards = [] } = {}) {
   const elementsById = new Map();
   const elementsBySelector = new Map();
   const postedMessages = [];
@@ -345,11 +345,14 @@ function createWebviewHarness(script) {
       return elementsById.get(id);
     },
     querySelector(selector) {
+      if (selector === '.preset-pill.active') return presetPills.find((pill) => pill.classList.contains('active')) ?? null;
       if (selector.includes('.active')) return null;
       if (!elementsBySelector.has(selector)) elementsBySelector.set(selector, createFakeElement());
       return elementsBySelector.get(selector);
     },
     querySelectorAll(selector) {
+      if (selector === '.preset-pill') return presetPills;
+      if (selector === '.preset-card[data-preset-type]') return presetCards;
       if (selector === '.adv-color-picker') return [editorPicker];
       if (selector === '.adv-hex-input') return [editorHex];
       if (selector === '.adv-syntax-picker') return [stringPicker];
@@ -835,7 +838,69 @@ assertUniqueIds(presets.SIMPLE_SYNTAX_DEFINITIONS, 'Simple syntax');
 assertUniqueIds(presets.THEME_PRESETS, 'Preset');
 assert.equal(uiIds.size, 84, 'Advanced UI role coverage must include the editor gutter and all status-bar variants');
 assert.equal(syntaxIds.size, 10, 'Advanced syntax role coverage must remain at 10');
-assert.equal(presets.THEME_PRESETS.length, 90, 'The bundled Studio preset catalog must remain complete');
+const atlasPresets = presets.THEME_PRESETS.filter((preset) => preset.id.startsWith('atlas-'));
+assert.deepEqual(Object.fromEntries(atlasPresets.map(({ id, type }) => [id, type])), {
+  'atlas-reykjavik-aurora': 'dark',
+  'atlas-petra-afterglow': 'dark',
+  'atlas-kyoto-maple': 'dark',
+  'atlas-new-orleans-twilight': 'dark',
+  'atlas-patagonia-blue-hour': 'dark',
+  'atlas-amalfi-coast': 'light',
+  'atlas-chefchaouen-blue': 'light',
+  'atlas-jaipur-sandstone': 'light',
+  'atlas-salar-de-uyuni': 'light',
+  'atlas-great-barrier-reef': 'light',
+}, 'Atlas must ship all ten locations with their intended light or dark base');
+assert.equal(presets.THEME_PRESETS.length, 100, 'The bundled Studio preset catalog must remain complete');
+assert.equal(new Set(atlasPresets.map(({ colors }) => colors['editor.background'])).size, atlasPresets.length,
+  'Each Atlas preset must have its own editor palette');
+
+for (const { name, colors, tokenColors } of atlasPresets) {
+  const canvas = colors['editor.background'];
+  const check = (fg, bg, min, label) => {
+    const ratio = contrastRatio(fg, colors[bg], canvas);
+    assert.ok(ratio >= min, `${name} ${label} on ${bg}: ${ratio.toFixed(2)}:1 (minimum ${min}:1)`);
+  };
+  // Check the chromatic tokens in the common editor states, not just on the plain canvas.
+  assert.equal(new Set(tokenColors.map((rule) => rule.settings.foreground)).size, syntaxIds.size,
+    `${name} must give every syntax role a distinct color`);
+  for (const { scope, settings } of tokenColors) {
+    const comments = scope.includes('comment');
+    for (const bg of ['editor.background', 'editor.lineHighlightBackground', 'editor.selectionBackground', 'textCodeBlock.background']) {
+      check(settings.foreground, bg, comments && bg === 'editor.selectionBackground' ? 3 : 4.5, scope[0]);
+    }
+  }
+  // This includes plain fenced chat code, input hints, and the hover footer.
+  for (const [fg, bg] of [
+    ['textPreformat.foreground', 'textCodeBlock.background'],
+    ['input.placeholderForeground', 'input.background'],
+    ['editorHoverWidget.foreground', 'editorHoverWidget.statusBarBackground'],
+    ['descriptionForeground', 'panel.background'],
+    ['tab.inactiveForeground', 'tab.hoverBackground'],
+  ]) check(colors[fg], bg, 4.5, fg);
+  for (const [fg, bg] of [
+    ['focusBorder', 'input.background'],
+    ['focusBorder', 'editorWidget.background'],
+    ['focusBorder', 'panel.background'],
+    ['editorCursor.foreground', 'editor.selectionBackground'],
+    ['editorCursor.foreground', 'editor.lineHighlightBackground'],
+    ['terminalCursor.foreground', 'terminal.background'],
+    ['tab.activeBorderTop', 'editorGroupHeader.tabsBackground'],
+    ['panelTitle.activeBorder', 'panel.background'],
+    ['editorWidget.border', 'editorWidget.background'],
+    ['editorHoverWidget.border', 'editorHoverWidget.background'],
+    ['editorSuggestWidget.border', 'editorSuggestWidget.background'],
+    ['chat.requestBorder', 'chat.requestBackground'],
+    ['chat.requestBorder', 'panel.background'],
+    ['interactive.requestBorder', 'interactive.requestBackground'],
+    ['panel.border', 'panel.background'],
+    ['textBlockQuote.border', 'textBlockQuote.background'],
+  ]) check(colors[fg], bg, 3, fg);
+  // These subtle fills reinforce the outlined/current states without drowning out syntax.
+  check(canvas, 'editor.selectionBackground', 1.30, 'selection fill against the canvas');
+  check(canvas, 'editor.lineHighlightBackground', 1.12, 'current line fill against the canvas');
+  check(colors['editorSuggestWidget.background'], 'editorSuggestWidget.selectedBackground', 1.15, 'selected suggestion fill');
+}
 
 const whiteTuxedo = presets.THEME_PRESETS.find((preset) => preset.id === 'white-tuxedo');
 assert.ok(whiteTuxedo, 'The screenshot-inspired White Tuxedo preset must remain bundled');
@@ -1392,6 +1457,42 @@ try {
   const script = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
   assert.ok(script, 'Generated Theme Studio HTML must contain a script');
   assert.doesNotThrow(() => new Function(script), 'Generated Theme Studio script must parse');
+
+  const atlasButton = findTagByAttribute(html, 'data-preset-filter', 'atlas');
+  const allButton = findTagByAttribute(html, 'data-preset-filter', 'all');
+  assert.match(atlasButton ?? '', /^<button\b[^>]*aria-pressed="false"/, 'Atlas must be a keyboard-accessible category');
+  assert.match(allButton ?? '', /^<button\b[^>]*aria-pressed="true"/, 'All must be an accessible way to clear the Atlas category');
+  assert.match(html, /Atlas \(10\)/, 'The Atlas category must advertise all ten presets');
+  const presetPills = [allButton, atlasButton].map((tag) => createFakeElement({
+    'data-preset-filter': readAttribute(tag, 'data-preset-filter'),
+    'aria-pressed': readAttribute(tag, 'aria-pressed'),
+  }));
+  presetPills[0].classList.add('active');
+  const presetCards = [...html.matchAll(/<div class="preset-card" data-preset-id="[^"]+"[^>]*>/g)].map(([tag]) => {
+    const attributes = Object.fromEntries(['data-preset-id', 'data-preset-type', 'data-preset-name']
+      .map((key) => [key, readAttribute(tag, key)]));
+    assert.ok(html.includes(`loadPreset('${attributes['data-preset-id']}')`), 'Every preset card must have an apply action');
+    return createFakeElement(attributes);
+  });
+  assert.equal(presetCards.length, presets.THEME_PRESETS.length, 'Every bundled preset must appear in the Studio');
+  const presetHarness = createWebviewHarness(script, { presetPills, presetCards });
+  const visiblePresetIds = () => presetCards.filter((card) => card.style.display !== 'none')
+    .map((card) => card.getAttribute('data-preset-id')).sort();
+  presetPills[1].dispatch('click');
+  assert.equal(presetPills[1].getAttribute('aria-pressed'), 'true', 'Atlas must announce its selected state');
+  assert.equal(presetPills[0].getAttribute('aria-pressed'), 'false', 'Atlas must replace the previous category');
+  assert.deepEqual(visiblePresetIds(), atlasPresets.map(({ id }) => id).sort(), 'Atlas must show exactly its ten presets');
+  const presetSearch = presetHarness.document.getElementById('presetSearchInput');
+  presetSearch.value = 'reykjavik';
+  presetSearch.dispatch('input');
+  assert.deepEqual(visiblePresetIds(), ['atlas-reykjavik-aurora'], 'Unaccented location search must work inside Atlas');
+  presetSearch.value = 'Morocco';
+  presetSearch.dispatch('input');
+  assert.deepEqual(visiblePresetIds(), ['atlas-chefchaouen-blue'], 'Atlas must be searchable by country as well as display name');
+  presetSearch.value = '';
+  presetPills[0].dispatch('click');
+  assert.equal(visiblePresetIds().length, presets.THEME_PRESETS.length, 'Clearing Atlas must restore the full preset grid');
+
   assert.ok(html.includes('Foundations'), 'Generated Theme Studio must render UI sections');
   assert.ok(html.includes('Mixed'), 'Generated Theme Studio must explain mixed linked colors');
   assert.ok(html.includes(`All UI (${uiIds.size})`), 'Preview must expose its complete UI role gallery');
